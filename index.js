@@ -11,6 +11,7 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
 // Connect to SQLite database
 let db = new sqlite3.Database('MyWebData.db', (err) => {
   if (err) {
@@ -27,12 +28,12 @@ app.set('view engine', 'ejs');
 
 
 // routing path
-app.get('/', function (req, res) {
-  res.render('home');
+app.get('/admin', function (req, res) {
+  res.render('admin');
 });
 
 //test
-app.get('/login', function (req, res) {
+app.get('/', function (req, res) {
   // res.render('login');
   res.render('login', { shake: false });
   // res.render('login', { errorMessage: null });
@@ -40,25 +41,25 @@ app.get('/login', function (req, res) {
 
 app.post('/loginAction', function (req, res) {
   let formdata = {
-      id: req.body.id,
+      username: req.body.id,
       password: req.body.password,
   };
   console.log(formdata);
-  let sql = `SELECT * FROM Users WHERE username = ? AND password = ?`;
-  db.get(sql, [formdata.id, formdata.password], (err, row) => {
+  let sql = `SELECT * FROM Users WHERE username = ${formdata.username} OR email = ${formdata.username} AND password = ${formdata.password}`;
+  db.get(sql, (err, row) => {
       if (err) {
           return console.error('Error checking data:', err.message);
       }
       console.log(row);
       if (row) {
-          if (row.role_id === 2) {
+          if (row.role_id === 1) {
               console.log('login successful');
               // Redirect to user page or home
               res.redirect('/user');
-          } else if (row.role_id === 1) {
+          } else if (row.role_id === 2) {
               console.log('login successful');
               // Redirect to admin page
-              res.redirect('/');
+              res.redirect('/admin');
           }
       }
       else{

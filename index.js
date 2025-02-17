@@ -38,7 +38,7 @@ app.get('/login', function (req, res) {
   // res.render('login', { errorMessage: null });
 });
 
-app.post('/loginAction', function (req, res) {
+app.post('/Home', function (req, res) {
   let formdata = {
     id: req.body.id,
     password: req.body.password,
@@ -54,11 +54,11 @@ app.post('/loginAction', function (req, res) {
       if (row.role_id === 2) {
         console.log('login successful');
         // Redirect to user page or home
-        res.redirect('/user');
+        res.render('user');
       } else if (row.role_id === 1) {
         console.log('login successful');
         // Redirect to admin page
-        res.redirect('/admin');
+        res.render('admin');
       }
     }
     else {

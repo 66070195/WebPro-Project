@@ -59,7 +59,7 @@ app.post('/loginAction', function (req, res) {
         console.log('login successful');
         // Redirect to admin page
         res.redirect('/');
-      } z
+      }
     }
     else {
       res.render('login', { shake: true });

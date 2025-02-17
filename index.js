@@ -58,7 +58,7 @@ app.post('/loginAction', function (req, res) {
       } else if (row.role_id === 1) {
         console.log('login successful');
         // Redirect to admin page
-        res.redirect('/');
+        res.redirect('/admin');
       }
     }
     else {

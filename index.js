@@ -33,7 +33,8 @@ app.get('/', function (req, res) {
 
 //test
 app.get('/login', function (req, res) {
-  res.render('login');
+  // res.render('login');
+  res.render('login', { shake: false });
   // res.render('login', { errorMessage: null });
 });
 
@@ -50,15 +51,18 @@ app.post('/loginAction', function (req, res) {
       }
       console.log(row);
       if (row) {
-          if (row.role_id === 1) {
+          if (row.role_id === 2) {
               console.log('login successful');
               // Redirect to user page or home
-              res.redirect('/');
-          } else if (row.role_id === 2) {
+              res.redirect('/user');
+          } else if (row.role_id === 1) {
               console.log('login successful');
               // Redirect to admin page
-              res.redirect('/admin');
+              res.redirect('/');
           }
+      }
+      else{
+        res.render('login', { shake: true });
       }
   });
 });

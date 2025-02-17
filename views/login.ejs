@@ -148,37 +148,54 @@
 
         @keyframes shake {
             0% {
-                transform: translateX(0);
+                transform: translate(0, 0);
+                box-shadow: 0 0 10px 3px rgba(255, 0, 0, 0.5);
             }
 
             25% {
-                transform: translateX(-10px);
+                transform: translate(-5px, -5px);
+                box-shadow: 0 0 10px 3px rgba(255, 0, 0, 0.5);
             }
 
             50% {
-                transform: translateX(10px);
+                transform: translate(5px, 5px);
+                box-shadow: 0 0 10px 3px rgba(255, 0, 0, 0.5);
             }
 
             75% {
-                transform: translateX(-10px);
+                transform: translate(-5px, -5px);
+                box-shadow: 0 0 10px 3px rgba(255, 0, 0, 0.5);
             }
 
             100% {
-                transform: translateX(0);
+                transform: translate(5px, 5px);
+                box-shadow: 0 0 10px 3px rgba(255, 0, 0, 0.5);
             }
         }
 
+
         .shake {
-            animation: shake 0.5s ease-in-out;
+            animation: shake 0.5s ease-in-out 10;
+            animation-iteration-count: 2;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
         }
+        .invalid {
+    visibility: hidden;
+    opacity: 0;
+    color: red;
+}
+
+.invalid.show {
+    visibility: visible;
+    opacity: 1;
+}
     </style>
 </head>
 
 <body>
     <form action="/loginAction" method="POST">
-
-
-        <div class="container">
+        <div class="container <%= shake ? 'shake' : '' %>">
             <img src="/img/login.png" alt="login" id="loginImg">
             <div>
                 <label for="id"> ชื่อผู้ใช้งาน : </label>
@@ -189,14 +206,13 @@
                 <input type="password" id="password" name="password">
                 <span class="toggle-password" onclick="togglePassword()"><img src="/img/hide.png" id="switch"></span>
             </div>
+            <p class="<%= shake ? 'invalid show' : 'invalid' %>">Username or password is incorrect</p>
             <div>
                 <button type="submit">เข้าสู่ระบบ</button>
             </div>
+            
         </div>
     </form>
-    
-    
-    
     <script>
         function togglePassword() {
             let passwordInput = document.getElementById("password");
@@ -212,7 +228,7 @@
             }
         }
 
-        
+
     </script>
 </body>
 

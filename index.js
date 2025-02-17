@@ -28,9 +28,7 @@ app.set('view engine', 'ejs');
 
 
 // routing path
-app.get('/admin', function (req, res) {
-  res.render('admin');
-});
+
 
 //test
 app.get('/', function (req, res) {
@@ -45,21 +43,21 @@ app.post('/loginAction', function (req, res) {
       password: req.body.password,
   };
   console.log(formdata);
-  let sql = `SELECT * FROM Users WHERE username = ${formdata.username} OR email = ${formdata.username} AND password = ${formdata.password}`;
+  let sql = `SELECT * FROM Users WHERE username = '${formdata.username}' OR email = '${formdata.username}' AND password = '${formdata.password}'`;
   db.get(sql, (err, row) => {
       if (err) {
           return console.error('Error checking data:', err.message);
       }
       console.log(row);
       if (row) {
-          if (row.role_id === 1) {
+          if (row.role === 1) {
               console.log('login successful');
               // Redirect to user page or home
-              res.redirect('/user');
-          } else if (row.role_id === 2) {
+              res.render('tenant');
+          } else if (row.role === 2) {
               console.log('login successful');
               // Redirect to admin page
-              res.redirect('/admin');
+              res.render('admin');
           }
       }
       else{

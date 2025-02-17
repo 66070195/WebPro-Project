@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+        rel="stylesheet">
+    <title>Login</title>
+    <style>
+        form,
+        body {
+            font-family: "K2D", serif;
+            background-color: rgb(219, 226, 239);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            box-shadow: 1px 5px 20px rgba(0, 0, 0, 0.3);
+            background-color: rgb(242, 242, 242);
+            border-radius: 12px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 514px;
+            min-height: 422px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .container div {
+            display: flex;
+            align-items: center;
+            margin: 10px;
+            position: relative;
+        }
+
+        label {
+            width: 170px;
+            text-align: left;
+            font-size: 20px;
+        }
+
+        input {
+            width: 100%;
+            max-width: 300px;
+            height: 28px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: all 0.5s ease;
+            padding-left: 10px;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        input:focus {
+            box-shadow: 0 0 10px rgba(15, 15, 15, 0.7);
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 13px;
+            transform: translateY(-40%);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            transform-origin: center top;
+        }
+
+
+        #loginImg {
+            width: 90px;
+            height: 90px;
+            margin-bottom: 40px;
+        }
+
+        #switch {
+            transition: transform 0.3s ease;
+            width: 25px;
+            height: 25px;
+        }
+
+        button {
+            font-size: 24px;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 15px;
+            }
+
+            label {
+                font-size: 18px;
+            }
+
+            input {
+                width: 100%;
+                max-width: 250px;
+                font-size: 16px;
+                padding: 10px;
+            }
+
+
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+
+            input {
+                width: 100%;
+                max-width: 220px;
+            }
+
+            button {
+                font-size: 18px;
+            }
+
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            50% {
+                transform: translateX(10px);
+            }
+
+            75% {
+                transform: translateX(-10px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="/loginAction" method="POST">
+
+
+        <div class="container">
+            <img src="/img/login.png" alt="login" id="loginImg">
+            <div>
+                <label for="id"> ชื่อผู้ใช้งาน : </label>
+                <input type="text" id="id" name="id">
+            </div>
+            <div>
+                <label for="password"> รหัสผ่าน : </label>
+                <input type="password" id="password" name="password">
+                <span class="toggle-password" onclick="togglePassword()"><img src="/img/hide.png" id="switch"></span>
+            </div>
+            <div>
+                <button type="submit">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </form>
+    
+    
+    
+    <script>
+        function togglePassword() {
+            let passwordInput = document.getElementById("password");
+            let switchImg = document.getElementById("switch");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                switchImg.src = '/img/view.png';
+                switchImg.style.transform = "rotate(180deg)";
+            } else {
+                passwordInput.type = "password";
+                switchImg.src = '/img/hide.png';
+                switchImg.style.transform = "rotate(0deg)";
+            }
+        }
+
+        
+    </script>
+</body>
+
+</html>

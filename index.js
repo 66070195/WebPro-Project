@@ -40,30 +40,30 @@ app.get('/login', function (req, res) {
 
 app.post('/loginAction', function (req, res) {
   let formdata = {
-      id: req.body.id,
-      password: req.body.password,
+    id: req.body.id,
+    password: req.body.password,
   };
   console.log(formdata);
   let sql = `SELECT * FROM Users WHERE username = ? AND password = ?`;
   db.get(sql, [formdata.id, formdata.password], (err, row) => {
-      if (err) {
-          return console.error('Error checking data:', err.message);
-      }
-      console.log(row);
-      if (row) {
-          if (row.role_id === 2) {
-              console.log('login successful');
-              // Redirect to user page or home
-              res.redirect('/user');
-          } else if (row.role_id === 1) {
-              console.log('login successful');
-              // Redirect to admin page
-              res.redirect('/');
-          }z
-      }
-      else{
-        res.render('login', { shake: true });
-      }
+    if (err) {
+      return console.error('Error checking data:', err.message);
+    }
+    console.log(row);
+    if (row) {
+      if (row.role_id === 2) {
+        console.log('login successful');
+        // Redirect to user page or home
+        res.redirect('/user');
+      } else if (row.role_id === 1) {
+        console.log('login successful');
+        // Redirect to admin page
+        res.redirect('/');
+      } z
+    }
+    else {
+      res.render('login', { shake: true });
+    }
   });
 });
 

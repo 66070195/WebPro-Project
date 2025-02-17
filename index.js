@@ -27,8 +27,8 @@ app.set('view engine', 'ejs');
 
 
 // routing path
-app.get('/', function (req, res) {
-  res.render('home');
+app.get(['/','/admin'], function (req, res) {
+  res.render('admin');
 });
 
 //test

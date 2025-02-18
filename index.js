@@ -34,32 +34,32 @@ app.get('/login', function (req, res) {
   // res.render('login', { errorMessage: null });
 });
 
-app.post('/loginAction', function (req, res) {
+app.post('/Home', function (req, res) {
   let formdata = {
     id: req.body.id,
     password: req.body.password,
   };
   console.log(formdata);
-  let sql = `SELECT * FROM Users WHERE username = ${formdata.username} OR email = ${formdata.username} AND password = ${formdata.password}`;
-  db.get(sql, (err, row) => {
-      if (err) {
-          return console.error('Error checking data:', err.message);
+  let sql = `SELECT * FROM Users WHERE username = ? AND password = ?`;
+  db.get(sql, [formdata.id, formdata.password], (err, row) => {
+    if (err) {
+      return console.error('Error checking data:', err.message);
+    }
+    console.log(row);
+    if (row) {
+      if (row.role_id === 2) {
+        console.log('login successful');
+        // Redirect to user page or home
+        res.redirect('/user');
+      } else if (row.role_id === 1) {
+        console.log('login successful');
+        // Redirect to admin page
+        res.redirect('/admin');
       }
-      console.log(row);
-      if (row) {
-          if (row.role_id === 1) {
-              console.log('login successful');
-              // Redirect to user page or home
-              res.redirect('/user');
-          } else if (row.role_id === 2) {
-              console.log('login successful');
-              // Redirect to admin page
-              res.redirect('/admin');
-          }
-      }
-      else{
-        res.render('login', { shake: true });
-      }
+    }
+    else {
+      res.render('login', { shake: true });
+    }
   });
 });
 

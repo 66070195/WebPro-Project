@@ -28,7 +28,7 @@ app.set('view engine', 'ejs');
 
 // routing path
 //test
-app.get('/login', function (req, res) {
+app.get('/', function (req, res) {
   // res.render('login');
   res.render('login', { shake: false });
   // res.render('login', { errorMessage: null });
@@ -40,8 +40,8 @@ app.post('/Home', function (req, res) {
     password: req.body.password,
   };
   console.log(formdata);
-  let sql = `SELECT * FROM Users WHERE username = ? AND password = ?`;
-  db.get(sql, [formdata.id, formdata.password], (err, row) => {
+  let sql = `SELECT * FROM Users WHERE username = ${formdata.id} OR  AND password = ${formdata.password}`;
+  db.get(sql, (err, row) => {
     if (err) {
       return console.error('Error checking data:', err.message);
     }
@@ -50,11 +50,11 @@ app.post('/Home', function (req, res) {
       if (row.role_id === 2) {
         console.log('login successful');
         // Redirect to user page or home
-        res.redirect('/user');
+        res.render('user');
       } else if (row.role_id === 1) {
         console.log('login successful');
         // Redirect to admin page
-        res.redirect('/admin');
+        res.render('admin');
       }
     }
     else {

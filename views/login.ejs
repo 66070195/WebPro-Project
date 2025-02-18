@@ -176,20 +176,21 @@
 
         .shake {
             animation: shake 0.5s ease-in-out 10;
-            animation-iteration-count: 2;
+            animation-iteration-count: 1;
             animation-duration: 0.5s;
             animation-fill-mode: forwards;
         }
-        .invalid {
-    visibility: hidden;
-    opacity: 0;
-    color: red;
-}
 
-.invalid.show {
-    visibility: visible;
-    opacity: 1;
-}
+        .invalid {
+            visibility: hidden;
+            opacity: 0;
+            color: red;
+        }
+
+        .invalid.show {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -210,7 +211,7 @@
             <div>
                 <button type="submit">เข้าสู่ระบบ</button>
             </div>
-            
+
         </div>
     </form>
     <script>

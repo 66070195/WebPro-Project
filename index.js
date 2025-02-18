@@ -40,7 +40,7 @@ app.post('/Home', function (req, res) {
     password: req.body.password,
   };
   console.log(formdata);
-  let sql = `SELECT * FROM Users WHERE username = ${formdata.id} OR email = ${formdata.id} AND password = ${formdata.password}`;
+  let sql = `SELECT * FROM Users WHERE username = '${formdata.id}' OR email = '${formdata.id}' AND password = '${formdata.password}'`;
   db.get(sql, (err, row) => {
     if (err) {
       return console.error('Error checking data:', err.message);

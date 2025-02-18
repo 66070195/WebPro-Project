@@ -27,10 +27,6 @@ app.set('view engine', 'ejs');
 
 
 // routing path
-app.get('/admin', function (req, res) {
-  res.render('admin');
-});
-
 //test
 app.get('/login', function (req, res) {
   // res.render('login');

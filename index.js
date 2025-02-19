@@ -1,4 +1,5 @@
 const express = require("express");
+const expressLayouts = require('express-ejs-layouts')
 const path = require("path");
 const port = 3000;
 const sqlite3 = require('sqlite3').verbose();
@@ -23,6 +24,8 @@ let db = new sqlite3.Database('MyWebData.db', (err) => {
 // static resourse & templating engine
 app.use(express.static('public'));
 // Set EJS as templating engine
+app.use(expressLayouts)
+app.set('layout', './layouts/index')
 app.set('view engine', 'ejs');
 
 
@@ -37,6 +40,10 @@ app.get('/', function (req, res) {
     formdata: nullForm
   });
   // res.render('login', { errorMessage: null });
+});
+
+app.get('/manageuser', (req, res) => {
+  res.render('manageuser')
 });
 
 //Action

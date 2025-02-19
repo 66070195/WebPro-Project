@@ -47,16 +47,18 @@ app.post('/Home', function (req, res) {
       return console.error('Error checking data:', err.message);
     }
     console.log(row);
-    if (row.password === formdata.password) {
-      if (row.role === 2) {
-        console.log('login successful');
-        // Redirect to user page or home
-        res.render('tenant');
-      } else if (row.role === 1) {
-        console.log('login successful');
-        // Redirect to admin page
-        res.render('admin');
-      }
+    if(row){
+      if (row.password === formdata.password) {
+        if (row.role === 2) {
+          console.log('login successful');
+          // Redirect to user page or home
+          res.render('tenant');
+        } else if (row.role === 1) {
+          console.log('login successful');
+          // Redirect to admin page
+          res.render('admin');
+        }
+    }
     }
     else {
       res.render('login', { shake: true });

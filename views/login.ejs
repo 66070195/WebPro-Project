@@ -30,8 +30,8 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-width: 514px;
-            min-height: 422px;
+            max-width: 401px;
+            min-height: 528px;
             display: flex;
             flex-direction: column;
             padding: 20px;
@@ -69,17 +69,22 @@
         .toggle-password {
             position: absolute;
             top: 50%;
-            right: 13px;
+            right: 2%;
             transform: translateY(-40%);
             cursor: pointer;
             transition: transform 0.3s ease;
             transform-origin: center top;
         }
 
-
         #loginImg {
             width: 90px;
             height: 90px;
+            margin-bottom: 40px;
+        }
+
+        #logoImg {
+            max-width: 190px;
+            width: 100%;
             margin-bottom: 40px;
         }
 
@@ -109,41 +114,36 @@
             transform: scale(0.98);
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 355px) {
             .container {
-                width: 100%;
-                padding: 15px;
+                display: grid;
             }
 
-            label {
-                font-size: 18px;
+            #logoImg {
+                justify-content: center;
+                place-self: center;
+            }
+
+            .container div {
+                display: block;
             }
 
             input {
                 width: 100%;
-                max-width: 250px;
-                font-size: 16px;
-                padding: 10px;
-            }
-
-
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                width: 95%;
-                padding: 10px;
-            }
-
-            input {
-                width: 100%;
-                max-width: 220px;
             }
 
             button {
                 font-size: 18px;
             }
 
+            .toggle-password {
+                bottom: 50px;
+            }
+
+            p {
+                font-size: 15px;
+                margin: 0;
+            }
         }
 
         @keyframes shake {
@@ -173,7 +173,6 @@
             }
         }
 
-
         .shake {
             animation: shake 0.5s ease-in-out 10;
             animation-iteration-count: 1;
@@ -185,6 +184,7 @@
             visibility: hidden;
             opacity: 0;
             color: red;
+            text-align: center;
         }
 
         .invalid.show {
@@ -197,7 +197,8 @@
 <body>
     <form action="/Home" method="POST">
         <div class="container <%= shake ? 'shake' : '' %>">
-            <img src="/img/login.png" alt="login" id="loginImg">
+            <img src="/img/LOGO.png" alt="login" id="logoImg">
+            <!-- <img src="/img/login.png" alt="login" id="loginImg"> -->
             <div>
                 <label for="id"> ชื่อผู้ใช้งาน : </label>
                 <input type="text" id="id" name="id">
@@ -228,8 +229,6 @@
                 switchImg.style.transform = "rotate(0deg)";
             }
         }
-
-
     </script>
 </body>
 

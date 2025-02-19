@@ -28,8 +28,14 @@ app.set('view engine', 'ejs');
 
 // routing path
 app.get('/', function (req, res) {
+  let nullForm = {
+    id: '',
+    password: ''
+  };
   // res.render('login');
-  res.render('login', { shake: false });
+  res.render('login', { shake: false,
+    formdata: nullForm
+  });
   // res.render('login', { errorMessage: null });
 });
 
@@ -41,7 +47,8 @@ app.post('/Home', function (req, res) {
   };
   console.log(formdata);
   let sql = `SELECT * FROM users 
-  WHERE username = '${formdata.id}' OR email = '${formdata.id}'`;
+  WHERE (username = '${formdata.id}' OR email = '${formdata.id}') 
+  AND password = '${formdata.password}'`;
   db.get(sql, (err, row) => {
     if (err) {
       return console.error('Error checking data:', err.message);
@@ -61,7 +68,10 @@ app.post('/Home', function (req, res) {
     }
     }
     else {
-      res.render('login', { shake: true });
+      // res.render('login', { shake: true});
+      res.render('login', { shake: true, formdata: formdata });
+
+
     }
   });
 });

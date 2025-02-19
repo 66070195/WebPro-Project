@@ -197,15 +197,15 @@
 <body>
     <form action="/Home" method="POST">
         <div class="container <%= shake ? 'shake' : '' %>">
-            <img src="/img/LOGO.png" alt="login" id="logoImg">
+            <img src="/img/LOGO.png" alt="login" id="logoImg" >
             <!-- <img src="/img/login.png" alt="login" id="loginImg"> -->
             <div>
                 <label for="id"> ชื่อผู้ใช้งาน : </label>
-                <input type="text" id="id" name="id">
+                <input type="text" id="id" name="id" value="<%= formdata.id %>" required>
             </div>
             <div>
                 <label for="password"> รหัสผ่าน : </label>
-                <input type="password" id="password" name="password">
+                <input type="password" id="password" name="password" required>
                 <span class="toggle-password" onclick="togglePassword()"><img src="/img/hide.png" id="switch"></span>
             </div>
             <p class="<%= shake ? 'invalid show' : 'invalid' %>">Username or password is incorrect</p>

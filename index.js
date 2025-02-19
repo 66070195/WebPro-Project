@@ -27,31 +27,32 @@ app.set('view engine', 'ejs');
 
 
 // routing path
-//test
 app.get('/', function (req, res) {
   // res.render('login');
   res.render('login', { shake: false });
   // res.render('login', { errorMessage: null });
 });
 
+//Action
 app.post('/Home', function (req, res) {
   let formdata = {
     id: req.body.id,
     password: req.body.password,
   };
   console.log(formdata);
-  let sql = `SELECT * FROM Users WHERE username = '${formdata.id}' OR email = '${formdata.id}' AND password = '${formdata.password}'`;
+  let sql = `SELECT * FROM users 
+  WHERE username = '${formdata.id}' OR email = '${formdata.id}'`;
   db.get(sql, (err, row) => {
     if (err) {
       return console.error('Error checking data:', err.message);
     }
     console.log(row);
-    if (row) {
-      if (row.role_id === 2) {
+    if (row.password === formdata.password) {
+      if (row.role === 2) {
         console.log('login successful');
         // Redirect to user page or home
-        res.render('user');
-      } else if (row.role_id === 1) {
+        res.render('tenant');
+      } else if (row.role === 1) {
         console.log('login successful');
         // Redirect to admin page
         res.render('admin');

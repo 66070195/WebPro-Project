@@ -35,16 +35,17 @@ app.get('/', function (req, res) {
     id: '',
     password: ''
   };
-  // res.render('login', { shake: false,
-  //   formdata: nullForm
-  // });
-  
   res.render('login', { layout: false, shake: false, formdata: nullForm });
 });
+
 
 app.get('/manageuser', (req, res) => {
   res.render('manageuser')
 });
+app.get("/graph", (req, res) => {
+  res.render("graph");
+});
+
 
 //Action
 app.post('/Home', function (req, res) {

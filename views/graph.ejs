@@ -1,0 +1,69 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="card shadowing">
+    <div class="mx-4 my-3">
+        <h4 class="card-title">สรุปรายงานทั่วไป</h4>
+        <p class="card-text">จัดการ <span class="text-danger">ผู้ใช้งาน & ผู้เช่า</span></p>
+    </div>
+    <div class="d-flex justify-content-between align-items-center bg-white text-dark shadowing">
+        <div class="dashboard">
+            <div>
+                <h3>จำนวนห้อง</h3>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="lineChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        const userData = [
+            { id: 1, name: "b", room: "C101", roomStatus: "ห้องเต็ม" },
+            { id: 2, name: "LoIvuzZhxXn", room: "A103", roomStatus: "ห้องว่าง" },
+            { id: 3, name: "ADWDAWDAWDAW", room: "A203", roomStatus: "ห้องเต็ม" }
+        ];
+
+        const roomStatusCounts = userData.reduce((acc, user) => {
+            acc[user.roomStatus] = (acc[user.roomStatus] || 0) + 1;
+            return acc;
+        }, {});
+
+        const labels = Object.keys(roomStatusCounts);
+        const data = Object.values(roomStatusCounts);
+        const colors = ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)'];
+
+        function createChart(chartId, type) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'จำนวนห้อง',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }
+
+        createChart('lineChart', 'line');
+        createChart('barChart', 'bar');
+        createChart('pieChart', 'pie');
+        createChart('doughnutChart', 'doughnut');
+    </script>

@@ -35,11 +35,11 @@ app.get('/', function (req, res) {
     id: '',
     password: ''
   };
-  // res.render('login');
-  res.render('login', { shake: false,
-    formdata: nullForm
-  });
-  // res.render('login', { errorMessage: null });
+  // res.render('login', { shake: false,
+  //   formdata: nullForm
+  // });
+  
+  res.render('login', { layout: false, shake: false, formdata: nullForm });
 });
 
 app.get('/manageuser', (req, res) => {
@@ -76,7 +76,7 @@ app.post('/Home', function (req, res) {
     }
     else {
       // res.render('login', { shake: true});
-      res.render('login', { shake: true, formdata: formdata });
+      res.render('login', { layout: false,shake: true, formdata: formdata });
 
 
     }

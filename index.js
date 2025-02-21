@@ -47,8 +47,6 @@ app.use((req, res, next) => {
 app.get('/', function (req, res) {
   res.render('login', { layout: false, shake: false, formdata: "" });
 });
-
-
 app.get('/manageuser', (req, res) => {
   res.render('manageuser', { role: req.user.role, currentPath: req.path });
 });
@@ -57,6 +55,9 @@ app.get("/graph", (req, res) => {
 });
 app.get("/manageroom", (req, res) => {
   res.render('manageroom', { role: req.user.role, currentPath: req.path });
+});
+app.get("/editroom", (req, res) => {
+  res.render('editroom', { role: req.user.role, currentPath: '/manageroom' });
 });
 app.get("/bookroom", (req, res) => {
   res.render('bookroom', { role: req.user.role, currentPath: req.path });
@@ -96,8 +97,9 @@ app.post('/home', function (req, res) {
   });
 });
 
+
 app.post('/adduser-submit', (req, res) => {
-  console.log('Submitted:', req.body);
+  console.log('Submitted Add User:', req.body);
   const { fname, lname, idcard, phone } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า manage user
   res.redirect('manageuser');
@@ -105,13 +107,33 @@ app.post('/adduser-submit', (req, res) => {
 app.post('/adduser-cancel', (req, res) => {
   res.redirect('manageuser');
 });
+
+
 app.post('/addroom', (req, res) => {
-  console.log('Submitted:', req.body);
+  console.log('Submitted Add Room:', req.body);
   const { noroom, roomprice, roominfo } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า manage room
   res.redirect('manageroom');
 });
 
+
+app.post('/editroom-submit', (req, res) => {
+  console.log('Submitted Edit Room:', req.body);
+  const { noroom, roomprice, roominfo } = req.body;
+  // update ข้อมูลลง database ละ redirect กลับหน้า manage room
+  res.redirect('manageroom');
+});
+app.post('/editroom-cancel', (req, res) => {
+  res.redirect('manageroom');
+});
+
+
+app.post('/bookroom-submit', (req, res) => {
+  console.log('Submitted Book Room:', req.body);
+  const { selectroom, selectuser, movein, checkout, invoice, duepayment } = req.body;
+  // insert ข้อมูลลง database ละ redirect กลับหน้า book room
+  res.redirect('bookroom');
+});
 
 
 // Starting the server

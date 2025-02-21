@@ -1,24 +1,5 @@
 const sidebar = document.getElementById('sidebar');
 
-// SIDEBAR SELECT
-// document.addEventListener('DOMContentLoaded', function() {
-//     const sidebarLinks = document.querySelectorAll('.side-menu li a');
-
-//     sidebarLinks.forEach(link => {
-//         link.addEventListener('click', function() {
-//             sidebarLinks.forEach(el => el.classList.remove('active'));
-//             this.classList.add('active');
-//         });
-//     });
-
-//     const currentPath = window.location.pathname;
-//     sidebarLinks.forEach(link => {
-//         if (link.getAttribute('href') === currentPath) {
-//             link.classList.add('active');
-//         }
-//     });
-// });
-
 // SIDEBAR COLLAPSE
 const toggleSidebar = document.querySelector('nav .toggle-sidebar');
 const allSideDivider = document.querySelectorAll('#sidebar .divider');

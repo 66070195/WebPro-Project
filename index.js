@@ -43,7 +43,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 // routing path
 app.get('/', function (req, res) {
   res.render('login', { layout: false, shake: false, formdata: "" });
@@ -79,10 +78,10 @@ app.post('/home', function (req, res) {
 
           if (row.role === 2) {
             console.log('login successful');
-            res.render('manageuser', {role: row.role, currentPath: req.path});
+            res.redirect("manageuser");
           } else if (row.role === 1) {
               console.log('login successful');
-              res.render('graph', {role: row.role, currentPath: req.path});
+              res.redirect("graph");
           }
       } else {
           console.log('login failed');

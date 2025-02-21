@@ -195,13 +195,13 @@
 </head>
 
 <body>
-    <form action="/Home" method="POST">
+    <form action="/home" method="POST">
         <div class="container <%= shake ? 'shake' : '' %>">
             <img src="/img/LOGO.png" alt="login" id="logoImg" >
             <!-- <img src="/img/login.png" alt="login" id="loginImg"> -->
             <div>
-                <label for="id"> ชื่อผู้ใช้งาน : </label>
-                <input type="text" id="id" name="id" value="<%= formdata.id %>" required>
+                <label for="username"> ชื่อผู้ใช้งาน : </label>
+                <input type="text" id="username" name="username" value="<%= formdata %>" required>
             </div>
             <div>
                 <label for="password"> รหัสผ่าน : </label>

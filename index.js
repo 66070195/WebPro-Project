@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts')
 const path = require("path");
 const port = 3000;
@@ -28,59 +29,62 @@ app.use(expressLayouts)
 app.set('layout', './layouts/index')
 app.set('view engine', 'ejs');
 
+app.use(session({
+  secret: 'idonthaveanysecretlmfao',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
+app.use((req, res, next) => {
+  if (req.session && req.session.user) {
+      req.user = req.session.user;
+  }
+  next();
+});
+
 
 // routing path
 app.get('/', function (req, res) {
-  let nullForm = {
-    id: '',
-    password: ''
-  };
-  res.render('login', { layout: false, shake: false, formdata: nullForm });
+  res.render('login', { layout: false, shake: false, formdata: "" });
 });
 
 
 app.get('/manageuser', (req, res) => {
-  res.render('manageuser')
+  res.render('manageuser', { role: req.user.role });
 });
 app.get("/graph", (req, res) => {
-  res.render("graph");
+  res.render('graph', { role: req.user.role });
 });
 
 
 //Action
-app.post('/Home', function (req, res) {
-  let formdata = {
-    id: req.body.id,
-    password: req.body.password,
-  };
-  console.log(formdata);
-  let sql = `SELECT * FROM users 
-  WHERE (username = '${formdata.id}' OR email = '${formdata.id}') 
-  AND password = '${formdata.password}'`;
-  db.get(sql, (err, row) => {
-    if (err) {
-      return console.error('Error checking data:', err.message);
-    }
-    console.log(row);
-    if(row){
-      if (row.password === formdata.password) {
-        if (row.role === 2) {
-          console.log('login successful');
-          // Redirect to user page or home
-          res.render('tenant');
-        } else if (row.role === 1) {
-          console.log('login successful');
-          // Redirect to admin page
-          res.render('admin');
-        }
-    }
-    }
-    else {
-      // res.render('login', { shake: true});
-      res.render('login', { layout: false,shake: true, formdata: formdata });
+app.post('/home', function (req, res) {
+  const { username, password } = req.body;
+    console.log(username);
 
+  db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+      if (err) {
+        return res.status(500).send('Error fetching user');
+      }
+      if (row && row.password === password) {
+          req.session.user = {
+              id: row.id,
+              username: row.username,
+              role: row.role
+          };
 
-    }
+          if (row.role === 2) {
+            console.log('login successful');
+            res.render('manageuser', {role: row.role});
+          } else if (row.role === 1) {
+              console.log('login successful');
+              res.render('graph', {role: row.role});
+          }
+      } else {
+          console.log('login failed');
+          res.render('login', { layout: false, shake: true, formdata: username });
+      }
   });
 });
 

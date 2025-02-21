@@ -58,6 +58,12 @@ app.get("/graph", (req, res) => {
 app.get("/manageroom", (req, res) => {
   res.render('manageroom', { role: req.user.role, currentPath: req.path });
 });
+app.get("/bookroom", (req, res) => {
+  res.render('bookroom', { role: req.user.role, currentPath: req.path });
+});
+app.get('/adduser', (req, res) => {
+  res.render('adduser', { role: req.user.role, currentPath: '/manageuser' });
+});
 
 
 //Action
@@ -88,6 +94,22 @@ app.post('/home', function (req, res) {
           res.render('login', { layout: false, shake: true, formdata: username });
       }
   });
+});
+
+app.post('/adduser-submit', (req, res) => {
+  console.log('Submitted:', req.body);
+  const { fname, lname, idcard, phone } = req.body;
+  // insert ข้อมูลลง database ละ redirect กลับหน้า manage user
+  res.redirect('manageuser');
+});
+app.post('/adduser-cancel', (req, res) => {
+  res.redirect('manageuser');
+});
+app.post('/addroom', (req, res) => {
+  console.log('Submitted:', req.body);
+  const { noroom, roomprice, roominfo } = req.body;
+  // insert ข้อมูลลง database ละ redirect กลับหน้า manage room
+  res.redirect('manageroom');
 });
 
 

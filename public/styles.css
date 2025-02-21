@@ -335,10 +335,8 @@ tbody tr td {
 		display: none;
 	}
 }
-/* Chart */
-#totalChart{
+
+#totalChart {
+    max-width: 250px;
 	width: 100%;
-	max-width: 235px;
-	display: block;
-	margin: auto;
 }

@@ -2,9 +2,9 @@
 <body>    
     <section id="sidebar">
         <% if (role === 2) { %>
-            <%- include("sidebarmember") %>
+            <%- include("sidebarmember", { currentPath: currentPath }) %>
         <% } else if (role === 1) { %>
-            <%- include("sidebaradmin") %>
+            <%- include("sidebaradmin", { currentPath: currentPath }) %>
         <% } %>
 	</section>
 

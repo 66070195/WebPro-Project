@@ -1,10 +1,21 @@
 const sidebar = document.getElementById('sidebar');
 
 // SIDEBAR SELECT
-document.querySelectorAll('.side-menu li a').forEach(item => {
-    item.addEventListener('click', function() {
-        document.querySelectorAll('.side-menu li a').forEach(el => el.classList.remove('active'));
-        this.classList.add('active');
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarLinks = document.querySelectorAll('.side-menu li a');
+
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            sidebarLinks.forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    const currentPath = window.location.pathname;
+    sidebarLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+        }
     });
 });
 

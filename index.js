@@ -51,10 +51,10 @@ app.get('/', function (req, res) {
 
 
 app.get('/manageuser', (req, res) => {
-  res.render('manageuser', { role: req.user.role });
+  res.render('manageuser', { role: req.user.role, currentPath: req.path });
 });
 app.get("/graph", (req, res) => {
-  res.render('graph', { role: req.user.role });
+  res.render('graph', { role: req.user.role, currentPath: req.path });
 });
 
 
@@ -76,10 +76,10 @@ app.post('/home', function (req, res) {
 
           if (row.role === 2) {
             console.log('login successful');
-            res.render('manageuser', {role: row.role});
+            res.render('manageuser', {role: row.role, currentPath: req.path});
           } else if (row.role === 1) {
               console.log('login successful');
-              res.render('graph', {role: row.role});
+              res.render('graph', {role: row.role, currentPath: req.path});
           }
       } else {
           console.log('login failed');

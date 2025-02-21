@@ -24,6 +24,7 @@ let db = new sqlite3.Database('MyWebData.db', (err) => {
 
 // static resourse & templating engine
 app.use(express.static('public'));
+app.use(express.json());
 // Set EJS as templating engine
 app.use(expressLayouts)
 app.set('layout', './layouts/index')
@@ -45,25 +46,28 @@ app.use((req, res, next) => {
 
 // routing path
 app.get('/', function (req, res) {
+  if (req.session.sidebarClass === undefined) {
+      req.session.sidebarClass = '';
+  }
   res.render('login', { layout: false, shake: false, formdata: "" });
 });
 app.get('/manageuser', (req, res) => {
-  res.render('manageuser', { role: req.user.role, currentPath: req.path });
+  res.render('manageuser', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
 });
 app.get("/graph", (req, res) => {
-  res.render('graph', { role: req.user.role, currentPath: req.path });
+  res.render('graph', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
 });
 app.get("/manageroom", (req, res) => {
-  res.render('manageroom', { role: req.user.role, currentPath: req.path });
+  res.render('manageroom', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
 });
 app.get("/editroom", (req, res) => {
-  res.render('editroom', { role: req.user.role, currentPath: '/manageroom' });
+  res.render('editroom', { role: req.user.role, currentPath: '/manageroom', sidebarClass: req.session.sidebarClass });
 });
 app.get("/bookroom", (req, res) => {
-  res.render('bookroom', { role: req.user.role, currentPath: req.path });
+  res.render('bookroom', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
 });
 app.get('/adduser', (req, res) => {
-  res.render('adduser', { role: req.user.role, currentPath: '/manageuser' });
+  res.render('adduser', { role: req.user.role, currentPath: '/manageuser', sidebarClass: req.session.sidebarClass });
 });
 
 
@@ -95,6 +99,12 @@ app.post('/home', function (req, res) {
           res.render('login', { layout: false, shake: true, formdata: username });
       }
   });
+});
+
+
+app.post('/toggle-sidebar', (req, res) => {
+  req.session.sidebarClass = req.body.sidebarClass || '';
+  res.sendStatus(200);
 });
 
 

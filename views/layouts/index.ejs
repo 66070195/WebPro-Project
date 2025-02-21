@@ -1,6 +1,6 @@
 <%- include("head") %>
 <body>    
-    <section id="sidebar">
+    <section id="sidebar" class="<%= sidebarClass %>">
         <% if (role === 2) { %>
             <%- include("sidebarmember", { currentPath: currentPath }) %>
         <% } else if (role === 1) { %>

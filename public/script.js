@@ -16,6 +16,15 @@ if(sidebar.classList.contains('hide')) {
 
 toggleSidebar.addEventListener('click', function () {
 	sidebar.classList.toggle('hide');
+	const sidebarClass = sidebar.classList.contains('hide') ? 'hide' : '';
+
+	fetch('/toggle-sidebar', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ sidebarClass: sidebarClass })
+	});
 
 	if(sidebar.classList.contains('hide')) {
 		allSideDivider.forEach(item=> {

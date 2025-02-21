@@ -1,66 +1,64 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<div class="card shadowing">
-    <div class="mx-4 my-3">
-        <h4 class="card-title">สรุปรายงานทั่วไป</h4>
-        <p class="card-text">จัดการ <span class="text-danger">ผู้ใช้งาน & ผู้เช่า</span></p>
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">รายงานทั่วไป & ผู้เช่า</h4>
+        <p>จัดการ <span class="text-danger">ผู้ใช้งาน & ผู้เช่า</span></p>
     </div>
-    <div class="d-flex flex-wrap justify-content-center bg-white shadowing">
-        <div class="card m-2 shadowing" style="width: 40rem;">
+</div>
+
+<div class="card shadow" style="padding-bottom: 200px;">
+    <div class="d-flex flex-wrap justify-content-center  bg-white shadowing">
+        <div class="card m-2 shadow" style="width: 40rem; padding-bottom: 50px;">
             <h5 class="card-title me-3 text-center mt-4">รายงานห้อง</h5>
-                <canvas id="pieChart"></canvas>
+            <canvas id="pieChart"></canvas>
         </div>
-        <div class="card m-2 shadowing" style="width: 40rem;">
+        <div class="card m-2 shadow" style="width: 40rem;">
             <h5 class="card-title me-3 text-center mt-4">รายงานห้อง</h5>
-                <canvas id="testChart"></canvas>
+            <canvas id="testChart"></canvas>
         </div>
     </div>
-    
-    
+
 </div>
 
 
-    <script>
-        window.onload = function() {
-    createChart('pieChart', 'pie');
-    createChart('testChart', 'pie');
-};
-        const userData = [
-            { id: 1, name: "b", room: "C101", roomStatus: "ห้องเต็ม" },
-            { id: 2, name: "LoIvuzZhxXn", room: "A103", roomStatus: "ห้องว่าง" },
-            { id: 3, name: "ADWDAWDAWDAW", room: "A203", roomStatus: "ห้องเต็ม" }
-        ];
-
-        const roomStatusCounts = userData.reduce((acc, user) => {
-            acc[user.roomStatus] = (acc[user.roomStatus] || 0) + 1;
-            return acc;
-        }, {});
-
-        const labels = Object.keys(roomStatusCounts);
-        const data = Object.values(roomStatusCounts);
-        const colors = ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)'];
-
-        function createChart(chartId, type) {
-            const ctx = document.getElementById(chartId).getContext('2d');
-            new Chart(ctx, {
-                type: type,
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'จำนวนห้อง',
-                        data: data,
-                        backgroundColor: colors,
-                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-        }
-
-        createChart('lineChart', 'line');
-        createChart('barChart', 'bar');
+<script>
+    window.onload = function () {
         createChart('pieChart', 'pie');
-        createChart('doughnutChart', 'doughnut');
-    </script>
+        createChart('testChart', 'pie');
+    };
+    const userData = [
+        { id: 1, name: "b", room: "C101", roomStatus: "ห้องเต็ม" },
+        { id: 2, name: "LoIvuzZhxXn", room: "A103", roomStatus: "ห้องว่าง" },
+        { id: 3, name: "ADWDAWDAWDAW", room: "A203", roomStatus: "ห้องเต็ม" }
+    ];
+
+    const roomStatusCounts = userData.reduce((acc, user) => {
+        acc[user.roomStatus] = (acc[user.roomStatus] || 0) + 1;
+        return acc;
+    }, {});
+
+    const labels = Object.keys(roomStatusCounts);
+    const data = Object.values(roomStatusCounts);
+    const colors = ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)'];
+
+    function createChart(chartId, type) {
+        const ctx = document.getElementById(chartId).getContext('2d');
+        new Chart(ctx, {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'จำนวนห้อง',
+                    data: data,
+                    backgroundColor: colors,
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+
+</script>

@@ -10,6 +10,7 @@
 	--blue: #3f72af;
 	--light-blue: #D0E4FF;
 	--dark-blue: #112d4e;
+	/* --dark-blue: linear-gradient(90deg, #112d4e 30%, #3f72af 100%); */
 	--grey: #F1F0F6;
 	--dark-grey: #8D8D8D;
 	--red: #FC3B56;
@@ -41,6 +42,7 @@ li {
 	max-width: 260px;
 	width: 100%;
 	background: var(--dark-blue);
+	/* background: linear-gradient(90deg, #112d4e 0%, #3f72af 100%); */
 	top: 0;
 	left: 0;
 	height: 100%;
@@ -70,6 +72,7 @@ li {
 	left: 0;
 	z-index: 100;
 	background: var(--dark-blue);
+	/* background: linear-gradient(90deg, #112d4e 0%, #3f72af 100%); */
 	transition: all .3s ease;
 	padding: 0 6px;
 }
@@ -147,7 +150,8 @@ li {
 
 /* NAVBAR */
 nav {
-	background: var(--blue);
+	/* background: var(--blue); */
+	background: linear-gradient(90deg, #112d4e 20%, #3f72af 80%);
 	height: 84px;
 	padding: 0 20px;
 	display: flex;

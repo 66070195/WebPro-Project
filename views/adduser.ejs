@@ -1,0 +1,34 @@
+<div class="bg-white p-3 mt-3 rounded">
+    <h5 class="title">เพิ่ม - ผู้ใช้งาน & ผู้เช่า</h5>
+    <hr>
+    <form id="adduser-form" action="/submit" method="post">
+        <div class="row">
+            <div class="col-6">
+                <label for="fname" class="form-label">ชื่อจริง</label>
+                <input type="text" class="form-control" id="fname" name="fname" required>
+            </div>
+            <div class="col-6">
+                <label for="lname" class="form-label">นามสกุล</label>
+                <input type="text" class="form-control" id="lname" name="lname" required>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-6">
+                <label for="idcard" class="form-label">หมายเลขบัตรประชาชน</label>
+                <input type="text" class="form-control" id="idcard" name="idcard" required>
+            </div>
+            <div class="col-6">
+                <label for="phone" class="form-label">เบอร์โทรศัพท์</label>
+                <input type="text" class="form-control" id="phone" name="phone" required>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-6">
+                <button type="button" class="btn btn-success form-control py-3" id="adduser-submit">ยืนยัน</button>
+            </div>
+            <div class="col-6">
+                <button type="button" class="btn btn-danger form-control py-3" id="adduser-cancel">ยกเลิก</button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -22,21 +22,21 @@
         <div class="bg-white p-3 mt-3 rounded flex-fill">
             <h5 class="title">เพิ่ม - ห้องพัก</h5>
             <hr>
-            <form action="">
+            <form action="/addroom" method="post">
                 <div class="row">
                     <div class="col-6">
                         <label for="noroom" class="form-label">เลขที่ห้องพัก</label>
-                        <input type="text" class="form-control" id="noroom">
+                        <input type="text" class="form-control" id="noroom" name="noroom" required>
                     </div>
                     <div class="col-6">
                         <label for="roomprice" class="form-label">ค่าเช่า / เดือน</label>
-                        <input type="number" class="form-control" id="roomprice">
+                        <input type="number" class="form-control" id="roomprice" name="roomprice" required>
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-12">
                         <label for="roominfo" class="form-label">รายละเอียดเพิ่มเติม</label>
-                        <input type="text" class="form-control" id="roominfo">
+                        <input type="text" class="form-control" id="roominfo" name="roominfo">
                     </div>
                 </div>
                 <div class="mt-3">

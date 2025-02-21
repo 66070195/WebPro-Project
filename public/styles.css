@@ -270,8 +270,11 @@ main {
 }
 main .title {
 	font-size: 28px;
-	font-weight: 400;
+	font-weight: 600;
 	margin-bottom: 10px;
+}
+main .form-button {
+	background: var(--blue);
 }
 /* MAIN */
 
@@ -316,7 +319,7 @@ tbody tr td {
         justify-content: flex-start;
     }
     main .title {
-        font-size: 24px;
+        font-size: 26px;
     }
 }
 

@@ -1,1 +1,156 @@
-<h4 class="title">จัดการห้องพัก</h4>
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">ห้องพัก</h4>
+        <p>จัดการ <span class="text-danger">ห้องพัก</span></p>
+    </div>
+    <!-- <div class="">
+        <button class="btn btn-info text-light btn-lg"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg> เพิ่มห้องพัก</ิ>
+    </div> -->
+</div>
+
+<div class="row">
+    <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
+        <div class="bg-white p-3 mt-3 rounded flex-fill">
+            <h1>กราฟ</h1>
+            <!-- <h1>โชว์</h1>
+            <h1>จำนวนห้องทั้งหมด</h1>
+            <h1>จำนวนห้องว่าง</h1>
+            <h1>จำนวนห้องไม่ว่าง</h1> -->
+        </div>
+    </div>
+    <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
+        <div class="bg-white p-3 mt-3 rounded flex-fill">
+            <h5 class="title">เพิ่ม - ห้องพัก</h5>
+            <hr>
+            <form action="">
+                <div class="row">
+                    <div class="col-6">
+                        <label for="noroom" class="form-label">เลขที่ห้องพัก</label>
+                        <input type="text" class="form-control" id="noroom">
+                    </div>
+                    <div class="col-6">
+                        <label for="roomprice" class="form-label">ค่าเช่า / เดือน</label>
+                        <input type="number" class="form-control" id="roomprice">
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <label for="roominfo" class="form-label">รายละเอียดเพิ่มเติม</label>
+                        <input type="text" class="form-control" id="roominfo">
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary form-control form-button py-3">เพิ่มห้องพัก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white p-3 mt-3 rounded">
+    <table class="table py-2" id="no-more-tables">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>ห้องพัก</th>
+                <th>ราคา</th>
+                <th>รายละเอียด</th>
+                <th>สถานะ</th>
+                <th class="text-center">จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-title="#">1</td>
+                <td data-title="ห้องพัก">C101</td>
+                <td data-title="ราคา">7500</td>
+                <td data-title="รายละเอียด">sarunbigboy</td>
+                <td data-title="สถานะ">ว่าง</td>
+                <td data-title="จัดการ" class="text-center">
+                    <div class="btn-table">
+                        <button class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</button>
+                        <button class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td data-title="#">2</td>
+                <td data-title="ห้องพัก">C201</td>
+                <td data-title="ราคา">5400</td>
+                <td data-title="รายละเอียด">bamibibi nutcha</td>
+                <td data-title="สถานะ">ว่าง</td>
+                <td data-title="จัดการ" class="text-center">
+                    <div class="btn-table">
+                        <button class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</button>
+                        <button class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td data-title="#">3</td>
+                <td data-title="ห้องพัก">C301</td>
+                <td data-title="ราคา">5800</td>
+                <td data-title="รายละเอียด">bazz</td>
+                <td data-title="สถานะ">ว่าง</td>
+                <td data-title="จัดการ" class="text-center">
+                    <div class="btn-table">
+                        <button class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</button>
+                        <button class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td data-title="#">4</td>
+                <td data-title="ห้องพัก">A101</td>
+                <td data-title="ราคา">5200</td>
+                <td data-title="รายละเอียด">romieohm</td>
+                <td data-title="สถานะ">ว่าง</td>
+                <td data-title="จัดการ" class="text-center">
+                    <div class="btn-table">
+                        <button class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</button>
+                        <button class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td data-title="#">5</td>
+                <td data-title="ห้องพัก">A103</td>
+                <td data-title="ราคา">6400</td>
+                <td data-title="รายละเอียด">Somchoon</td>
+                <td data-title="สถานะ">ว่าง</td>
+                <td data-title="จัดการ" class="text-center">
+                    <div class="btn-table">
+                        <button class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</button>
+                        <button class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td data-title="#">6</td>
+                <td data-title="ห้องพัก">B202</td>
+                <td data-title="ราคา">6500</td>
+                <td data-title="รายละเอียด">Folkyes</td>
+                <td data-title="สถานะ">ว่าง</td>
+                <td data-title="จัดการ" class="text-center">
+                    <div class="btn-table">
+                        <button class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</button>
+                        <button class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td data-title="#">7</td>
+                <td data-title="ห้องพัก">C502</td>
+                <td data-title="ราคา">7000</td>
+                <td data-title="รายละเอียด">Supanorth</td>
+                <td data-title="สถานะ">ว่าง</td>
+                <td data-title="จัดการ" class="text-center">
+                    <div class="btn-table">
+                        <button class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</button>
+                        <button class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

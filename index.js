@@ -56,6 +56,9 @@ app.get('/manageuser', (req, res) => {
 app.get("/graph", (req, res) => {
   res.render('graph', { role: req.user.role, currentPath: req.path });
 });
+app.get("/manageroom", (req, res) => {
+  res.render('manageroom', { role: req.user.role, currentPath: req.path });
+});
 
 
 //Action

@@ -1,1 +1,113 @@
-<h5 class="title">จองห้องพัก</h5>
+<div class="bg-white p-4 mt-3 rounded">
+    <h5 class="title">จองห้องพัก</h5>
+    <hr>
+    <form id="adduser-form" action="/bookroom-submit" method="post">
+        <div class="row">
+            <div class="col-6">
+                <label for="selectroom" class="form-label">เลือกห้อง</label>
+                <select name="selectroom" id="selectroom" class="form-control" required>
+                    <option value="roomno-fromdb">เลขห้องที่ว่าง ดึงจาก db เอา</option>
+                </select>
+            </div>
+            <div class="col-6">
+                <label for="selectuser" class="form-label">เลือกผู้เช่า</label>
+                <select name="selectuser" id="selectuser" class="form-control" required>
+                    <option value="userno-fromdb">ผู้เช่าทุกคน ดึงจาก db เอา</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-6">
+                <label for="movein" class="form-label">วันที่ย้ายเข้า</label>
+                <input type="date" class="form-control" id="movein" name="movein" required>
+            </div>
+            <div class="col-6">
+                <label for="checkout" class="form-label">วันที่ย้ายออก</label>
+                <input type="date" class="form-control" id="checkout" name="checkout">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-6">
+                <label for="invoice-date" class="form-label">วันออกใบแจ้งหนี้</label>
+                <input type="date" class="form-control" id="invoice-date" name="invoice-date" required>
+            </div>
+            <div class="col-6">
+                <label for="payment-due" class="form-label">วันกำหนดชำระ</label>
+                <input type="date" class="form-control" id="payment-due" name="payment-due" required>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <button type="submit" class="btn btn-success form-control py-3" id="bookroom-submit">ยืนยันการจอง</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="bg-white p-4 mt-4 rounded">
+    <h5 class="title">รายการห้องที่ว่าง</h5>
+    <hr>
+    <table class="table py-2" id="no-more-tables">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>ห้องพัก</th>
+                <th>ราคา</th>
+                <th>รายละเอียด</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-title="#">1</td>
+                <td data-title="ห้องพัก">C101</td>
+                <td data-title="ราคา">7500</td>
+                <td data-title="รายละเอียด">sarunbigboy</td>
+                <td data-title="สถานะ">ว่าง</td>
+            </tr>
+            <tr>
+                <td data-title="#">2</td>
+                <td data-title="ห้องพัก">C201</td>
+                <td data-title="ราคา">5400</td>
+                <td data-title="รายละเอียด">bamibibi nutcha</td>
+                <td data-title="สถานะ">ว่าง</td>
+            </tr>
+            <tr>
+                <td data-title="#">3</td>
+                <td data-title="ห้องพัก">C301</td>
+                <td data-title="ราคา">5800</td>
+                <td data-title="รายละเอียด">bazz</td>
+                <td data-title="สถานะ">ว่าง</td>
+            </tr>
+            <tr>
+                <td data-title="#">4</td>
+                <td data-title="ห้องพัก">A101</td>
+                <td data-title="ราคา">5200</td>
+                <td data-title="รายละเอียด">romieohm</td>
+                <td data-title="สถานะ">ว่าง</td>
+            </tr>
+            <tr>
+                <td data-title="#">5</td>
+                <td data-title="ห้องพัก">A103</td>
+                <td data-title="ราคา">6400</td>
+                <td data-title="รายละเอียด">Somchoon</td>
+                <td data-title="สถานะ">ว่าง</td>
+                <td data-title="จัดการ" class="text-center">
+            </tr>
+            <tr>
+                <td data-title="#">6</td>
+                <td data-title="ห้องพัก">B202</td>
+                <td data-title="ราคา">6500</td>
+                <td data-title="รายละเอียด">Folkyes</td>
+                <td data-title="สถานะ">ว่าง</td>
+            </tr>
+            <tr>
+                <td data-title="#">7</td>
+                <td data-title="ห้องพัก">C502</td>
+                <td data-title="ราคา">7000</td>
+                <td data-title="รายละเอียด">Supanorth</td>
+                <td data-title="สถานะ">ว่าง</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

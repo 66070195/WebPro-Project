@@ -10,12 +10,10 @@
 
 <div class="row">
     <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
-        <div class="bg-white p-3 mt-3 rounded flex-fill">
-            <h1>กราฟ</h1>
-            <!-- <h1>โชว์</h1>
-            <h1>จำนวนห้องทั้งหมด</h1>
-            <h1>จำนวนห้องว่าง</h1>
-            <h1>จำนวนห้องไม่ว่าง</h1> -->
+        <div class="bg-white p-3 mt-3 rounded flex-fill justify-content-center">
+            <h5 class="title">ให้เอาเลขออกไหม</h5>
+            <hr>
+            <canvas id="totalChart"></canvas>
         </div>
     </div>
     <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
@@ -154,3 +152,68 @@
         </tbody>
     </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+    const userData = [
+        { id: 1, name: "a", room: "C101", roomStatus: "ห้องเต็ม" },
+        { id: 2, name: "b", room: "A103", roomStatus: "ห้องว่าง" },
+        { id: 3, name: "c", room: "A203", roomStatus: "ห้องเต็ม" },
+        { id: 4, name: "d", room: "A204", roomStatus: "ห้องว่าง" },
+        { id: 5, name: "e", room: "A205", roomStatus: "ห้องว่าง" },
+        { id: 6, name: "f", room: "A206", roomStatus: "ห้องเต็ม" },
+        { id: 7, name: "g", room: "A207", roomStatus: "ห้องว่าง" }
+    ];
+
+    const roomStatusCounts = userData.reduce((acc, user) => {
+        acc[user.roomStatus] = (acc[user.roomStatus] || 0) + 1;
+        return acc;
+    }, {});
+    
+    const labels = Object.keys(roomStatusCounts);
+    const data = Object.values(roomStatusCounts);
+    const colors = ['rgba(255, 255, 255, 1)', 'rgba(63, 114, 175, 0.8)'];
+    const borderColor = ['rgba(214, 219, 224, 1)', 'rgba(44, 89, 138, 1)'];
+
+    function createChart(chartId, type) {
+    const ctx = document.getElementById(chartId).getContext('2d');
+    new Chart(ctx, {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                label: 'จำนวน',
+                backgroundColor: colors,
+                borderColor: borderColor,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                },
+                datalabels: {
+                    color: '#000',
+                    font: {
+                        weight: 'bold',
+                        size: 13
+                    },
+                    align: 'center',
+                    formatter: (value, context) => {
+                        return `${value}`;
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+
+    createChart('totalChart', 'pie');
+</script>

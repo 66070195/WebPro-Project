@@ -1,1 +1,43 @@
-<h1>shnow</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">ใบแจ้งหนี้</h4>
+        <p>จัดการ <span class="text-danger">ใบแจ้งหนี้</span></p>
+    </div>
+    <div class="">
+        <a href="/invoice" class="btn btn-warning text-light btn-lg"><- ย้อนกลับ</a>
+    </div>
+</div>
+
+<div class="bg-white p-3 mt-3 rounded shadowing">
+    <table class="table py-2" id="no-more-tables">
+        <thead>
+            <tr>
+                <th>ห้อง</th>
+                <th>ชื่อผู้เช่า</th>
+                <th>วันที่เข้าพัก</th>
+                <th>วันออกใบแจ้งหนี้</th>
+                <th>กำหนดชำระเงิน</th>
+                <th>ยอดชำระ</th>
+                <th>สถานะ</th>
+                <th class="text-center">ดำเนินการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-title="ห้อง">db-1</td>
+                <td data-title="ชื่อผู้เช่า">db-1</td>
+                <td data-title="วันที่เข้าพัก">db-1</td>
+                <td data-title="วันออกใบแจ้งหนี้">db-1</td>
+                <td data-title="กำหนดชำระเงิน">db-1</td>
+                <td data-title="ยอดชำระ">db-1</td>
+                <td data-title="สถานะ">db-1</td>
+                <td data-title="ดำเนินการ" class="text-center">
+                    <div class="btn-table">
+                        <!-- database ดึงข้อมูลตอนเลือกตอน loop กด click add  ตอนนั้น -->
+                        <a href="/showinvoice" class="btn btn-secondary btn-sm px-lg-4 px-md-3 mx-1">ใบเสร็จรับเงิน</a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

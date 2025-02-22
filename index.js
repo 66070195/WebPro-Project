@@ -179,6 +179,8 @@ app.post('/receipt-submit', (req, res) => {
   res.redirect('showreceipt');
 });
 
+// test
+app.get('/test', renderPage('exportReciept'));
 
 // Invoices
 // app.get("/createinvoice", (req, res) => {

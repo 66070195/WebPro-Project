@@ -347,3 +347,15 @@ tbody tr td {
     max-width: 250px;
 	width: 100%;
 }
+.receipt{
+	width: 750px;
+	background-color: #c0d3e9;
+	justify-content: center;
+	/* border: solid 2px black; */
+}
+.receipt table{
+	width: 100%; border-collapse: collapse; margin-top: 12px;
+}
+.receipt tr,.receipt td,.receipt th{
+	border: 1px solid #000000; padding: 8px; text-align: left;
+}

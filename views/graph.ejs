@@ -1,64 +1,71 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<div class="d-flex justify-content-between align-items-center">
-    <div class="">
-        <h4 class="title">รายงานทั่วไป & ผู้เช่า</h4>
-        <p>จัดการ <span class="text-danger">ผู้ใช้งาน & ผู้เช่า</span></p>
-    </div>
-</div>
-
 <div class="card shadow" style="padding-bottom: 200px;">
-    <div class="d-flex flex-wrap justify-content-center  bg-white shadowing">
+    <div class="d-flex flex-wrap justify-content-center bg-white shadowing">
         <div class="card m-2 shadow" style="width: 40rem; padding-bottom: 50px;">
-            <h5 class="card-title me-3 text-center mt-4">รายงานห้อง</h5>
-            <canvas id="pieChart"></canvas>
+            <h5 class="card-title me-3 text-center mt-4">เพศ</h5>
+            <canvas id="sexChart"></canvas>
         </div>
-        <div class="card m-2 shadow" style="width: 40rem;">
-            <h5 class="card-title me-3 text-center mt-4">รายงานห้อง</h5>
-            <canvas id="testChart"></canvas>
+        <div class="card m-2 shadow" style="width: 40rem; padding-bottom: 50px;">
+            <h5 class="card-title me-3 text-center mt-4">บทบาทผู้ใช้</h5>
+            <canvas id="roleChart"></canvas>
         </div>
     </div>
-
 </div>
-
+<!-- ห้องว่าง / ห้องเต็ม   -->
+ <!-- ชำระแล้ว / ยังไม่ชำระ   -->
 
 <script>
-    window.onload = function () {
-        createChart('pieChart', 'pie');
-        createChart('testChart', 'pie');
-    };
-    const userData = [
-        { id: 1, name: "b", room: "C101", roomStatus: "ห้องเต็ม" },
-        { id: 2, name: "LoIvuzZhxXn", room: "A103", roomStatus: "ห้องว่าง" },
-        { id: 3, name: "ADWDAWDAWDAW", room: "A203", roomStatus: "ห้องเต็ม" }
-    ];
+    
+    function createSexChart(chartId, type, maleUsers, femaleUsers, otherUsers) {
+        const data = {
+            labels: ['เพศชาย', 'เพศหญิง', 'เพศอื่นๆ'],
+            datasets: [{
+                label: 'จำนวนผู้ใช้งาน',
+                data: [maleUsers.length, femaleUsers.length, otherUsers.length],
+                backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'],
+                borderWidth: 2
+            }]
+        };
 
-    const roomStatusCounts = userData.reduce((acc, user) => {
-        acc[user.roomStatus] = (acc[user.roomStatus] || 0) + 1;
-        return acc;
-    }, {});
-
-    const labels = Object.keys(roomStatusCounts);
-    const data = Object.values(roomStatusCounts);
-    const colors = ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)'];
-
-    function createChart(chartId, type) {
         const ctx = document.getElementById(chartId).getContext('2d');
         new Chart(ctx, {
             type: type,
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'จำนวนห้อง',
-                    data: data,
-                    backgroundColor: colors,
-                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
-                    borderWidth: 2
-                }]
-            },
+            data: data,
             options: {
                 responsive: true
             }
         });
     }
 
+    
+    // function createRoleChart(chartId, type, adminRole, userRole) {
+    //     const data = {
+    //         labels: ['ผู้ดูแลระบบ', 'ผู้ใช้งานทั่วไป'],
+    //         datasets: [{
+    //             label: 'จำนวนผู้ใช้งาน',
+    //             data: [adminRole.length, userRole.length],
+    //             backgroundColor: ['rgba(255, 159, 64, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+    //             borderColor: ['rgba(255, 159, 64, 1)', 'rgba(153, 102, 255, 1)'],
+    //             borderWidth: 2
+    //         }]
+    //     };
+
+    //     const ctx = document.getElementById(chartId).getContext('2d');
+    //     new Chart(ctx, {
+    //         type: type,
+    //         data: data,
+    //         options: {
+    //             responsive: true
+    //         }
+    //     });
+    // }
+
+    const maleUsers = <%- JSON.stringify(maleUsers) %>;
+    const femaleUsers = <%- JSON.stringify(femaleUsers) %>;
+    const otherUsers = <%- JSON.stringify(otherUsers) %>;
+    // const adminRole = <%- JSON.stringify(adminRole) %>;
+    // const userRole = <%- JSON.stringify(userRole) %>;
+    createSexChart('sexChart', 'pie', maleUsers, femaleUsers, otherUsers);
+    createRoleChart('roleChart', 'pie', adminRole, userRole);
 </script>

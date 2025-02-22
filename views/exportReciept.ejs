@@ -1,0 +1,49 @@
+<div class="bg-white p-4 mt-3 rounded shadowing d-flex flex-column align-items-center">
+    <div class="receipt" id="receipt">
+        <h3 style="font-weight: bold; text-align: center;">ใบเสร็จรับเงิน</h3>
+        <div style="margin-top: 12px;">
+            <p>ชื่อ: ___________________________ วันที่ออกใบเสร็จ: _____________</p>
+            <p>ห้อง: ___________________________ วันที่ชำระ: _______________</p>
+        </div>
+        <table>
+            <tr>
+                <th>รายการ</th>
+                <th>ราคาต่อหน่วย</th>
+                <th>จำนวนหน่วย</th>
+                <th>จำนวนเงิน</th>
+            </tr>
+            <tr>
+                <td>test</td>
+                <td>test</td>
+                <td>test</td>
+                <td>test</td>
+            </tr>
+        </table>
+        <div class="mt-3 fw-bold fs-5 text-end">รวม: __________ บาท</div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-3">
+        <button id="downloadPdfBtn" class="btn btn-success">ดาวน์โหลดเป็น PDF</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+    document.getElementById("downloadPdfBtn").addEventListener("click", async function () {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: "p",
+            unit: "mm",
+            format: [210, 210] 
+        });
+        const receiptElement = document.getElementById("receipt");
+        const canvas = await html2canvas(receiptElement, {
+            scale: 2
+        });
+        const imgData = canvas.toDataURL("image/png");
+        doc.addImage(imgData, "PNG", 10, 10, 190, 0);
+        doc.save("receipt.pdf");
+    });
+</script>

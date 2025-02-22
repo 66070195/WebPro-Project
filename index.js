@@ -81,7 +81,6 @@ app.get('/', function (req, res) {
   res.render('login', { layout: false, shake: false, formdata: "" });
 });
 
-<<<<<<< HEAD
 app.get('/manageuser', (req, res) => {
   const query = 'SELECT * FROM users';
   db.all(query, (err, rows) => {
@@ -90,9 +89,13 @@ app.get('/manageuser', (req, res) => {
     }
     // console.log(rows);
     res.render('manageuser', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-=======
-app.get('/manageuser', renderPage('manageuser'));
+  });
+});
+
+
+// app.get('/manageuser', renderPage('manageuser'));
 // app.get('/graph', renderPage('graph'));
+
 app.get('/graph', (req, res) => {
   db.all('SELECT * FROM users', [], (err, rows) => {
     if (err) {
@@ -113,18 +116,9 @@ app.get('/graph', (req, res) => {
       adminRole: adminRole,
       userRole: userRole,
     });
->>>>>>> b60bc52bc321e8651f0538dcd3470992a938b90b
   });
 });
 
-
-<<<<<<< HEAD
-// app.get('/manageuser', renderPage('manageuser'));
-app.get('/graph', renderPage('graph'));
-=======
-
-
->>>>>>> b60bc52bc321e8651f0538dcd3470992a938b90b
 app.get('/manageroom', renderPage('manageroom'));
 app.get('/managemeter', renderPage('managemeter'));
 app.get('/editroom', renderPage('editroom', '/manageroom'));

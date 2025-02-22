@@ -125,6 +125,14 @@ $(document).ready(function() {
 			$(this).DataTable($.extend({}, commonSetting, {
                 "order": [[3, "asc"]]
 			}));
+		} else if ($(this).hasClass('showinvoice-table')) {
+			$(this).DataTable($.extend({}, commonSetting, {
+                "order": [[3, "asc"]]
+			}));
+		} else if ($(this).hasClass('showreceipt-table')) {
+			$(this).DataTable($.extend({}, commonSetting, {
+                "order": [[3, "asc"]]
+			}));
 		}
 	});
 });

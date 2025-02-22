@@ -1,15 +1,15 @@
-<div class="d-flex justify-content-between align-items-center">
+<div class="d-flex justify-content-between">
     <div class="">
         <h4 class="title">ใบแจ้งหนี้</h4>
         <p>จัดการ <span class="text-danger">ใบแจ้งหนี้</span></p>
     </div>
     <div class="">
-        <a href="/invoice" class="btn btn-warning text-light btn-lg"><- ย้อนกลับ</a>
+        <a href="/invoice" class="btn btn-danger btn-lg"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg> ย้อนกลับ</a>
     </div>
 </div>
 
 <div class="bg-white p-3 mt-3 rounded shadowing">
-    <table class="table py-2" id="no-more-tables">
+    <table class="table py-2 showinvoice-table" id="no-more-tables">
         <thead>
             <tr>
                 <th>ห้อง</th>
@@ -34,7 +34,7 @@
                 <td data-title="ดำเนินการ" class="text-center">
                     <div class="btn-table">
                         <!-- database ดึงข้อมูลตอนเลือกตอน loop กด click add  ตอนนั้น -->
-                        <a href="/showinvoice" class="btn btn-secondary btn-sm px-lg-4 px-md-3 mx-1">ใบเสร็จรับเงิน</a>
+                        <a href="/showinvoice" class="btn btn-warning text-light btn-sm px-lg-4 px-md-3 mx-1">ใบแจ้งหนี้</a>
                     </div>
                 </td>
             </tr>

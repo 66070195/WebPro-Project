@@ -79,14 +79,14 @@ app.post('/home', function (req, res) {
   const { username, password } = req.body;
     console.log(username);
 
-  db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+  db.get('SELECT * FROM users WHERE phone = ?', [username], (err, row) => {
       if (err) {
         return res.status(500).send('Error fetching user');
       }
       if (row && row.password === password) {
           req.session.user = {
               id: row.id,
-              username: row.username,
+              username: row.phone,
               role: row.role
           };
 

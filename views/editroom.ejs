@@ -1,32 +1,43 @@
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">ห้องพัก</h4>
+        <p>แก้ไข <span class="text-danger">ห้องพัก</span></p>
+    </div>
+</div>
+
 <div class="bg-white p-3 mt-3 rounded flex-fill">
-    <h5 class="title">แก้ไข - ห้องพัก (จะดึงข้อมูลของอันที่กดมาใส่ทุก input)</h5>
+    <h5 class="title">แก้ไข - ห้องพัก</h5>
     <hr>
-    <form id="editroom-form" action="/editroom-submit" method="post">
+    <% data.forEach((item)=>{ %>
+    <form id="editroom-form" action="/editroom-submit/<%=item.id%>" method="post">
         <div class="row">
             <div class="col-lg-6 col-sm-12 mb-2">
                 <label for="noroom" class="form-label fw-bold">เลขที่ห้องพัก</label>
-                <input type="text" class="form-control" id="noroom" name="noroom" required>
+                <input type="text" class="form-control" id="noroom" name="noroom" value="<%=item.id %>" required>
             </div>
             <div class="col-lg-6 col-sm-12">
                 <label for="roomprice" class="form-label fw-bold">ค่าเช่า / เดือน</label>
-                <input type="number" class="form-control" id="roomprice" name="roomprice" required>
+                <input type="number" class="form-control" id="roomprice" name="roomprice" value="<%=item.rent %>" required>
             </div>
         </div>
         <div class="row mt-2">
             <div class="col-12">
                 <label for="roominfo" class="form-label fw-bold">รายละเอียดเพิ่มเติม</label>
-                <input type="text" class="form-control" id="roominfo" name="roominfo">
+                <input type="text" class="form-control" id="roominfo" name="roominfo" value="<%=item.description %>">
             </div>
         </div>
         <div class="row mt-4">
             <div class="col-6">
-                <button type="button" class="btn btn-warning btn-lg form-control py-3" id="editroom-submit">แก้ไขห้องพัก</button>
+                <button type="submit" class="btn btn-warning btn-lg form-control py-3" id="editroom-submit">แก้ไขห้องพัก</button>
             </div>
             <div class="col-6">
-                <button type="button" class="btn btn-danger btn-lg form-control py-3" id="editroom-cancel">ยกเลิกการแก้ไข</button>
+                <form action="/editroom-cancel" method="post">
+                    <button type="submit" class="btn btn-danger btn-lg form-control py-3" id="editroom-cancel">ยกเลิกการแก้ไข</button>
+                </form>
             </div>
         </div>
     </form>
+    <% }); %>
 </div>
 
-<script src="editroom.js"></script>
+<!-- <script src="editroom.js"></script> -->

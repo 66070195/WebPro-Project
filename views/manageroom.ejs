@@ -83,7 +83,7 @@
                     <td data-title="สถานะ"><%=item.status === 0 ? 'ว่าง' : 'ไม่ว่าง' %></td>
                     <td data-title="จัดการ" class="text-center">
                         <div class="btn-table">
-                            <a href="/editroom" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
+                            <a href="/editroom?id=<%=item.id%>" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
                             <form action="/manageroom/delete/<%=item.id %>" method="post">
                                 <button type="submit" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
                             </form>

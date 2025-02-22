@@ -94,7 +94,8 @@ app.get('/invoice', renderPage('invoice'));
 app.get('/showinvoice', renderPage('showinvoice', '/invoice'));
 app.get('/showreceipt', renderPage('showreceipt', '/invoice'));
 app.get('/addinvoice', renderPage('addinvoice', '/invoice'));
-app.get('/addreceipt', renderPage('addreceipt', '/invoice'));
+// app.get('/addreceipt', renderPage('addreceipt', '/invoice'));
+app.get('/addreceipt', renderPage('addre2', '/invoice'));
 
 
 //Action
@@ -169,6 +170,14 @@ app.post('/bookroom-submit', (req, res) => {
   const { selectroom, selectuser, movein, checkout, invoice, duepayment } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า book room
   res.redirect('bookroom');
+});
+
+
+app.post('/receipt-submit', (req, res) => {
+  console.log('Receipt Submitted:', req.body);
+  const { selectPayment, amount } = req.body;
+  // insert ข้อมูลลง database ละ redirect กลับหน้า book room
+  res.redirect('invoice');
 });
 
 

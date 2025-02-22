@@ -33,14 +33,16 @@
     <hr>
     <form id="editprice-form" action="/editprice" method="post">
         <div class="row mb-3">
+            <% data.forEach((item)=>{ %>
             <div class="col-lg-6 col-sm-12 mb-2">
                 <label for="electricprice" class="form-label text-warning fw-bold">ค่าไฟฟ้า / หน่วย</label>
-                <input type="number" class="form-control mb-2" id="electricprice" name="electricprice" required>
+                <input type="number" class="form-control mb-2" id="electricprice" name="electricprice" value="<%=item.elec_rate%>" required>
             </div>
             <div class="col-lg-6 col-sm-12 mb-2">
                 <label for="waterprice" class="form-label text-info fw-bold">ค่าน้ำ / หน่วย</label>
-                <input type="number" class="form-control mb-2" id="waterprice" name="waterprice" required>
+                <input type="number" class="form-control mb-2" id="waterprice" name="waterprice" value="<%=item.water_rate%>" required>
             </div>
+            <% }); %>
         </div>
         <button type="submit" class="btn btn-success form-control py-3">ยืนยันการกำหนดราคา</button>
     </form>

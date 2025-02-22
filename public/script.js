@@ -114,7 +114,7 @@ $(document).ready(function() {
 			}));
 		} else if ($(this).hasClass('manage-user-table')) {
 			$(this).DataTable($.extend({}, commonSetting, {
-                "order": [[2, "asc"]]
+                "order": [[0, "asc"]]
 			}));
 		} else if ($(this).hasClass('request-fix-table')) {
 			$(this).DataTable($.extend({}, commonSetting, {

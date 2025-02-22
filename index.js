@@ -40,7 +40,7 @@ app.use(session({
 //Middleware กำหนด user
 app.use((req, res, next) => {
   if (req.session && req.session.user) {
-      req.user = req.session.user;
+    req.user = req.session.user;
   }
   next();
 });
@@ -49,39 +49,51 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   // เดะ Query จำนวนแถวแจ้งซ่อมที่ สถานะแจ้งเรื่อง ไปโชว์ตรง Notification
   db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
-      if (err) {
-          return next(err);
-      }
-      // console.log(row.count)
-      res.locals.rowCount = row.count;
-      // res.locals.role = req.user.role;
-      res.locals.role = req.user ? req.user.role : 2;
-      res.locals.currentPath = req.path;
-      res.locals.sidebarClass = req.session.sidebarClass;
-      next();
+    if (err) {
+      return next(err);
+    }
+    // console.log(row.count)
+    res.locals.rowCount = row.count;
+    // res.locals.role = req.user.role;
+    res.locals.role = req.user ? req.user.role : 2;
+    res.locals.currentPath = req.path;
+    res.locals.sidebarClass = req.session.sidebarClass;
+    next();
   });
 });
 
 function renderPage(page, customPath) {
   return (req, res) => {
-      res.render(page, {
-          role: res.locals.role,
-          currentPath: customPath || res.locals.currentPath,
-          sidebarClass: res.locals.sidebarClass,
-          rowCount: res.locals.rowCount
-      });
+    res.render(page, {
+      role: res.locals.role,
+      currentPath: customPath || res.locals.currentPath,
+      sidebarClass: res.locals.sidebarClass,
+      rowCount: res.locals.rowCount
+    });
   };
 }
 
 // routing path
 app.get('/', function (req, res) {
   if (req.session.sidebarClass === undefined) {
-      req.session.sidebarClass = '';
+    req.session.sidebarClass = '';
   }
   res.render('login', { layout: false, shake: false, formdata: "" });
 });
 
-app.get('/manageuser', renderPage('manageuser'));
+app.get('/manageuser', (req, res) => {
+  const query = 'SELECT * FROM users';
+  db.all(query, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    // console.log(rows);
+    res.render('manageuser', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
+});
+
+
+// app.get('/manageuser', renderPage('manageuser'));
 app.get('/graph', renderPage('graph'));
 app.get('/manageroom', renderPage('manageroom'));
 app.get('/managemeter', renderPage('managemeter'));
@@ -100,30 +112,31 @@ app.get('/addreceipt', renderPage('addreceipt', '/invoice'));
 //Action
 app.post('/home', function (req, res) {
   const { username, password } = req.body;
-    console.log(username);
+  console.log(username);
 
   db.get('SELECT * FROM users WHERE phone = ?', [username], (err, row) => {
-      if (err) {
-        return res.status(500).send('Error fetching user');
-      }
-      if (row && row.password === password) {
-          req.session.user = {
-              id: row.id,
-              username: row.phone,
-              role: row.role
-          };
+    if (err) {
+      return res.status(500).send('Error fetching user');
+    }
+    if (row && row.password === password) {
+      req.session.user = {
+        id: row.id,
+        username: row.phone,
+        role: row.role
+      };
+      console.log(row.role);
 
-          if (row.role === 2) {
-            console.log('login successful');
-            res.redirect("manageuser");
-          } else if (row.role === 1) {
-              console.log('login successful');
-              res.redirect("graph");
-          }
-      } else {
-          console.log('login failed');
-          res.render('login', { layout: false, shake: true, formdata: username });
+      if (row.role === 2) {
+        console.log('login successful');
+        res.redirect("manageuser");
+      } else if (row.role === 1) {
+        console.log('login successful');
+        res.redirect("graph");
       }
+    } else {
+      console.log('login failed');
+      res.render('login', { layout: false, shake: true, formdata: username });
+    }
   });
 });
 
@@ -135,14 +148,34 @@ app.post('/toggle-sidebar', (req, res) => {
 
 
 app.post('/adduser-submit', (req, res) => {
-  console.log('Submitted Add User:', req.body);
-  const { fname, lname, idcard, phone } = req.body;
+  // console.log('Submitted Add User:', req.body);
+  const { fname, lname, gender, idcard, phone, password } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า manage user
-  res.redirect('manageuser');
+  db.run('INSERT INTO users (fname, lname, sex, id_card, phone, password) VALUES (?, ?, ?, ?, ?, ?)', [fname, lname, gender, idcard, phone, password], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    res.redirect('/manageuser');
+  });
 });
 app.post('/adduser-cancel', (req, res) => {
-  res.redirect('manageuser');
+  res.redirect('/manageuser');
 });
+
+
+app.post('/manageuser/delete/:id', (req, res) => {
+  const userId = req.params.id;
+  const query = 'DELETE FROM users WHERE id = ?';
+  db.run(query, [userId], (err) => {
+      if (err) {
+          console.error(err.message);
+          return res.status(500).send('Error deleting user');
+      }
+      console.log('User deleted.');
+      res.redirect('/manageuser');
+  });
+});
+
 
 
 app.post('/addroom', (req, res) => {

@@ -1,3 +1,13 @@
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">ผู้ใช้งาน & ผู้เช่า</h4>
+        <p>จัดการ <span class="text-danger">ผู้ใช้งาน & ผู้เช่า</span></p>
+    </div>
+    <!-- <div class="">
+        <button class="btn btn-info text-light btn-lg"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg> เพิ่มห้องพัก</ิ>
+    </div> -->
+</div>
+
 <div class="bg-white p-3 mt-3 rounded">
     <h5 class="title">เพิ่ม - ผู้ใช้งาน & ผู้เช่า</h5>
     <hr>
@@ -14,8 +24,21 @@
         </div>
         <div class="row">
             <div class="col-lg-6 col-sm-12 mb-2">
-                <label for="idcard" class="form-label fw-bold">หมายเลขบัตรประชาชน</label>
-                <input type="text" class="form-control" id="idcard" name="idcard" required>
+                <div class="row">
+                    <div class="col-lg-6 col-sm-12 mb-2">
+                        <label for="gender" class="form-label fw-bold">เพศ</label>
+                        <select name="gender" id="gender" class="form-control" required>
+                            <option value=""></option>
+                            <option value="M">ชาย</option>
+                            <option value="F">หญิง</option>
+                            <option value="O">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-6 col-sm-12">
+                        <label for="idcard" class="form-label fw-bold">หมายเลขบัตรประชาชน</label>
+                        <input type="text" class="form-control" id="idcard" name="idcard" required>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-6 col-sm-12 mb-2">
                 <div class="row">

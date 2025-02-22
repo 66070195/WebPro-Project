@@ -89,6 +89,12 @@ app.get('/editroom', renderPage('editroom', '/manageroom'));
 app.get('/bookroom', renderPage('bookroom'));
 app.get('/adduser', renderPage('adduser', '/manageuser'));
 app.get('/fixpage', renderPage('fixpage'));
+// InvoicePage
+app.get('/invoice', renderPage('invoice'));
+app.get('/showinvoice', renderPage('showinvoice', '/invoice'));
+app.get('/showreceipt', renderPage('showreceipt', '/invoice'));
+app.get('/addinvoice', renderPage('addinvoice', '/invoice'));
+app.get('/addreceipt', renderPage('addreceipt', '/invoice'));
 
 
 //Action
@@ -167,22 +173,22 @@ app.post('/bookroom-submit', (req, res) => {
 
 
 // Invoices
-app.get("/createinvoice", (req, res) => {
-  res.render('invoice', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
-});
-app.get('/showinvoice', (req, res) => {
-  res.render('showinvoice', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
-});
-app.get('/showreceipt', (req, res) => {
-  res.render('showreceipt', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
-});
+// app.get("/createinvoice", (req, res) => {
+//   res.render('invoice', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
+// });
+// app.get('/showinvoice', (req, res) => {
+//   res.render('showinvoice', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
+// });
+// app.get('/showreceipt', (req, res) => {
+//   res.render('showreceipt', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
+// });
 // ต้องลองเอา database มา
-app.get('/addInvoice', (req, res) => {
-  res.render('addinvoice', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
-});
-app.get('/addReceipt', (req, res) => {
-  res.render('addreceipt', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
-});
+// app.get('/addInvoice', (req, res) => {
+//   res.render('addinvoice', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
+// });
+// app.get('/addReceipt', (req, res) => {
+//   res.render('addreceipt', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
+// });
 
 
 app.post('/editmeter', (req, res) => {

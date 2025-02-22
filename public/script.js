@@ -100,6 +100,11 @@ $(document).ready(function() {
 			$(this).DataTable($.extend({}, commonSetting, {
                 "order": [[2, "asc"]]
 			}));
+		} else if ($(this).hasClass('request-fix-table')) {
+			$(this).DataTable($.extend({}, commonSetting, {
+                "order": [[3, "asc"]],
+				"lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "ทั้งหมด"]]
+			}));
 		}
 	});
 });

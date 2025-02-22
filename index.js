@@ -90,28 +90,6 @@ app.get('/bookroom', renderPage('bookroom'));
 app.get('/adduser', renderPage('adduser', '/manageuser'));
 app.get('/fixpage', renderPage('fixpage'));
 
-// app.get('/manageuser', (req, res) => {
-//   res.render('manageuser', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-// });
-// app.get("/graph", (req, res) => {
-//   res.render('graph', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-// });
-// app.get("/manageroom", (req, res) => {
-//   res.render('manageroom', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-// });
-// app.get("/managemeter", (req, res) => {
-//   res.render('managemeter', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-// });
-// app.get("/editroom", (req, res) => {
-//   res.render('editroom', { role: req.user.role, currentPath: '/manageroom', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-// });
-// app.get("/bookroom", (req, res) => {
-//   res.render('bookroom', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-// });
-// app.get('/adduser', (req, res) => {
-//   res.render('adduser', { role: req.user.role, currentPath: '/manageuser', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-// });
-
 
 //Action
 app.post('/home', function (req, res) {
@@ -199,6 +177,14 @@ app.post('/editprice', (req, res) => {
   const { electricprice, waterprice } = req.body;
   // Update ข้อมูลลง database ละ redirect กลับหน้า manage meter
   res.redirect('managemeter');
+});
+
+
+app.post('/managefix', (req, res) => {
+  console.log('Manage fix:', req.body);
+  const { selectroom, extrapayment, description, fixStatus } = req.body;
+  // Update ข้อมูลลง database ละ redirect กลับหน้า fixpage
+  res.redirect('fixpage');
 });
 
 

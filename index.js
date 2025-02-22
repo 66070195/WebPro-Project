@@ -142,7 +142,19 @@ app.get('/editroom', function (req, res) {
         console.log(err.message);
       }
       console.log(rows);
-      res.render('editroom', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      res.render('editroom', { data : rows, role: req.user.role, currentPath: '/manageroom', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      // res.render('editroom', { data : rows });
+    });
+});
+
+app.get('/edituser', function (req, res) {
+  let sql = `SELECT * FROM users WHERE id = '${req.query.id}'`;
+  db.all(sql, (err, rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('edituser', { data : rows, role: req.user.role, currentPath: '/manageuser', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
       // res.render('editroom', { data : rows });
     });
 });
@@ -212,6 +224,22 @@ app.post('/adduser-cancel', (req, res) => {
   res.redirect('manageuser');
 });
 
+app.post('/edituser-submit/:id', (req, res) => {
+  console.log('Submitted Edit user:', req.body);
+  const userId = req.params.id;
+  const { fname, lname, gender, idcard, phone, password } = req.body;
+  // update ข้อมูลลง database ละ redirect กลับหน้า manage room
+  const sql = `UPDATE users SET fname = ?, lname = ?, sex = ?, id_card = ?, phone = ?, password = ? WHERE id = ?`;
+  
+    db.run(sql, [fname, lname, gender, idcard, phone, password, userId], (err) => {
+        if (err) {
+            return console.error('Error modify data:', err.message);
+        }
+        console.log('User modified successful');
+        res.redirect('/manageuser');
+    });
+});
+
 
 app.post('/manageuser/delete/:id', (req, res) => {
   const userId = req.params.id;
@@ -269,9 +297,6 @@ app.post('/editroom-submit/:id', (req, res) => {
         console.log('Room modified successful');
         res.redirect('/manageroom');
     });
-});
-app.post('/editroom-cancel', (req, res) => {
-  res.redirect('manageroom');
 });
 
 

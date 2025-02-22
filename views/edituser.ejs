@@ -3,23 +3,21 @@
         <h4 class="title">ผู้ใช้งาน & ผู้เช่า</h4>
         <p>จัดการ <span class="text-danger">ผู้ใช้งาน & ผู้เช่า</span></p>
     </div>
-    <!-- <div class="">
-        <button class="btn btn-info text-light btn-lg"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg> เพิ่มห้องพัก</ิ>
-    </div> -->
 </div>
 
 <div class="bg-white p-3 mt-3 rounded">
-    <h5 class="title">เพิ่ม - ผู้ใช้งาน & ผู้เช่า</h5>
+    <h5 class="title">แก้ไข - ผู้ใช้งาน & ผู้เช่า</h5>
     <hr>
-    <form id="adduser-form" action="/adduser-submit" method="post">
+    <% data.forEach((item)=>{ %>
+    <form id="edituser-form" action="/edituser-submit/<%=item.id%>" method="post">
         <div class="row">
             <div class="col-lg-6 col-sm-12 mb-2">
                 <label for="fname" class="form-label fw-bold">ชื่อจริง</label>
-                <input type="text" class="form-control" id="fname" name="fname" required>
+                <input type="text" class="form-control" id="fname" name="fname" value="<%=item.fname %>" required>
             </div>
             <div class="col-lg-6 col-sm-12 mb-2">
                 <label for="lname" class="form-label fw-bold">นามสกุล</label>
-                <input type="text" class="form-control" id="lname" name="lname" required>
+                <input type="text" class="form-control" id="lname" name="lname" value="<%=item.lname %>" required>
             </div>
         </div>
         <div class="row">
@@ -29,14 +27,14 @@
                         <label for="gender" class="form-label fw-bold">เพศ</label>
                         <select name="gender" id="gender" class="form-control" required>
                             <option value=""></option>
-                            <option value="M">ชาย</option>
-                            <option value="F">หญิง</option>
-                            <option value="O">อื่นๆ</option>
+                            <option value="M" <%=item.sex === 'M' ? 'selected' : ''%>>ชาย</option>
+                            <option value="F" <%=item.sex === 'F' ? 'selected' : ''%>>หญิง</option>
+                            <option value="O" <%=item.sex === 'O' ? 'selected' : ''%>>อื่นๆ</option>
                         </select>
                     </div>
                     <div class="col-lg-6 col-sm-12">
                         <label for="idcard" class="form-label fw-bold">หมายเลขบัตรประชาชน</label>
-                        <input type="text" class="form-control" id="idcard" name="idcard" required>
+                        <input type="text" class="form-control" id="idcard" name="idcard" value="<%=item.id_card %>" required>
                     </div>
                 </div>
             </div>
@@ -44,24 +42,25 @@
                 <div class="row">
                     <div class="col-lg-6 col-sm-12 mb-2">
                         <label for="phone" class="form-label fw-bold">เบอร์โทรศัพท์</label>
-                        <input type="text" class="form-control" id="phone" name="phone" required>
+                        <input type="text" class="form-control" id="phone" name="phone" value="<%=item.phone %>" required>
                     </div>
                     <div class="col-lg-6 col-sm-12 mb-4">
                         <label for="password" class="form-label fw-bold">รหัสผ่าน</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control" id="password" name="password" value="<%=item.password %>" required>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-6">
-                <button type="button" class="btn btn-success btn-lg form-control py-3" id="adduser-submit">ยืนยัน</button>
+                <button type="submit" class="btn btn-warning btn-lg form-control py-3" id="edituser-submit">แก้ไขผู้ใช้งาน</button>
             </div>
             <div class="col-6">
-                <button type="button" class="btn btn-danger btn-lg form-control py-3" id="adduser-cancel">ยกเลิก</button>
+                <a href="/manageuser" class="btn btn-danger btn-lg form-control py-3" id="edituser-cancel">ยกเลิก</a>
             </div>
         </div>
     </form>
+    <% }); %>
 </div>
 
-<script src="adduser.js"></script>
+<!-- <script src="adduser.js"></script> -->

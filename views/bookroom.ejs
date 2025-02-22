@@ -4,13 +4,13 @@
     <form id="adduser-form" action="/bookroom-submit" method="post">
         <div class="row">
             <div class="col-6">
-                <label for="selectroom" class="form-label">เลือกห้อง</label>
+                <label for="selectroom" class="form-label fw-bold">เลือกห้อง</label>
                 <select name="selectroom" id="selectroom" class="form-control" required>
                     <option value="roomno-fromdb">เลขห้องที่ว่าง ดึงจาก db เอา</option>
                 </select>
             </div>
             <div class="col-6">
-                <label for="selectuser" class="form-label">เลือกผู้เช่า</label>
+                <label for="selectuser" class="form-label fw-bold">เลือกผู้เช่า</label>
                 <select name="selectuser" id="selectuser" class="form-control" required>
                     <option value="userno-fromdb">ผู้เช่าทุกคน ดึงจาก db เอา</option>
                 </select>
@@ -18,21 +18,21 @@
         </div>
         <div class="row mt-2">
             <div class="col-6">
-                <label for="movein" class="form-label">วันที่ย้ายเข้า</label>
+                <label for="movein" class="form-label fw-bold">วันที่ย้ายเข้า</label>
                 <input type="date" class="form-control" id="movein" name="movein" required>
             </div>
             <div class="col-6">
-                <label for="checkout" class="form-label">วันที่ย้ายออก</label>
+                <label for="checkout" class="form-label fw-bold">วันที่ย้ายออก</label>
                 <input type="date" class="form-control" id="checkout" name="checkout">
             </div>
         </div>
         <div class="row mt-2">
             <div class="col-6">
-                <label for="invoice" class="form-label">วันออกใบแจ้งหนี้</label>
+                <label for="invoice" class="form-label fw-bold">วันออกใบแจ้งหนี้</label>
                 <input type="date" class="form-control" id="invoice" name="invoice" required>
             </div>
             <div class="col-6">
-                <label for="duepayment" class="form-label">วันกำหนดชำระ</label>
+                <label for="duepayment" class="form-label fw-bold">วันกำหนดชำระ</label>
                 <input type="date" class="form-control" id="duepayment" name="duepayment" required>
             </div>
         </div>

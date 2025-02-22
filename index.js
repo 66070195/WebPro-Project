@@ -60,6 +60,9 @@ app.get("/graph", (req, res) => {
 app.get("/manageroom", (req, res) => {
   res.render('manageroom', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
 });
+app.get("/managemeter", (req, res) => {
+  res.render('managemeter', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
+});
 app.get("/editroom", (req, res) => {
   res.render('editroom', { role: req.user.role, currentPath: '/manageroom', sidebarClass: req.session.sidebarClass });
 });
@@ -143,6 +146,20 @@ app.post('/bookroom-submit', (req, res) => {
   const { selectroom, selectuser, movein, checkout, invoice, duepayment } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า book room
   res.redirect('bookroom');
+});
+
+
+app.post('/editmeter', (req, res) => {
+  console.log('Edit Elec/Water Meter:', req.body);
+  const { selectroom, electricmeter, watermeter } = req.body;
+  // Update ข้อมูลลง database ละ redirect กลับหน้า manage meter
+  res.redirect('managemeter');
+});
+app.post('/editprice', (req, res) => {
+  console.log('Edit Elec/Water Price:', req.body);
+  const { electricprice, waterprice } = req.body;
+  // Update ข้อมูลลง database ละ redirect กลับหน้า manage meter
+  res.redirect('managemeter');
 });
 
 

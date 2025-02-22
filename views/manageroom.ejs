@@ -60,7 +60,7 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            <tr>
+            <!-- <tr>
                 <td data-title="#">1</td>
                 <td data-title="ห้องพัก">C101</td>
                 <td data-title="ราคา">7500</td>
@@ -72,85 +72,25 @@
                         <a href="#" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</a>
                     </div>
                 </td>
-            </tr>
-            <tr>
-                <td data-title="#">2</td>
-                <td data-title="ห้องพัก">C201</td>
-                <td data-title="ราคา">5400</td>
-                <td data-title="รายละเอียด">bamibibi nutcha</td>
-                <td data-title="สถานะ">ว่าง</td>
-                <td data-title="จัดการ" class="text-center">
-                    <div class="btn-table">
-                        <a href="#" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
-                        <a href="#" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td data-title="#">3</td>
-                <td data-title="ห้องพัก">C301</td>
-                <td data-title="ราคา">5800</td>
-                <td data-title="รายละเอียด">bazz</td>
-                <td data-title="สถานะ">ว่าง</td>
-                <td data-title="จัดการ" class="text-center">
-                    <div class="btn-table">
-                        <a href="#" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
-                        <a href="#" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td data-title="#">4</td>
-                <td data-title="ห้องพัก">A101</td>
-                <td data-title="ราคา">5200</td>
-                <td data-title="รายละเอียด">romieohm</td>
-                <td data-title="สถานะ">ว่าง</td>
-                <td data-title="จัดการ" class="text-center">
-                    <div class="btn-table">
-                        <a href="#" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
-                        <a href="#" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td data-title="#">5</td>
-                <td data-title="ห้องพัก">A103</td>
-                <td data-title="ราคา">6400</td>
-                <td data-title="รายละเอียด">Somchoon</td>
-                <td data-title="สถานะ">ว่าง</td>
-                <td data-title="จัดการ" class="text-center">
-                    <div class="btn-table">
-                        <a href="#" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
-                        <a href="#" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td data-title="#">6</td>
-                <td data-title="ห้องพัก">B202</td>
-                <td data-title="ราคา">6500</td>
-                <td data-title="รายละเอียด">Folkyes</td>
-                <td data-title="สถานะ">ว่าง</td>
-                <td data-title="จัดการ" class="text-center">
-                    <div class="btn-table">
-                        <a href="#" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
-                        <a href="#" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td data-title="#">7</td>
-                <td data-title="ห้องพัก">C502</td>
-                <td data-title="ราคา">7000</td>
-                <td data-title="รายละเอียด">Supanorth</td>
-                <td data-title="สถานะ">ว่าง</td>
-                <td data-title="จัดการ" class="text-center">
-                    <div class="btn-table">
-                        <a href="#" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
-                        <a href="#" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</a>
-                    </div>
-                </td>
-            </tr>
+            </tr> -->
+            <% let index = 1; %>
+            <% data.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="#"><%= index++ %></td>
+                    <td data-title="ห้องพัก"><%=item.id %></td>
+                    <td data-title="ราคา"><%=item.rent %></td>
+                    <td data-title="รายละเอียด"><%=item.description %></td>
+                    <td data-title="สถานะ"><%=item.status === 0 ? 'ว่าง' : 'ไม่ว่าง' %></td>
+                    <td data-title="จัดการ" class="text-center">
+                        <div class="btn-table">
+                            <a href="/editroom" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
+                            <form action="/manageroom/delete/<%=item.id %>" method="post">
+                                <button type="submit" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %> 
         </tbody>
     </table>
 </div>

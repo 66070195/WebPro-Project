@@ -119,7 +119,18 @@ app.get('/graph', (req, res) => {
   });
 });
 
-app.get('/manageroom', renderPage('manageroom'));
+app.get('/manageroom', (req, res) => {
+  const query = 'SELECT * FROM rooms ORDER BY id;';
+  db.all(query, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('manageroom', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
+});
+
+// app.get('/manageroom', renderPage('manageroom'));
 app.get('/managemeter', renderPage('managemeter'));
 app.get('/editroom', renderPage('editroom', '/manageroom'));
 app.get('/bookroom', renderPage('bookroom'));
@@ -179,11 +190,11 @@ app.post('/adduser-submit', (req, res) => {
     if (err) {
       return console.error(err.message);
     }
-    res.redirect('/manageuser');
+    res.redirect('manageuser');
   });
 });
 app.post('/adduser-cancel', (req, res) => {
-  res.redirect('/manageuser');
+  res.redirect('manageuser');
 });
 
 
@@ -206,8 +217,27 @@ app.post('/addroom', (req, res) => {
   console.log('Submitted Add Room:', req.body);
   const { noroom, roomprice, roominfo } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า manage room
-  res.redirect('manageroom');
+  db.run('INSERT INTO rooms (id, rent, description) VALUES (?, ?, ?)', [noroom, roomprice, roominfo], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Added room.')
+    res.redirect('manageroom');
+  });
 });
+
+app.post('/manageroom/delete/:id', (req, res) => {
+  const roomId = req.params.id;
+  const query = 'DELETE FROM rooms WHERE id = ?';
+  db.run(query, [roomId], (err) => {
+    if (err) {
+        console.error(err.message);
+        return res.status(500).send('Error deleting room');
+    }
+    console.log('Rooms deleted.');
+    res.redirect('/manageroom');
+});
+})
 
 
 app.post('/editroom-submit', (req, res) => {

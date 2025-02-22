@@ -57,6 +57,22 @@ sidebar.addEventListener('mouseenter', function () {
 })
 
 
+function addMore() {
+	let table = document.getElementById("extra");
+	let newRow = document.createElement("tr");
+	newRow.innerHTML = `
+		<td><input type="text" class="form-control" placeholder="รายการ"></td>
+		<td><input type="number" class="form-control" placeholder="ราคา"></td>
+		<td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
+	`;
+	table.appendChild(newRow);
+}
+
+function removeRow(button) {
+	button.closest("tr").remove();
+}
+
+
 // PROFILE DROPDOWN
 const profile = document.querySelector('nav .profile');
 const imgProfile = profile.querySelector('img');
@@ -99,6 +115,15 @@ $(document).ready(function() {
 		} else if ($(this).hasClass('manage-user-table')) {
 			$(this).DataTable($.extend({}, commonSetting, {
                 "order": [[2, "asc"]]
+			}));
+		} else if ($(this).hasClass('request-fix-table')) {
+			$(this).DataTable($.extend({}, commonSetting, {
+                "order": [[3, "asc"]],
+				"lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "ทั้งหมด"]]
+			}));
+		} else if ($(this).hasClass('invoice-table')) {
+			$(this).DataTable($.extend({}, commonSetting, {
+                "order": [[3, "asc"]]
 			}));
 		}
 	});

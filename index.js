@@ -37,12 +37,41 @@ app.use(session({
   cookie: { secure: false }
 }));
 
+//Middleware กำหนด user
 app.use((req, res, next) => {
   if (req.session && req.session.user) {
       req.user = req.session.user;
   }
   next();
 });
+
+// Middleware กำหนด Notification badge
+app.use((req, res, next) => {
+  // เดะ Query จำนวนแถวแจ้งซ่อมที่ สถานะแจ้งเรื่อง ไปโชว์ตรง Notification
+  db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
+      if (err) {
+          return next(err);
+      }
+      // console.log(row.count)
+      res.locals.rowCount = row.count;
+      // res.locals.role = req.user.role;
+      res.locals.role = req.user ? req.user.role : 2;
+      res.locals.currentPath = req.path;
+      res.locals.sidebarClass = req.session.sidebarClass;
+      next();
+  });
+});
+
+function renderPage(page, customPath) {
+  return (req, res) => {
+      res.render(page, {
+          role: res.locals.role,
+          currentPath: customPath || res.locals.currentPath,
+          sidebarClass: res.locals.sidebarClass,
+          rowCount: res.locals.rowCount
+      });
+  };
+}
 
 // routing path
 app.get('/', function (req, res) {
@@ -51,27 +80,22 @@ app.get('/', function (req, res) {
   }
   res.render('login', { layout: false, shake: false, formdata: "" });
 });
-app.get('/manageuser', (req, res) => {
-  res.render('manageuser', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
-});
-app.get("/graph", (req, res) => {
-  res.render('graph', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
-});
-app.get("/manageroom", (req, res) => {
-  res.render('manageroom', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
-});
-app.get("/managemeter", (req, res) => {
-  res.render('managemeter', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
-});
-app.get("/editroom", (req, res) => {
-  res.render('editroom', { role: req.user.role, currentPath: '/manageroom', sidebarClass: req.session.sidebarClass });
-});
-app.get("/bookroom", (req, res) => {
-  res.render('bookroom', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
-});
-app.get('/adduser', (req, res) => {
-  res.render('adduser', { role: req.user.role, currentPath: '/manageuser', sidebarClass: req.session.sidebarClass });
-});
+
+app.get('/manageuser', renderPage('manageuser'));
+app.get('/graph', renderPage('graph'));
+app.get('/manageroom', renderPage('manageroom'));
+app.get('/managemeter', renderPage('managemeter'));
+app.get('/editroom', renderPage('editroom', '/manageroom'));
+app.get('/bookroom', renderPage('bookroom'));
+app.get('/adduser', renderPage('adduser', '/manageuser'));
+app.get('/fixpage', renderPage('fixpage'));
+// InvoicePage
+app.get('/invoice', renderPage('invoice'));
+app.get('/showinvoice', renderPage('showinvoice', '/invoice'));
+app.get('/showreceipt', renderPage('showreceipt', '/invoice'));
+app.get('/addinvoice', renderPage('addinvoice', '/invoice'));
+// app.get('/addreceipt', renderPage('addreceipt', '/invoice'));
+app.get('/addreceipt', renderPage('addre2', '/invoice'));
 
 
 //Action
@@ -149,6 +173,33 @@ app.post('/bookroom-submit', (req, res) => {
 });
 
 
+app.post('/receipt-submit', (req, res) => {
+  console.log('Receipt Submitted:', req.body);
+  const { selectPayment, amount } = req.body;
+  // insert ข้อมูลลง database ละ redirect กลับหน้า book room
+  res.redirect('invoice');
+});
+
+
+// Invoices
+// app.get("/createinvoice", (req, res) => {
+//   res.render('invoice', { role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass });
+// });
+// app.get('/showinvoice', (req, res) => {
+//   res.render('showinvoice', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
+// });
+// app.get('/showreceipt', (req, res) => {
+//   res.render('showreceipt', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
+// });
+// ต้องลองเอา database มา
+// app.get('/addInvoice', (req, res) => {
+//   res.render('addinvoice', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
+// });
+// app.get('/addReceipt', (req, res) => {
+//   res.render('addreceipt', { role: req.user.role, currentPath: '/createinvoice', sidebarClass: req.session.sidebarClass });
+// });
+
+
 app.post('/editmeter', (req, res) => {
   console.log('Edit Elec/Water Meter:', req.body);
   const { selectroom, electricmeter, watermeter } = req.body;
@@ -160,6 +211,14 @@ app.post('/editprice', (req, res) => {
   const { electricprice, waterprice } = req.body;
   // Update ข้อมูลลง database ละ redirect กลับหน้า manage meter
   res.redirect('managemeter');
+});
+
+
+app.post('/managefix', (req, res) => {
+  console.log('Manage fix:', req.body);
+  const { selectroom, extrapayment, description, fixStatus } = req.body;
+  // Update ข้อมูลลง database ละ redirect กลับหน้า fixpage
+  res.redirect('fixpage');
 });
 
 

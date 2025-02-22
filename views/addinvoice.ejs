@@ -1,0 +1,100 @@
+<div class="d-flex justify-content-between">
+    <div class="">
+        <h4 class="title">สร้างใบแจ้งหนี้</h4>
+        <p>สร้าง <span class="text-danger">ใบแจ้งหนี้</span></p>
+    </div>
+    <div class="">
+        <a href="/invoice" class="btn btn-danger btn-lg"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg> ย้อนกลับ</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
+        <div class="bg-white p-5 mt-3 rounded flex-fill shadowing">
+            <div class="text-center">
+                <h4 class="title">ค่าไฟ</h4>
+            </div>
+            <div class="table">
+                <table class="table table-bordered text-center" id="no-more-tables">
+                    <thead class="table-warning align-middle">
+                        <tr>
+                            <th style="background: #fccc33;">มิเตอร์ไฟฟ้าจากวัน</th>
+                            <th style="background: #fccc33;">มิเตอร์ไฟฟ้าถึงวัน</th>
+                            <th style="background: #fccc33;">ใช้ไฟฟ้าไป</th>
+                            <th style="background: #fccc33;">ราคา/หน่วย</th>
+                            <th style="background: #fccc33;">ราคารวม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-title="มิเตอร์ไฟฟ้าจากวัน">xx</td>
+                            <td data-title="มิเตอร์ไฟฟ้าถึงวัน">xx</td>
+                            <td data-title="ใช้ไฟฟ้าไป">xx</td>
+                            <td data-title="ราคา/หน่วย">xx</td>
+                            <td data-title="ราคารวม">xx</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
+        <div class="bg-white p-5 mt-3 rounded flex-fill shadowing">
+            <div class="text-center">
+                <h4 class="title">ค่าน้ำ</h4>
+            </div>
+            <div class="table">
+                <table class="table table-bordered text-center" id="no-more-tables">
+                    <thead class="table-info align-middle">
+                        <tr>
+                            <th>มิเตอร์น้ำจากวัน</th>
+                            <th>มิเตอร์น้ำถึงวัน</th>
+                            <th>ใช้น้ำไป</th>
+                            <th>ราคา/หน่วย</th>
+                            <th>ราคารวม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-title="มิเตอร์น้ำจากวัน">xx</td>
+                            <td data-title="มิเตอร์น้ำถึงวัน">xx</td>
+                            <td data-title="ใช้น้ำไป">xx</td>
+                            <td data-title="ราคา/หน่วย">xx</td>
+                            <td data-title="ราคารวม">xx</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white p-4 mt-4 rounded shadowing">
+    <div class="d-flex justify-content-between">
+        <button onclick="addMore()" class="btn btn-primary form-button px-4 bg-white border-white" style="pointer-events: none;">เพิ่มรายการ</button>
+        <h4 class="title">ค่าใช้จ่ายเพิ่มเติม</h4>
+        <button onclick="addMore()" class="btn btn-primary form-button px-4">เพิ่มรายการ</button>
+    </div>
+    <hr>
+    <table class="table table-bordered text-center">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 60%;">รายการ</th>
+                <th style="width: 35%;">ราคารวม</th>
+                <th style="width: 5%;">#</th>
+            </tr>
+        </thead>
+        <tbody id="extra">
+            <tr>
+                <td><input type="text" class="form-control" placeholder="รายการ"></td>
+                <td><input type="number" class="form-control" placeholder="ราคา"></td>
+                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-end">
+        <input type="text" id="amount" class="form-control w-auto text-center mx-3" placeholder="ราคารวม" >
+        <button class="btn btn-success text-nowrap px-2 py-3">ยืนยันการสร้าง</button>
+    </div>
+</div>

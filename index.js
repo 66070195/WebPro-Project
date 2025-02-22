@@ -129,10 +129,25 @@ app.get('/manageroom', (req, res) => {
     res.render('manageroom', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
   });
 });
-
 // app.get('/manageroom', renderPage('manageroom'));
+
+
 app.get('/managemeter', renderPage('managemeter'));
-app.get('/editroom', renderPage('editroom', '/manageroom'));
+
+
+app.get('/editroom', function (req, res) {
+  let sql = `SELECT * FROM rooms WHERE id = '${req.query.id}'`;
+  db.all(sql, (err, rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('editroom', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      // res.render('editroom', { data : rows });
+    });
+});
+// app.get('/editroom', renderPage('editroom', '/manageroom'));
+
 app.get('/bookroom', renderPage('bookroom'));
 app.get('/adduser', renderPage('adduser', '/manageuser'));
 app.get('/fixpage', renderPage('fixpage'));
@@ -212,7 +227,7 @@ app.post('/manageuser/delete/:id', (req, res) => {
 });
 
 
-
+// Manage Room
 app.post('/addroom', (req, res) => {
   console.log('Submitted Add Room:', req.body);
   const { noroom, roomprice, roominfo } = req.body;
@@ -240,11 +255,20 @@ app.post('/manageroom/delete/:id', (req, res) => {
 })
 
 
-app.post('/editroom-submit', (req, res) => {
+app.post('/editroom-submit/:id', (req, res) => {
   console.log('Submitted Edit Room:', req.body);
+  const roomId = req.params.id;
   const { noroom, roomprice, roominfo } = req.body;
   // update ข้อมูลลง database ละ redirect กลับหน้า manage room
-  res.redirect('manageroom');
+  const sql = `UPDATE rooms SET id = ?, rent = ?, description = ? WHERE id = ?`;
+  
+    db.run(sql, [noroom, roomprice, roominfo, roomId], (err) => {
+        if (err) {
+            return console.error('Error modify data:', err.message);
+        }
+        console.log('Room modified successful');
+        res.redirect('/manageroom');
+    });
 });
 app.post('/editroom-cancel', (req, res) => {
   res.redirect('manageroom');

@@ -25,17 +25,17 @@
             <form action="/addroom" method="post">
                 <div class="row">
                     <div class="col-6">
-                        <label for="noroom" class="form-label">เลขที่ห้องพัก</label>
+                        <label for="noroom" class="form-label fw-bold">เลขที่ห้องพัก</label>
                         <input type="text" class="form-control" id="noroom" name="noroom" required>
                     </div>
                     <div class="col-6">
-                        <label for="roomprice" class="form-label">ค่าเช่า / เดือน</label>
+                        <label for="roomprice" class="form-label fw-bold">ค่าเช่า / เดือน</label>
                         <input type="number" class="form-control" id="roomprice" name="roomprice" required>
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-12">
-                        <label for="roominfo" class="form-label">รายละเอียดเพิ่มเติม</label>
+                        <label for="roominfo" class="form-label fw-bold">รายละเอียดเพิ่มเติม</label>
                         <input type="text" class="form-control" id="roominfo" name="roominfo">
                     </div>
                 </div>
@@ -48,7 +48,7 @@
 </div>
 
 <div class="bg-white p-3 mt-4 rounded shadowing">
-    <table class="table py-2" id="no-more-tables">
+    <table class="table py-2 manage-room-table" id="no-more-tables">
         <thead>
             <tr>
                 <th>#</th>

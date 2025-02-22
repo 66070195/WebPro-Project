@@ -82,7 +82,33 @@ app.get('/', function (req, res) {
 });
 
 app.get('/manageuser', renderPage('manageuser'));
-app.get('/graph', renderPage('graph'));
+// app.get('/graph', renderPage('graph'));
+app.get('/graph', (req, res) => {
+  db.all('SELECT * FROM users', [], (err, rows) => {
+    if (err) {
+      return res.status(500).send('Error fetching users');
+    }
+
+    // แยกข้อมูล
+    const maleUsers = rows.filter(user => user.sex === 'M');
+    const femaleUsers = rows.filter(user => user.sex === 'F');
+    const otherUsers = rows.filter(user => user.sex === 'O');
+    const adminRole = rows.filter(user => user.role === 1);
+    const userRole = rows.filter(user => user.role === 2);
+
+    res.render('graph', {
+      maleUsers: maleUsers,
+      femaleUsers: femaleUsers,
+      otherUsers: otherUsers,
+      adminRole: adminRole,
+      userRole: userRole,
+    });
+  });
+});
+
+
+
+
 app.get('/manageroom', renderPage('manageroom'));
 app.get('/managemeter', renderPage('managemeter'));
 app.get('/editroom', renderPage('editroom', '/manageroom'));

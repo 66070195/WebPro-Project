@@ -343,6 +343,11 @@ tbody tr td {
 	}
 }
 
+#chart{
+	font-size: 35px;
+	/* border: 2px solid black; */
+}
+
 .receipt{
 	width: 750px;
 	background-color: #c0d3e9;

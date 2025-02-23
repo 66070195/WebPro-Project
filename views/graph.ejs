@@ -1,17 +1,23 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">Dashboard</h4>
+        <p>แสดง <span class="text-danger">Dashboard</span></p>
+    </div>
+</div>
 <div class="card shadow" style="padding-bottom: 50px;">
     <div class="d-flex flex-wrap justify-content-center bg-white">
-        <div class="card m-2 shadow" style="width: 30rem; padding-bottom: 50px;">
+        <div class="card m-2 shadow" style="width: 34rem;">
             <h5 class="card-title me-3 text-center mt-4">เพศ</h5>
             <canvas id="sexChart"></canvas>
         </div>
-        <div class="card m-2 shadow" style="width: 30rem; padding-bottom: 50px;">
+        
+        <div class="card m-2 shadow" style="width: 34rem; padding-bottom: 50px;">
             <h5 class="card-title me-3 text-center mt-4">จำนวนห้อง</h5>
             <canvas id="roleChart"></canvas>
         </div>
-        <div class="card m-2 shadow" style="width: 40rem; padding-bottom: 50px;">
+        <div class="card m-2 shadow mt-5" style="width: 30rem; padding-bottom: 50px;">
             <h5 class="card-title me-3 text-center mt-4">สถานะห้องพัก</h5>
             <canvas id="totalChart"></canvas>
         </div>

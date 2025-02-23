@@ -337,10 +337,10 @@ tbody tr td {
 		width: calc(100% - 60px);
 		transition: all .3s ease;
 	}
-	nav .nav-link,
+	/* nav .nav-link,
 	nav .divider {
 		display: none;
-	}
+	} */
 }
 
 #chart{

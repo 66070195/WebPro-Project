@@ -136,3 +136,65 @@ $(document).ready(function() {
 		}
 	});
 });
+
+// function confirmDelete() {
+//     return confirm('ยืนยันการลบ?');
+// }
+
+
+function confirmDelete(formId) {
+    let confirmBox = document.createElement('div');
+    confirmBox.style.position = 'fixed';
+    confirmBox.style.top = '50%';
+    confirmBox.style.left = '50%';
+    confirmBox.style.transform = 'translate(-50%, -50%)';
+    confirmBox.style.background = 'var(--grey)';
+    confirmBox.style.padding = '20px';
+    confirmBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+    confirmBox.style.border = '1px solid grey';
+    confirmBox.innerHTML = `
+        <p>ยืนยันที่จะลบ?</p>
+        <button class="btn btn-warning text-light" onclick="document.body.removeChild(this.parentNode); document.getElementById('${formId}').submit();">ยืนยัน</button>
+        <button class="btn btn-danger" onclick="document.body.removeChild(this.parentNode);">ยกเลิก</button>
+    `;
+    document.body.appendChild(confirmBox);
+    return false;
+}
+
+function showDetails(itemId) {
+    fetch('/getuserdetails', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: itemId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        let detailsBox = document.createElement('div');
+        detailsBox.id = 'detailsBox';
+        detailsBox.style.position = 'fixed';
+        detailsBox.style.top = '50%';
+        detailsBox.style.left = '50%';
+        detailsBox.style.transform = 'translate(-50%, -50%)';
+        detailsBox.innerHTML = `
+            <div class="card border-secondary mb-3 shadowing" style="max-width: 18rem;">
+                <div class="card-header">รายละเอียดผู้ใช้ : ${data.id}</div>
+                <div class="card-body">
+                    <p><span class="fw-bold">ชื่อเต็ม:</span> ${data.fname} ${data.lname}</p>
+                    <p><span class="fw-bold">เลขบัตรประชาชน:</span> ${data.id_card}</p>
+					<hr>
+                    <p><span class="fw-bold">เบอร์โทรศัพท์:</span> ${data.phone}</p>
+                    <p><span class="fw-bold">รหัสผ่าน:</span> ${data.password}</p>
+					<hr>
+                    <p><span class="fw-bold">ห้องพัก:</span> ${data.room_id == null ? 'ไม่มีห้องพัก' : data.room_id}</p>
+                    <hr>
+					<button class="btn form-control btn-danger" onclick="document.body.removeChild(document.getElementById('detailsBox'));">ปิด</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(detailsBox);
+    })
+    .catch(error => console.error('Error:', error));
+}
+

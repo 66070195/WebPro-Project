@@ -79,7 +79,7 @@
                     <td data-title="จัดการ" class="text-center">
                         <div class="btn-table">
                             <a href="/editroom?id=<%=item.id%>" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
-                            <form action="/manageroom/delete/<%=item.id %>" method="post">
+                            <form id="removeRoom" action="/manageroom/delete/<%=item.id %>" method="post" onsubmit="return confirmDelete('removeRoom')">
                                 <button type="submit" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
                             </form>
                         </div>
@@ -91,7 +91,7 @@
 </div>
 
 <script>
-    // ส่งค่าจาก EJS ไปที่ JavaScript
+    ส่งค่าจาก EJS ไปที่ JavaScript
     const available = <%= available %>;
     const notAva = <%= notAva %>;
 

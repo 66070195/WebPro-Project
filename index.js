@@ -81,13 +81,13 @@ app.get('/', function (req, res) {
   res.render('login', { layout: false, shake: false, formdata: "" });
 });
 
-app.get('/manageuser', (req, res) => {
-  const query = 'SELECT * FROM users';
+app.get('/manageuser', (req, res) => { 
+  const query = 'SELECT * FROM users LEFT JOIN tenants ON users.id = tenants.user_id';
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
     }
-    // console.log(rows);
+    console.log(rows);
     res.render('manageuser', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
   });
 });
@@ -483,6 +483,29 @@ app.post('/managefix', (req, res) => {
   res.redirect('fixpage');
 });
 
+
+app.post('/getuserdetails', (req, res) => {
+  const userId = req.body.id;
+  const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id WHERE users.id = ?';
+  db.get(query, [userId], (err, row) => {
+      if (err) {
+          console.error(err.message);
+          return res.status(500).send('Error retrieving user details');
+      }
+      res.json(row);
+  });
+});
+
+app.get('/testquery', (req, res) => {
+  const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
+  db.all(query, (err, rows) => {
+      if (err) {
+          console.log(err.message);
+      }
+      console.log(rows);
+      res.send(JSON.stringify(rows));        
+  });
+});
 
 // Starting the server
 app.listen(port, () => {

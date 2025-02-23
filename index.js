@@ -75,14 +75,13 @@ app.use((req, res, next) => {
   let query;
 
   if (role === 1) {
-    query = 'SELECT COUNT(*) AS count FROM users';
+    query = 'SELECT COUNT(*) FROM maintenance WHERE status != 2';
   } else if (role === 2) {
     query = `SELECT COUNT(*) FROM parcels
                   WHERE status = 0 AND room_id IN (
                   SELECT room_id FROM tenants
                   WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
                 );`;
-                console.log(userId + 'kuy');
   }
 
   db.get(query, (err, row) => {
@@ -360,7 +359,8 @@ app.get('/edituser', isAdmin, function (req, res) {
 app.get('/bookroom', isAdmin, function (req, res) {
   let sql1 = `SELECT * FROM rooms WHERE status = 0 ORDER BY id;`;
   // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE role = 2;`;
-  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2 AND tenants.user_id IS NULL`;
+  // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2 AND tenants.user_id IS NULL`;
+  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2`;
   db.all(sql1, (err1, rows1) => {
       if (err1) {
         console.log(err1.message);
@@ -390,7 +390,16 @@ app.get('/addreceipt', isAdmin, renderPage('addreceipt', '/invoice'));
 app.get('/repairs', function (req, res) {
   const userRole = req.session.user.role;
   if (userRole == 1) {
-    res.render('fixpage', { role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    let sql = `SELECT * FROM maintenance WHERE status != 2`;
+    db.all(sql, (err, rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('fixpage', { data : rows, role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      // res.render('editroom', { data : rows });
+    });
+    // res.render('fixpage', { role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
   } else {
     res.redirect('parcel');
   }
@@ -683,9 +692,17 @@ app.post('/editprice', (req, res) => {
 
 app.post('/managefix', (req, res) => {
   console.log('Manage fix:', req.body);
-  const { selectroom, extrapayment, description, fixStatus } = req.body;
+  const { id, cost, description, fixStatus } = req.body;
   // Update ข้อมูลลง database ละ redirect กลับหน้า fixpage
-  res.redirect('fixpage');
+  const sql = `UPDATE maintenance SET status = ?, cost = ? WHERE id = ?`;
+  
+  db.run(sql, [fixStatus, cost, id], (err) => {
+      if (err) {
+          return console.error('Error modify data:', err.message);
+      }
+      console.log('Request repair modified successful');
+      res.redirect('repairs');
+  });
 });
 
 
@@ -703,11 +720,8 @@ app.post('/getuserdetails', (req, res) => {
 
 app.get('/testquery', (req, res) => {
   const userId = req.session.user.id;
-  const query = `SELECT count(id) FROM parcels
-      WHERE status = 0 AND room_id IN (
-      SELECT room_id FROM tenants
-      WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
-    );`;
+  console.log(userId + 'ke');
+  const query = `SELECT room_id FROM tenants WHERE user_id = ${userId}`
   // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
   db.all(query, (err, rows) => {
       if (err) {
@@ -752,6 +766,7 @@ app.get('/parcel', function (req, res) {
                   SELECT room_id FROM tenants
                   WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
                 );`;
+  const query3 = `SELECT room_id FROM tenants WHERE user_id = ${userId} `
   db.all(query1, (err, rows1) => {
     if (err) {
       console.log(err.message);
@@ -760,8 +775,12 @@ app.get('/parcel', function (req, res) {
       if (err) {
         console.log(err.message);
       }
-      console.log(rows2);
-      res.render('parcel', { data1 : rows1, data2 : rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      db.all(query3, (err, rows3) => {
+        if (err) {
+          console.log(err.message);
+        }
+        res.render('parcel', { data1 : rows1, data2 : rows2, data3 : rows3, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      });
     });
   });
 });
@@ -811,8 +830,42 @@ app.post('/accept-parcel/:id', (req, res) => {
 //   res.send('User ID is ' + userId);
 // });
 
+app.get('/api/item/:id', (req, res) => {
+  const id = req.params.id;
+  db.get('SELECT detail, cost, status FROM maintenance WHERE id = ?', [id], (err, row) => {
+    if (err) {
+      return res.status(500).send('Error fetching item');
+    }
+    res.json(row);
+  });
+});
+
 app.get('/repair', function (req, res) {
-  res.render('repair');
+  const userId = req.session.user.id;
+  const query = `SELECT room_id FROM tenants WHERE user_id = ${userId} `
+  let query2 = `SELECT * FROM maintenance`;
+  db.all(query, (err, rows1) => {
+    if (err) {
+      console.log(err.message);
+    }
+    db.all(query2, (err, rows2) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows1);
+      res.render('repair', { room : rows1, data : rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+  });
+});
+
+app.post('/request-repair', (req, res) => {
+  const { room_id, type, detail } = req.body;
+  db.run('INSERT INTO maintenance (room_id, type, detail) VALUES (?, ?, ?)', [room_id, type, detail], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    res.redirect('repair');
+  });
 });
 
 app.get('/home', function (req, res) {

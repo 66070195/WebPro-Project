@@ -118,7 +118,7 @@ $(document).ready(function() {
 			}));
 		} else if ($(this).hasClass('request-fix-table')) {
 			$(this).DataTable($.extend({}, commonSetting, {
-                "order": [[3, "asc"]],
+                "order": [[3, "desc"]],
 				"lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "ทั้งหมด"]]
 			}));
 		} else if ($(this).hasClass('invoice-table')) {
@@ -208,3 +208,31 @@ function showDetails(itemId) {
     .catch(error => console.error('Error:', error));
 }
 
+
+function repairSelectChange(event) {
+	const selectedId = event.target.value;
+	const detailField = document.getElementById('description');
+	const costField = document.getElementById('cost');
+
+	if (selectedId) {
+		// ถ้ามี value ใน option ที่เลือก
+		fetch(`/api/item/${selectedId}`)
+			.then(response => response.json())
+			.then(data => {
+				detailField.value = data.detail;
+				costField.value = data.cost;
+				document.getElementById(`inlineRadio${data.status}`).checked = true;
+			})
+			.catch(error => console.error('Error:', error));
+	} else {
+		detailField.value = '';
+		costField.value = '0';
+		document.querySelectorAll('input[name="fixStatus"]').forEach(radio => radio.checked = false);
+	}
+	// fetch(`/api/item/${selectedId}`)
+	// 	.then(response => response.json())
+	// 	.then(data => {
+	// 		inputField.value = data.detail;
+	// 	})
+	// 	.catch(error => console.error('Error:', error));
+}

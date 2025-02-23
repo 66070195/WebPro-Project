@@ -1,1 +1,75 @@
-<h4>repair</h4>
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">ส่งเรื่องแจ้งซ่อม</h4>
+        <p>จัดการ <span class="text-danger">แจ้งซ่อม</span></p>
+    </div>
+</div>
+
+<div class="bg-white p-3 mt-3 rounded shadowing">
+    <h4 class="title">ส่งเรื่องแจ้งซ่อม</h4>
+    <hr>
+    <form action="/request-repair" method="post">
+        <div class="row">
+            <div class="col-lg-6 col-sm-12 mb-2">
+                <label for="room_id" class="form-label fw-bold">เลือกห้องที่ต้องการแจ้ง</label>
+                <select name="room_id" id="room_id" class="form-control" required>
+                    <option value="">-</option>
+                    <% room.forEach((item)=>{ %>
+                        <option value="<%= item.room_id %>"><%= item.room_id %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="col-lg-6 col-sm-12 mb-2">
+                <label for="type" class="form-label fw-bold">ประเภทงาน</label>
+                <select name="type" id="type" class="form-control" required>
+                    <option value="">-</option>
+                    <option value="ฉุกเฉิน">ฉุกเฉิน</option>
+                    <option value="เร่งด่วน">เร่งด่วน</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-12">
+                <label for="detail" class="form-label fw-bold">รายละเอียด</label>
+                <input type="text" class="form-control mb-2" id="detail" name="detail" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success btn-lg form-control py-3 mt-3">ยืนยันการแจ้งซ่อม</button>
+    </form>
+</div>
+
+<div class="bg-white p-3 mt-4 rounded shadowing">
+    <h5 class="title">ประวัติการแจ้งซ่อม</h5>
+    <hr>
+    <table class="table py-2 request-fix-table text-center" id="no-more-tables"> 
+        <thead class="table-dark">
+            <tr>
+                <th>ห้องพัก</th>
+                <th>ประเภทงาน</th>
+                <th>รายละเอียด</th>
+                <th>วันที่แจ้งซ่อม</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% data.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="ห้องพัก"><%=item.room_id %></td>
+                    <td data-title="ประเภทงาน"><%=item.type %></td>
+                    <td data-title="รายละเอียด"><%=item.detail %></td>
+                    <td data-title="วันที่แจ้งซ่อม"><%=item.request_date %></td>
+                    <td data-title="สถานะ">
+                        <% if (item.status === 0) { %>
+                            แจ้งเรื่อง
+                        <% } else if (item.status === 1) { %>
+                            กำลังดำเนินการ
+                        <% } else { %>
+                            เสร็จสิ้น
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>

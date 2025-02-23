@@ -92,11 +92,9 @@
 </div>
 
 <div class="bg-white p-4 mt-4 rounded shadowing">
-    <div class="d-flex justify-content-between">
-        <button onclick="addMore()" class="btn btn-primary form-button px-4 bg-white border-white"
-            style="pointer-events: none;">เพิ่มรายการ</button>
-        <h4 class="title">ค่าใช้จ่ายเพิ่มเติม</h4>
-        <button onclick="addMore()" class="btn btn-primary form-button px-4">เพิ่มรายการ</button>
+    <div class="d-flex justify-content-center">
+        <h4 class="title text-center">ค่าใช้จ่ายเพิ่มเติม</h4>
+        
     </div>
     <hr>
     <table class="table table-bordered text-center">
@@ -104,14 +102,12 @@
             <tr>
                 <th style="width: 60%;">รายการ</th>
                 <th style="width: 35%;">ราคารวม</th>
-                <th style="width: 5%;">#</th>
             </tr>
         </thead>
         <tbody id="extra">
             <tr>
                 <td><input type="text" class="form-control" placeholder="รายการ"></td>
                 <td><input type="number" class="form-control" placeholder="ราคา"></td>
-                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
             </tr>
         </tbody>
     </table>

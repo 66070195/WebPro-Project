@@ -260,6 +260,7 @@ WHERE me.room_id ='${req.query.id}'`;
       res.render('addinvoice', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
     });
 });
+
 app.get('/exportInvoice', isAdmin, function (req, res) {
   let sql = `SELECT 
     u.fname, 
@@ -298,7 +299,7 @@ app.post('/insertBill/:id', (req, res) => {
   console.log(water_amount,elec_amount,total_amount);
   const sql = `
     UPDATE bills
-    SET water_amount = ?, elec_amount = ?, total_amount = ?, status = 0
+    SET water_amount = ?, elec_amount = ?, total_amount = ?, status = 1
     WHERE room_id = ?
   `;
   const values = [water_amount, elec_amount, total_amount, roomId]; 
@@ -323,8 +324,8 @@ app.get('/showinvoice', isAdmin, function (req, res) {
     bi.due_date AS payment_due_date,
     bi.total_amount,
     CASE 
-        WHEN bi.status = 0 THEN 'ยังไม่ชำระ' 
-        ELSE 'ชำระแล้ว' 
+        WHEN bi.status = 2 THEN 'ชำระแล้ว' 
+        ELSE 'ยังไม่ชำระ' 
     END AS bill_status 
 FROM rooms r
 LEFT JOIN booking b ON r.id = b.room_id

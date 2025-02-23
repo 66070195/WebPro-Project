@@ -1,71 +1,110 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<div class="card shadow" style="padding-bottom: 200px;">
-    <div class="d-flex flex-wrap justify-content-center bg-white shadowing">
-        <div class="card m-2 shadow" style="width: 40rem; padding-bottom: 50px;">
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<div class="card shadow" style="padding-bottom: 50px;">
+    <div class="d-flex flex-wrap justify-content-center bg-white">
+        <div class="card m-2 shadow" style="width: 30rem; padding-bottom: 50px;">
             <h5 class="card-title me-3 text-center mt-4">เพศ</h5>
             <canvas id="sexChart"></canvas>
         </div>
-        <div class="card m-2 shadow" style="width: 40rem; padding-bottom: 50px;">
-            <h5 class="card-title me-3 text-center mt-4">บทบาทผู้ใช้</h5>
+        <div class="card m-2 shadow" style="width: 30rem; padding-bottom: 50px;">
+            <h5 class="card-title me-3 text-center mt-4">จำนวนห้อง</h5>
             <canvas id="roleChart"></canvas>
+        </div>
+        <div class="card m-2 shadow" style="width: 40rem; padding-bottom: 50px;">
+            <h5 class="card-title me-3 text-center mt-4">สถานะห้องพัก</h5>
+            <canvas id="totalChart"></canvas>
         </div>
     </div>
 </div>
-<!-- ห้องว่าง / ห้องเต็ม   -->
- <!-- ชำระแล้ว / ยังไม่ชำระ   -->
 
 <script>
-    
-    function createSexChart(chartId, type, maleUsers, femaleUsers, otherUsers) {
+    function createChart(chartId, chartData) {
         const data = {
-            labels: ['เพศชาย', 'เพศหญิง', 'เพศอื่นๆ'],
+            labels: chartData.labels,
             datasets: [{
-                label: 'จำนวนผู้ใช้งาน',
-                data: [maleUsers.length, femaleUsers.length, otherUsers.length],
-                backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)'],
-                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'],
+                label: chartData.label,
+                data: chartData.dataValues,
+                backgroundColor: chartData.backgroundColors,
+                borderColor: chartData.borderColors,
                 borderWidth: 2
             }]
         };
-
+    
         const ctx = document.getElementById(chartId).getContext('2d');
         new Chart(ctx, {
-            type: type,
+            type: chartData.type,
             data: data,
             options: {
-                responsive: true
-            }
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold',
+                            },
+                        },
+                    },
+                    datalabels: {
+                        color: '#000',
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        align: 'center',
+                        formatter: (value) => `${value}`,
+                    }
+                },
+                tooltips: {
+                    enabled: true,
+                    callbacks: {
+                        label: chartData.tooltipsCallback,
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutBounce',
+                }
+            },
+            plugins: [ChartDataLabels]
         });
     }
-
-    
-    // function createRoleChart(chartId, type, adminRole, userRole) {
-    //     const data = {
-    //         labels: ['ผู้ดูแลระบบ', 'ผู้ใช้งานทั่วไป'],
-    //         datasets: [{
-    //             label: 'จำนวนผู้ใช้งาน',
-    //             data: [adminRole.length, userRole.length],
-    //             backgroundColor: ['rgba(255, 159, 64, 0.6)', 'rgba(153, 102, 255, 0.6)'],
-    //             borderColor: ['rgba(255, 159, 64, 1)', 'rgba(153, 102, 255, 1)'],
-    //             borderWidth: 2
-    //         }]
-    //     };
-
-    //     const ctx = document.getElementById(chartId).getContext('2d');
-    //     new Chart(ctx, {
-    //         type: type,
-    //         data: data,
-    //         options: {
-    //             responsive: true
-    //         }
-    //     });
-    // }
 
     const maleUsers = <%- JSON.stringify(maleUsers) %>;
     const femaleUsers = <%- JSON.stringify(femaleUsers) %>;
     const otherUsers = <%- JSON.stringify(otherUsers) %>;
-    // const adminRole = <%- JSON.stringify(adminRole) %>;
-    // const userRole = <%- JSON.stringify(userRole) %>;
-    createSexChart('sexChart', 'pie', maleUsers, femaleUsers, otherUsers);
-    createRoleChart('roleChart', 'pie', adminRole, userRole);
+    const roomsAvailable = <%- JSON.stringify(roomsAvailable) %>;
+    const roomsRented = <%- JSON.stringify(roomsRented) %>;
+
+    
+    const sexChartData = {
+        type: 'pie',
+        labels: ['เพศชาย', 'เพศหญิง', 'เพศอื่นๆ'],
+        dataValues: [maleUsers, femaleUsers, otherUsers],
+        backgroundColors: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 99, 132, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+        borderColors: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'],
+        label: 'จำนวนผู้ใช้งาน',
+        tooltipsCallback: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw} คน`
+    };
+
+    
+    const roomChartData = {
+        type: 'pie',
+        labels: ['ห้องว่าง', 'ห้องไม่ว่าง'],
+        dataValues: [roomsAvailable, roomsRented],
+        backgroundColors: ['rgba(255, 255, 255, 1)', 'rgba(63, 114, 175, 0.8)'],
+        borderColors: ['rgba(214, 219, 224, 1)', 'rgba(44, 89, 138, 1)'],
+        label: 'จำนวนห้อง',
+        tooltipsCallback: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw} ห้อง`
+    };
+
+    
+    createChart('sexChart', sexChartData);
+    createChart('roleChart', roomChartData);
 </script>
+
+    

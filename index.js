@@ -96,27 +96,50 @@ app.get('/manageuser', (req, res) => {
 // app.get('/manageuser', renderPage('manageuser'));
 // app.get('/graph', renderPage('graph'));
 
-app.get('/graph', (req, res) => {
-  db.all('SELECT * FROM users', [], (err, rows) => {
-    if (err) {
-      return res.status(500).send('Error fetching users');
-    }
+app.get('/graph', async (req, res) => {
+  try {
+    const getUsers = new Promise((resolve, reject) => {
+      db.all('SELECT sex, COUNT(*) as count FROM users GROUP BY sex', [], (err, rows) => {
+        if (err) reject(err);
+        resolve(rows);
+      });
+    });
 
-    // แยกข้อมูล
-    const maleUsers = rows.filter(user => user.sex === 'M');
-    const femaleUsers = rows.filter(user => user.sex === 'F');
-    const otherUsers = rows.filter(user => user.sex === 'O');
-    const adminRole = rows.filter(user => user.role === 1);
-    const userRole = rows.filter(user => user.role === 2);
+    const getRooms = new Promise((resolve, reject) => {
+      db.all('SELECT status, COUNT(*) as count FROM rooms GROUP BY status', [], (err, rows) => {
+        if (err) reject(err);
+        resolve(rows);
+      });
+    });
+
+    const [userStats, roomStats] = await Promise.all([getUsers, getRooms]);
+
+    
+    let maleUsers = 0, femaleUsers = 0, otherUsers = 0;
+    let roomsAvailable = 0, roomsRented = 0;
+
+    userStats.forEach(row => {
+      if (row.sex === 'M') maleUsers = row.count;
+      else if (row.sex === 'F') femaleUsers = row.count;
+      else if (row.sex === 'O') otherUsers = row.count;
+    });
+
+    roomStats.forEach(row => {
+      if (row.status === 0) roomsAvailable = row.count;
+      else if (row.status === 1) roomsRented = row.count;
+    });
 
     res.render('graph', {
-      maleUsers: maleUsers,
-      femaleUsers: femaleUsers,
-      otherUsers: otherUsers,
-      adminRole: adminRole,
-      userRole: userRole,
+      maleUsers,
+      femaleUsers,
+      otherUsers,
+      roomsAvailable,
+      roomsRented
     });
-  });
+
+  } catch (error) {
+    res.status(500).send('Error fetching data');
+  }
 });
 
 app.get('/manageroom', (req, res) => {

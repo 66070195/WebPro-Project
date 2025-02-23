@@ -343,10 +343,6 @@ tbody tr td {
 	}
 }
 
-#totalChart {
-    max-width: 250px;
-	width: 100%;
-}
 .receipt{
 	width: 750px;
 	background-color: #c0d3e9;

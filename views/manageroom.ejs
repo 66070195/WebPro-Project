@@ -1,3 +1,6 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
 <div class="d-flex justify-content-between align-items-center">
     <div class="">
         <h4 class="title">ห้องพัก</h4>
@@ -6,12 +9,12 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
+    <div class="col-lg-6 col-sm-12 d-flex justify-content-center align-items-center"> 
         <div class="bg-white p-3 mt-3 rounded flex-fill shadowing">
             <h5 class="title">จำนวนห้องว่าง</h5>
             <hr>
-            <div class="d-flex justify-content-center align-items-center">
-                <canvas id="totalChart"></canvas>
+            <div class="d-flex justify-content-center align-items-center" style="width: 17rem; height: 17rem; justify-self: center;">
+                <canvas id="roomChart"></canvas>
             </div>
         </div>
     </div>
@@ -58,13 +61,21 @@
         </thead>
         <tbody class="align-middle">
             <% let index = 1; %>
+            <% let available = 0; %>
+            <% let notAva = 0; %>
             <% data.forEach((item)=>{ %>
                 <tr>
                     <td data-title="#"><%= index++ %></td>
                     <td data-title="ห้องพัก"><%=item.id %></td>
                     <td data-title="ราคา"><%=item.rent %></td>
                     <td data-title="รายละเอียด"><%=item.description %></td>
-                    <td data-title="สถานะ"><%=item.status === 0 ? 'ว่าง' : 'ไม่ว่าง' %></td>
+                    <td data-title="สถานะ"><% if (item.status === 0) { %>
+                        <%= 'ว่าง' %>
+                        <% available++; %>
+                    <% } else { %>
+                        <%= 'ไม่ว่าง' %>
+                        <% notAva++; %>
+                    <% } %></td>
                     <td data-title="จัดการ" class="text-center">
                         <div class="btn-table">
                             <a href="/editroom?id=<%=item.id%>" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
@@ -79,70 +90,78 @@
     </table>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script>
+    // ส่งค่าจาก EJS ไปที่ JavaScript
+    const available = <%= available %>;
+    const notAva = <%= notAva %>;
 
-
-const userData = [
-	{ id: 1, name: "a", room: "C101", roomStatus: "ห้องเต็ม" },
-	{ id: 2, name: "b", room: "A103", roomStatus: "ห้องว่าง" },
-	{ id: 3, name: "c", room: "A203", roomStatus: "ห้องเต็ม" },
-	{ id: 4, name: "d", room: "A204", roomStatus: "ห้องว่าง" },
-	{ id: 5, name: "e", room: "A205", roomStatus: "ห้องว่าง" },
-	{ id: 6, name: "f", room: "A206", roomStatus: "ห้องเต็ม" },
-	{ id: 7, name: "g", room: "A207", roomStatus: "ห้องว่าง" }
-];
-
-const roomStatusCounts = userData.reduce((acc, user) => {
-	acc[user.roomStatus] = (acc[user.roomStatus] || 0) + 1;
-	return acc;
-}, {});
-
-const labels = Object.keys(roomStatusCounts);
-const data = Object.values(roomStatusCounts);
-const colors = ['rgba(255, 255, 255, 1)', 'rgba(63, 114, 175, 0.8)'];
-const borderColor = ['rgba(214, 219, 224, 1)', 'rgba(44, 89, 138, 1)'];
-
-function createChart(chartId, type) {
-	const ctx = document.getElementById(chartId).getContext('2d');
-	new Chart(ctx, {
-		type: type,
-		data: {
-			labels: labels,
-			datasets: [{
-				data: data,
-				label: 'จำนวน',
-				backgroundColor: colors,
-				borderColor: borderColor,
-				borderWidth: 2
-			}]
-		},
-		options: {
-			responsive: true,
-			maintainAspectRatio: false,
-			plugins: {
-				legend: {
-					display: true,
-					position: 'bottom',
-				},
-				datalabels: {
-					color: '#000',
-					font: {
-						weight: 'bold',
-						size: 13
-					},
-					align: 'center',
-					formatter: (value, context) => {
-						return `${value}`;
-					}
-				}
-			}
-		},
-		plugins: [ChartDataLabels]
-	});
-}
-    window.onload = function() {
-        createChart('totalChart', 'pie');
+    // กำหนดข้อมูลกราฟ
+    const roomChartData = {
+        type: 'pie',
+        labels: ['ห้องว่าง', 'ห้องไม่ว่าง'],
+        dataValues: [available, notAva],
+        backgroundColors: ['rgba(255, 255, 255, 1)', 'rgba(63, 114, 175, 0.8)'],
+        borderColors: ['rgba(214, 219, 224, 1)', 'rgba(44, 89, 138, 1)'],
+        label: 'จำนวนห้อง',
+        tooltipsCallback: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw} ห้อง`
     };
+
+    // ฟังก์ชั่นสร้างกราฟ
+    function createChart(chartId, chartData) {
+        const data = {
+            labels: chartData.labels,
+            datasets: [{
+                label: chartData.label,
+                data: chartData.dataValues,
+                backgroundColor: chartData.backgroundColors,
+                borderColor: chartData.borderColors,
+                borderWidth: 2
+            }]
+        };
+    
+        const ctx = document.getElementById(chartId).getContext('2d');
+        new Chart(ctx, {
+            type: chartData.type,
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold',
+                            },
+                        },
+                    },
+                    datalabels: {
+                        color: '#000',
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        align: 'center',
+                        formatter: (value) => `${value}`,
+                    }
+                },
+                tooltips: {
+                    enabled: true,
+                    callbacks: {
+                        label: chartData.tooltipsCallback,
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutBounce',
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    // สร้างกราฟเมื่อโหลดหน้าเว็บ
+    createChart('roomChart', roomChartData);
 </script>

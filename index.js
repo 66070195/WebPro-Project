@@ -54,16 +54,43 @@ app.use((req, res, next) => {
 });
 
 // Middleware กำหนด Notification badge
+// app.use((req, res, next) => {
+//   // เดะ Query จำนวนแถวแจ้งซ่อมที่ สถานะแจ้งเรื่อง ไปโชว์ตรง Notification
+//   db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
+//     if (err) {
+//       return next(err);
+//     }
+//     // console.log(row.count)
+//     res.locals.rowCount = row.count;
+//     // res.locals.role = req.user.role;
+//     res.locals.role = req.user ? req.user.role : 2;
+//     res.locals.currentPath = req.path;
+//     res.locals.sidebarClass = req.session.sidebarClass;
+//     next();
+//   });
+// });
 app.use((req, res, next) => {
-  // เดะ Query จำนวนแถวแจ้งซ่อมที่ สถานะแจ้งเรื่อง ไปโชว์ตรง Notification
-  db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
+  const role = req.user ? req.user.role : 2;
+  const userId = req.user ? req.user.id : 0;
+  let query;
+
+  if (role === 1) {
+    query = 'SELECT COUNT(*) AS count FROM users';
+  } else if (role === 2) {
+    query = `SELECT COUNT(*) FROM parcels
+                  WHERE status = 0 AND room_id IN (
+                  SELECT room_id FROM tenants
+                  WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
+                );`;
+                console.log(userId + 'kuy');
+  }
+
+  db.get(query, (err, row) => {
     if (err) {
       return next(err);
     }
-    // console.log(row.count)
-    res.locals.rowCount = row.count;
-    // res.locals.role = req.user.role;
-    res.locals.role = req.user ? req.user.role : 2;
+    res.locals.rowCount = row['COUNT(*)'];
+    res.locals.role = role;
     res.locals.currentPath = req.path;
     res.locals.sidebarClass = req.session.sidebarClass;
     next();
@@ -225,7 +252,7 @@ app.get('/bookroom', isAdmin, function (req, res) {
 
 
 app.get('/adduser', isAdmin, renderPage('adduser', '/manageuser'));
-app.get('/fixpage', isAdmin, renderPage('fixpage'));
+// app.get('/fixpage', isAdmin, renderPage('fixpage'));
 // InvoicePage
 app.get('/invoice', isAdmin, renderPage('invoice'));
 app.get('/showinvoice', isAdmin, renderPage('showinvoice', '/invoice'));
@@ -233,6 +260,15 @@ app.get('/showreceipt', isAdmin, renderPage('showreceipt', '/invoice'));
 app.get('/addinvoice', isAdmin, renderPage('addinvoice', '/invoice'));
 app.get('/addreceipt', isAdmin, renderPage('addreceipt', '/invoice'));
 
+
+app.get('/repairs', function (req, res) {
+  const userRole = req.session.user.role;
+  if (userRole == 1) {
+    res.render('fixpage', { role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  } else {
+    res.redirect('parcel');
+  }
+});
 
 app.get('/parcelpage', isAdmin, function (req, res) {
   let sql1 = `SELECT * FROM parcels`;
@@ -466,7 +502,7 @@ app.post('/notifyparcel', (req, res) => {
   console.log('Parcel Sent:', req.body);
   const { room_id, receiver_name, size } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า parcelpage
-  db.run('INSERT INTO pacels (room_id, receiver_name, size) VALUES (?, ?, ?)', [room_id, receiver_name, size], (err) => {
+  db.run('INSERT INTO parcels (room_id, receiver_name, size) VALUES (?, ?, ?)', [room_id, receiver_name, size], (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -540,7 +576,12 @@ app.post('/getuserdetails', (req, res) => {
 });
 
 app.get('/testquery', (req, res) => {
-  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
+  const userId = req.session.user.id;
+  const query = `SELECT count(id) FROM parcels
+      WHERE status = 0 AND room_id IN (
+      SELECT room_id FROM tenants
+      WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
+    );`;
   // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
   db.all(query, (err, rows) => {
       if (err) {
@@ -569,6 +610,62 @@ app.get('/count-parcels', (req, res) => {
       res.json(rows);
   });
 });
+
+
+// NORMAL USER ROUTING
+app.get('/parcel', function (req, res) {
+  const userId = req.session.user.id;
+  // const query = 'SELECT * FROM parcels WHERE;';
+  const query1 = `SELECT * FROM parcels
+                  WHERE status = 0 AND room_id IN (
+                  SELECT room_id FROM tenants
+                  WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
+                );`;
+  const query2 = `SELECT * FROM parcels
+                  WHERE status = 1 AND room_id IN (
+                  SELECT room_id FROM tenants
+                  WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
+                );`;
+  db.all(query1, (err, rows1) => {
+    if (err) {
+      console.log(err.message);
+    }
+    db.all(query2, (err, rows2) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows2);
+      res.render('parcel', { data1 : rows1, data2 : rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+  });
+});
+// app.get('/parcel', function (req, res) {
+//   const userId = req.session.user.id;
+
+//   const query1 = `SELECT parcels.*, tenants.room_id FROM parcels
+//                   LEFT JOIN tenants ON parcels.room_id = tenants.room_id
+//                   LEFT JOIN users ON tenants.user_id = users.id
+//                   WHERE parcels.status = 0 AND (users.id = ${userId} OR tenants.user_id IS NULL);`;
+
+//   const query2 = `SELECT parcels.*, tenants.room_id FROM parcels
+//                   LEFT JOIN tenants ON parcels.room_id = tenants.room_id
+//                   LEFT JOIN users ON tenants.user_id = users.id
+//                   WHERE parcels.status = 1 AND (users.id = ${userId} OR tenants.user_id IS NULL);`;
+
+//   db.all(query1, (err, rows1) => {
+//     if (err) {
+//       console.log(err.message);
+//     }
+//     db.all(query2, (err, rows2) => {
+//       if (err) {
+//         console.log(err.message);
+//       }
+//       console.log(rows2);
+//       res.render('parcel', { data1: rows1, data2: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+//     });
+//   });
+// });
+
 app.post('/accept-parcel/:id', (req, res) => {
   const parcelId = req.params.id;
   console.log(parcelId);
@@ -581,6 +678,12 @@ app.post('/accept-parcel/:id', (req, res) => {
         res.redirect('/parcel');
     });
 });
+
+// app.get('/some-route', function (req, res) {
+//   const userId = req.session.user.id;
+//   console.log('User ID:', userId);
+//   res.send('User ID is ' + userId);
+// });
 
 app.get('/repair', function (req, res) {
   res.render('repair');

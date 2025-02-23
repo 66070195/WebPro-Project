@@ -1,6 +1,10 @@
 <div class="d-flex justify-content-between align-items-center">
     <div class="">
-        <h4 class="title">แจ้งเตือนพัสดุ</h4>
+        <% if (data2.length > 0 && data2[0].room_id) { %>
+            <h4 class="title">แจ้งเตือนพัสดุ - ของห้อง <span class="fw-bold"><%= data2[0].room_id %></span></h4>
+        <% } else { %>
+            <h4 class="title">แจ้งเตือนพัสดุ - ไม่มีห้องพัก</h4>
+        <% } %>
         <p>ข้อมูล <span class="text-danger">แจ้งเตือนพัสดุ</span></p>
     </div>
 </div>
@@ -16,25 +20,31 @@
                 <th>ขนาดพัสดุ</th>
                 <th>วันที่พัสดุถึง</th>
                 <th class="text-center">ยืนยันการรับพัสดุ</th>
-                <!-- <th style="width: 10%;">#</th>
-                <th style="width: 30%;">ชื่อผู้รับ</th>
-                <th style="width: 15%;">ขนาดพัสดุ</th>
-                <th style="width: 15%;">วันที่พัสดุถึง</th>
-                <th style="width: 30%;"">ยืนยันการรับพัสดุ</th> -->
             </tr>
         </thead>
         <tbody>
+            <% let index = 1; %>
+            <% data1.forEach((item)=>{ %>
                 <tr>
-                    <td data-title="#">1</td>
-                    <td data-title="ชื่อผู้รับ">Sarun Manpraphan</td>
-                    <td data-title="ขนาดพัสดุ">ขนาดใหญ่</td>
-                    <td data-title="วันที่พัสดุมาถึง">20-02-2025 00:00:00</td>
+                    <td data-title="#"><%=index++%></td>
+                    <td data-title="ชื่อผู้รับ"><%=item.receiver_name%></td>
+                    <td data-title="ขนาดพัสดุ">
+                        <% if (item.size === 'S') { %>
+                            ขนาดเล็ก
+                        <% } else if (item.size === 'M') { %>
+                            ขนาดกลาง
+                        <% } else { %>
+                            ขนาดใหญ่
+                        <% } %>
+                    </td>
+                    <td data-title="วันที่พัสดุถึง"><%=item.arrival_date%></td>
                     <td data-title="ยืนยันการรับพัสดุ" class="text-center">
-                        <form action="/accept-parcel/1" method="post">
+                        <form action="/accept-parcel/<%=item.id%>" method="post">
                             <button type="submit" class="btn btn-success ">ยืนยันการรับ</button>
                         </form>
                     </td>
                 </tr>
+            <% }); %>
         </tbody>
     </table>
 </div>
@@ -42,33 +52,33 @@
 <div class="bg-white p-3 mt-4 rounded shadowing">
     <h5 class="title">ประวัติการรับพัสดุ</h5>
     <hr>
-    <table class="table py-2 wait-parcel-table" id="no-more-tables">
-        <thead class="align-middle">
+    <table class="table py-2 text-center" id="no-more-tables">
+        <thead class="align-middle table-dark">
             <tr>
-                <th>#</th>
                 <th>ชื่อผู้รับ</th>
                 <th>ขนาดพัสดุ</th>
                 <th>วันที่พัสดุถึง</th>
-                <th class="text-center">ยืนยันการรับพัสดุ</th>
-                <!-- <th style="width: 10%;">#</th>
-                <th style="width: 30%;">ชื่อผู้รับ</th>
-                <th style="width: 15%;">ขนาดพัสดุ</th>
-                <th style="width: 15%;">วันที่พัสดุถึง</th>
-                <th style="width: 30%;"">ยืนยันการรับพัสดุ</th> -->
+                <th>วันที่ยืนยันรับพัสดุ</th>
+                <th>สถานะ</th>
             </tr>
         </thead>
         <tbody>
+            <% data2.forEach((item)=>{ %>
                 <tr>
-                    <td data-title="#">1</td>
-                    <td data-title="ชื่อผู้รับ">Sarun Manpraphan</td>
-                    <td data-title="ขนาดพัสดุ">ขนาดใหญ่</td>
-                    <td data-title="วันที่พัสดุมาถึง">20-02-2025 00:00:00</td>
-                    <td data-title="ยืนยันการรับพัสดุ" class="text-center">
-                        <form action="/accept-parcel/1" method="post">
-                            <button type="submit" class="btn btn-success ">ยืนยันการรับ</button>
-                        </form>
+                    <td data-title="ชื่อผู้รับ"><%=item.receiver_name%></td>
+                    <td data-title="ขนาดพัสดุ">
+                        <% if (item.size === 'S') { %>
+                            ขนาดเล็ก
+                        <% } else if (item.size === 'M') { %>
+                            ขนาดกลาง
+                        <% } else { %>
+                            ขนาดใหญ่
+                        <% } %>
                     </td>
-                </tr>
+                    <td data-title="วันที่พัสดุถึง"><%=item.arrival_date%></td>
+                    <td data-title="วันที่ยืนยันรับพัสดุ"><%=item.receive_date%></td>
+                    <td data-title="สถานะ"><%=item.status === 1 ? 'รับแล้ว' : 'ยังไม่รับ'%></td>
+            <% }); %>
         </tbody>
     </table>
 </div>

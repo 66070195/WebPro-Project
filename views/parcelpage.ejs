@@ -1,0 +1,117 @@
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">แจ้งเตือนพัสดุ</h4>
+        <p>จัดการ <span class="text-danger">แจ้งเตือนพัสดุ</span></p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 col-sm-12 d-flex justify-content-center align-items-center">
+        <div class="bg-white p-3 mt-3 rounded flex-fill shadowing">
+            <h5 class="title">กราฟพัสดุ เป็นแท่งได้ปะบอกว่าแต่ละวันทีกี่พัสดุ</h5>
+            <hr>
+            <div class="d-flex justify-content-center align-items-center"
+                style="width: 17rem; height: 18rem; justify-self: center;">
+                <canvas id="parcelChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
+        <div class="bg-white p-3 mt-3 rounded flex-fill shadowing">
+            <h5 class="title">แจ้งเตือน - พัสดุ</h5>
+            <hr>
+            <form action="/notifyparcel" method="post">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="room_id" class="form-label fw-bold">เลขที่ห้องพัก</label>
+                        <select name="room_id" id="room_id" class="form-select" required>
+                            <option value=""></option>
+                            <% room.forEach((item)=>{ %>
+                                <option value="<%=item.id%>"><%=item.id%></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <label for="receiver_name" class="form-label fw-bold">ชื่อผู้รับ</label>
+                        <input type="text" name="receiver_name" id="receiver_name" class="form-input form-control" required>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12 text-nowrap">
+                        <p class="fw-bold mb-2">ขนาดพัสดุ</p>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="inlineRadio1"
+                                value="S">
+                            <label class="form-check-label" for="inlineRadio1">ขนาดเล็ก</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="inlineRadio2"
+                                value="M" required>
+                            <label class="form-check-label" for="inlineRadio2">ขนาดกลาง</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="inlineRadio3"
+                                value="L">
+                            <label class="form-check-label" for="inlineRadio3">ขนาดใหญ่</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary form-control form-button py-3">แจ้งเตือนพัสดุ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white p-3 mt-4 rounded shadowing">
+    <h5 class="title">รายการพัสดุทั้งหมด</h5>
+    <hr>
+    <table class="table parcel-table" id="no-more-tables">
+        <thead>
+            <tr>
+                <th>ห้องพัก</th>
+                <th>ชื่อผู้รับ</th>
+                <th>ขนาด</th>
+                <th>วันที่พัสดุถึง</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% data.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="ห้องพัก"><%=item.room_id%></td>
+                    <td data-title="ชื่อผู้รับ"><%=item.receiver_name%></td>
+                    <td data-title="ขนาด">
+                        <% if (item.size === 'S') { %>
+                            ขนาดเล็ก
+                        <% } else if (item.size === 'M') { %>
+                            ขนาดกลาง
+                        <% } else { %>
+                            ขนาดใหญ่
+                        <% } %>
+                    </td>
+                    <td data-title="วันที่พัสดุถึง"><%=item.arrival_date%></td>
+                    <td data-title="สถานะ"><%=item.status == 0 ? 'ยังไม่รับ' : 'รับแล้ว'%></td>
+                </tr>
+            <% }); %>
+
+            <!-- <tr>
+                <td data-title="ห้องพัก">A203</td>
+                <td data-title="ชื่อผู้รับ">Sarun Manpraphan</td>
+                <td data-title="ขนาด">กลาง</td>
+                <td data-title="วันที่พัสดุถึง">20-02-2025</td>
+                <td data-title="สถานะ">ยังไม่รับ</td>
+            </tr>
+            <tr>
+                <td data-title="ห้องพัก">B102</td>
+                <td data-title="ชื่อผู้รับ">Wathasin HavenHub</td>
+                <td data-title="ขนาด">ใหญ่</td>
+                <td data-title="วันที่พัสดุถึง">24-02-2025</td>
+                <td data-title="สถานะ">เสร็จสิ้น</td>
+            </tr> -->
+        </tbody>
+    </table>
+</div>

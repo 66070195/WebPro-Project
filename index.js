@@ -197,7 +197,8 @@ app.get('/edituser', function (req, res) {
 
 app.get('/bookroom', function (req, res) {
   let sql1 = `SELECT * FROM rooms WHERE status = 0 ORDER BY id;`;
-  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE role = 2;`;
+  // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE role = 2;`;
+  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2 AND tenants.user_id IS NULL`;
   db.all(sql1, (err1, rows1) => {
       if (err1) {
         console.log(err1.message);
@@ -222,6 +223,25 @@ app.get('/showinvoice', renderPage('showinvoice', '/invoice'));
 app.get('/showreceipt', renderPage('showreceipt', '/invoice'));
 app.get('/addinvoice', renderPage('addinvoice', '/invoice'));
 app.get('/addreceipt', renderPage('addreceipt', '/invoice'));
+
+
+app.get('/parcelpage', function (req, res) {
+  let sql1 = `SELECT * FROM pacels`;
+  let sql2 = `SELECT id FROM rooms`;
+  db.all(sql1, (err1, rows1) => {
+      if (err1) {
+        console.log(err1.message);
+      }
+      console.log(rows1);
+      db.all(sql2, (err2, rows2) => {
+        if (err2) {
+          console.log(err2.message);
+        }
+        res.render('parcelpage', { data : rows1, room : rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      });
+    });
+});
+// app.get('/parcelpage', renderPage('parcelpage'));
 
 
 //Action
@@ -428,8 +448,22 @@ app.post('/bookroom-submit', (req, res) => {
 app.post('/receipt-submit', (req, res) => {
   console.log('Receipt Submitted:', req.body);
   const { selectPayment, amount } = req.body;
-  // insert ข้อมูลลง database ละ redirect กลับหน้า book room
+  // insert ข้อมูลลง database ละ redirect กลับหน้า showreceipt
   res.redirect('showreceipt');
+});
+
+
+app.post('/notifyparcel', (req, res) => {
+  console.log('Parcel Sent:', req.body);
+  const { room_id, receiver_name, size } = req.body;
+  // insert ข้อมูลลง database ละ redirect กลับหน้า parcelpage
+  db.run('INSERT INTO pacels (room_id, receiver_name, size) VALUES (?, ?, ?)', [room_id, receiver_name, size], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Added parcel.')
+    res.redirect('/parcelpage');
+  });
 });
 
 // test

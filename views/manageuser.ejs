@@ -15,33 +15,17 @@
                 <th>#</th>
                 <th>ชื่อ</th>
                 <th>เพศ</th>
-                <!-- <th>ห้องพัก</th> -->
                 <th>บทบาท</th>
                 <th>ห้องพัก</th>
                 <th class="text-center">จัดการ</th>
             </tr>
         </thead>
         <tbody>
-            <!-- <tr>
-                <td data-title="#">1</td>
-                <td data-title="ชื่อ">sarunbigboy</td>
-                <td data-title="ห้องพัก">C101</td>
-                <td data-title="บทบาท">ผู้ดูแล</td>
-                <td data-title="สถานะ">ใช้งาน</td>
-                <td data-title="จัดการ" class="text-center">
-                    <div class="btn-table">
-                        <button class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1">แสดง</button>
-                        <button class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</button>
-                        <button class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
-                    </div>
-                </td>
-            </tr> -->
             <% let index = 1; %>
             <% data.forEach((item)=>{ %>
                 <tr>
                     <td data-title="#"><%=index++%></td>
                     <td data-title="ชื่อ"><%=item.fname%></td>
-                    <!-- <td data-title="ห้องพัก"><%=item.sex%></td> -->
                     <td data-title="เพศ">
                         <% if (item.sex === 'M') { %>
                           ชาย
@@ -52,7 +36,7 @@
                         <% } %>
                       </td>
                     <td data-title="บทบาท"><%=item.role === 1 ? 'ผู้ดูแล' : 'ผู้เช่า'%></td>
-                    <td data-title="ห้องพัก"><%= item.room_id == null ? 'ไม่มีห้องพัก' : item.room_id%></td>
+                    <td data-title="ห้องพัก"><%= item.room_id == null ? 'ไม่มี' : item.room_id%></td>
                     <td data-title="จัดการ" class="text-center">
                         <div class="btn-table">
                             <button class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1" onclick="showDetails('<%= item.id %>')">แสดง</button>

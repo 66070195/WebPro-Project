@@ -1,3 +1,7 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+
 <div class="d-flex justify-content-between align-items-center">
     <div class="">
         <h4 class="title">แจ้งเตือนพัสดุ</h4>
@@ -6,12 +10,11 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6 col-sm-12 d-flex justify-content-center align-items-center">
+    <div class="col-lg-6 col-sm-12 d-flex justify-content-center align-items-center"> 
         <div class="bg-white p-3 mt-3 rounded flex-fill shadowing">
-            <h5 class="title">กราฟพัสดุ เป็นแท่งได้ปะบอกว่าแต่ละวันทีกี่พัสดุ</h5>
+            <h5 class="title">จำนวนพัสดุ</h5>
             <hr>
-            <div class="d-flex justify-content-center align-items-center"
-                style="width: 17rem; height: 18rem; justify-self: center;">
+            <div class="d-flex justify-content-center align-items-center" >
                 <canvas id="parcelChart"></canvas>
             </div>
         </div>
@@ -115,3 +118,114 @@
         </tbody>
     </table>
 </div>
+<script>
+    function createChart(chartId, chartData) {
+    const data = {
+        labels: chartData.labels,
+        datasets: chartData.datasets,
+    };
+
+    const ctx = document.getElementById(chartId).getContext('2d');
+    new Chart(ctx, {
+        type: chartData.type,
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: 'bold',
+                        },
+                    },
+                },
+                datalabels: {
+                    color: '#000',
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    },
+                    align: 'center',
+                    formatter: (value) => `${value}`,
+                },
+                zoom: {
+                    pan: {
+                        enabled: true, 
+                        mode: 'x',  
+                    },
+                    zoom: {
+                        enabled: true,  
+                        mode: 'x',     
+                        speed: 0.1,
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 45,
+                        minRotation: 0
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeOutBounce',
+            }
+        },
+        plugins: [ChartDataLabels, ChartZoom]
+    });
+}
+
+    // try new
+    fetch('/count-parcels')
+    .then(response => response.json())
+    .then(data => {
+        if (!data || data.length === 0) {
+            console.log("no parcel");
+            return;
+        }
+
+        const labels = data.map(row => row.arrival_day);
+        const receivedCounts = data.map(row => row.received_count);
+        const notReceivedCounts = data.map(row => row.not_received_count);
+
+        
+        const chartData = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'พัสดุที่รับแล้ว',
+                    data: receivedCounts,
+                    backgroundColor: '#A8E6CF',
+                    borderColor: 'darkgreen',
+                    borderWidth: 2
+                },
+                {
+                    label: 'พัสดุที่ยังไม่รับ',
+                    data: notReceivedCounts,
+                    backgroundColor: '#FFB3B3',
+                    borderColor: 'darkred',
+                    borderWidth: 2
+                }
+            ],
+            type: 'bar',
+            tooltipsCallback: function(tooltipItem) {
+                return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+            }
+        };
+        createChart('parcelChart', chartData);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+</script>

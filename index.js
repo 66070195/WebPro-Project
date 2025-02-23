@@ -551,16 +551,23 @@ app.get('/testquery', (req, res) => {
   });
 });
 
-
-
-
-
-
-
-
-// NORMAL USER ROUTING
-app.get('/parcel', function (req, res) {
-  res.render('parcel');
+// test
+app.get('/count-parcels', (req, res) => {
+  const query = `
+      SELECT 
+          DATE(arrival_date) AS arrival_day,
+          SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS received_count,
+          SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS not_received_count
+      FROM parcels
+      GROUP BY arrival_day
+      ORDER BY arrival_day;
+  `;
+  db.all(query, [], (err, rows) => {
+      if (err) {
+          throw err;
+      }
+      res.json(rows);
+  });
 });
 app.post('/accept-parcel/:id', (req, res) => {
   const parcelId = req.params.id;
@@ -586,10 +593,6 @@ app.get('/home', function (req, res) {
 app.get('/meter', function (req, res) {
   res.render('meter');
 });
-
-
-
-
 
 // Starting the server
 app.listen(port, () => {

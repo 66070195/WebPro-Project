@@ -82,7 +82,8 @@ app.get('/', function (req, res) {
 });
 
 app.get('/manageuser', (req, res) => { 
-  const query = 'SELECT * FROM users LEFT JOIN tenants ON users.id = tenants.user_id';
+  // const query = "SELECT users.*, tenants.*, CONCAT(users.fname, ' ', users.lname) AS fullname FROM user LEFT JOIN tenants ON users.id = tenants.user_id";
+  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -531,7 +532,8 @@ app.post('/getuserdetails', (req, res) => {
 });
 
 app.get('/testquery', (req, res) => {
-  const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
+  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
+  // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
   db.all(query, (err, rows) => {
       if (err) {
           console.log(err.message);

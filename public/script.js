@@ -183,8 +183,8 @@ function showDetails(itemId) {
         detailsBox.style.left = '50%';
         detailsBox.style.transform = 'translate(-50%, -50%)';
         detailsBox.innerHTML = `
-            <div class="card border-secondary mb-3 shadowing" style="max-width: 18rem;">
-                <div class="card-header">รายละเอียดผู้ใช้ : ${data.id}</div>
+            <div class="card border-secondary mb-3 shadowing">
+                <div class="card-header fs-2">รายละเอียดผู้ใช้ : ${data.id}</div>
                 <div class="card-body">
                     <p><span class="fw-bold">ชื่อเต็ม:</span> ${data.fname} ${data.lname}</p>
                     <p><span class="fw-bold">เลขบัตรประชาชน:</span> ${data.id_card}</p>

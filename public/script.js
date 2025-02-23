@@ -138,6 +138,11 @@ $(document).ready(function() {
                 "order": [[3, "desc"]],
 				"lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "ทั้งหมด"]]
 			}));
+		} else if ($(this).hasClass('wait-parcel-table')) {
+			$(this).DataTable($.extend({}, commonSetting, {
+                "order": [[3, "desc"]],
+				"lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "ทั้งหมด"]]
+			}));
 		}
 	});
 });

@@ -272,7 +272,7 @@ app.post('/home', function (req, res) {
 
       if (row.role === 2) {
         console.log('login successful');
-        res.redirect("graph");
+        res.redirect("/home");
       } else if (row.role === 1) {
         console.log('login successful');
         res.redirect("graph");
@@ -568,6 +568,30 @@ app.get('/count-parcels', (req, res) => {
       }
       res.json(rows);
   });
+});
+app.post('/accept-parcel/:id', (req, res) => {
+  const parcelId = req.params.id;
+  console.log(parcelId);
+  const query = `UPDATE parcels SET status = 1, receive_date = CURRENT_TIMESTAMP WHERE id = ?`;
+    db.run(query, [parcelId], (err) => {
+        if (err) {
+            return console.error('Error modify data:', err.message);
+        }
+        console.log('Parcel update successful');
+        res.redirect('/parcel');
+    });
+});
+
+app.get('/repair', function (req, res) {
+  res.render('repair');
+});
+
+app.get('/home', function (req, res) {
+  res.render('home');
+});
+
+app.get('/meter', function (req, res) {
+  res.render('meter');
 });
 
 // Starting the server

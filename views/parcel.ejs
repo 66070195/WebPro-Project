@@ -1,6 +1,74 @@
 <div class="d-flex justify-content-between align-items-center">
     <div class="">
         <h4 class="title">แจ้งเตือนพัสดุ</h4>
-        <p>จัดการ <span class="text-danger">แจ้งเตือนพัสดุ</span></p>
+        <p>ข้อมูล <span class="text-danger">แจ้งเตือนพัสดุ</span></p>
     </div>
+</div>
+
+<div class="bg-white p-3 mt-3 rounded shadowing">
+    <h5 class="title">พัสดุที่กำลังรอรับ</h5>
+    <hr>
+    <table class="table py-2 wait-parcel-table" id="no-more-tables">
+        <thead class="align-middle">
+            <tr>
+                <th>#</th>
+                <th>ชื่อผู้รับ</th>
+                <th>ขนาดพัสดุ</th>
+                <th>วันที่พัสดุถึง</th>
+                <th class="text-center">ยืนยันการรับพัสดุ</th>
+                <!-- <th style="width: 10%;">#</th>
+                <th style="width: 30%;">ชื่อผู้รับ</th>
+                <th style="width: 15%;">ขนาดพัสดุ</th>
+                <th style="width: 15%;">วันที่พัสดุถึง</th>
+                <th style="width: 30%;"">ยืนยันการรับพัสดุ</th> -->
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td data-title="#">1</td>
+                    <td data-title="ชื่อผู้รับ">Sarun Manpraphan</td>
+                    <td data-title="ขนาดพัสดุ">ขนาดใหญ่</td>
+                    <td data-title="วันที่พัสดุมาถึง">20-02-2025 00:00:00</td>
+                    <td data-title="ยืนยันการรับพัสดุ" class="text-center">
+                        <form action="/accept-parcel/1" method="post">
+                            <button type="submit" class="btn btn-success ">ยืนยันการรับ</button>
+                        </form>
+                    </td>
+                </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="bg-white p-3 mt-4 rounded shadowing">
+    <h5 class="title">ประวัติการรับพัสดุ</h5>
+    <hr>
+    <table class="table py-2 wait-parcel-table" id="no-more-tables">
+        <thead class="align-middle">
+            <tr>
+                <th>#</th>
+                <th>ชื่อผู้รับ</th>
+                <th>ขนาดพัสดุ</th>
+                <th>วันที่พัสดุถึง</th>
+                <th class="text-center">ยืนยันการรับพัสดุ</th>
+                <!-- <th style="width: 10%;">#</th>
+                <th style="width: 30%;">ชื่อผู้รับ</th>
+                <th style="width: 15%;">ขนาดพัสดุ</th>
+                <th style="width: 15%;">วันที่พัสดุถึง</th>
+                <th style="width: 30%;"">ยืนยันการรับพัสดุ</th> -->
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td data-title="#">1</td>
+                    <td data-title="ชื่อผู้รับ">Sarun Manpraphan</td>
+                    <td data-title="ขนาดพัสดุ">ขนาดใหญ่</td>
+                    <td data-title="วันที่พัสดุมาถึง">20-02-2025 00:00:00</td>
+                    <td data-title="ยืนยันการรับพัสดุ" class="text-center">
+                        <form action="/accept-parcel/1" method="post">
+                            <button type="submit" class="btn btn-success ">ยืนยันการรับ</button>
+                        </form>
+                    </td>
+                </tr>
+        </tbody>
+    </table>
 </div>

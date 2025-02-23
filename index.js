@@ -558,7 +558,7 @@ app.get('/count-parcels', (req, res) => {
           DATE(arrival_date) AS arrival_day,
           SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS received_count,
           SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS not_received_count
-      FROM pacels
+      FROM parcels
       GROUP BY arrival_day
       ORDER BY arrival_day;
   `;

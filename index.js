@@ -541,6 +541,25 @@ app.get('/testquery', (req, res) => {
   });
 });
 
+// test
+app.get('/count-parcels', (req, res) => {
+  const query = `
+      SELECT 
+          DATE(arrival_date) AS arrival_day,
+          SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS received_count,
+          SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS not_received_count
+      FROM pacels
+      GROUP BY arrival_day
+      ORDER BY arrival_day;
+  `;
+  db.all(query, [], (err, rows) => {
+      if (err) {
+          throw err;
+      }
+      res.json(rows);
+  });
+});
+
 // Starting the server
 app.listen(port, () => {
   console.log("Server started.");

@@ -91,11 +91,10 @@
 </div>
 
 <script>
-    ส่งค่าจาก EJS ไปที่ JavaScript
     const available = <%= available %>;
     const notAva = <%= notAva %>;
 
-    // กำหนดข้อมูลกราฟ
+    
     const roomChartData = {
         type: 'pie',
         labels: ['ห้องว่าง', 'ห้องไม่ว่าง'],
@@ -106,7 +105,7 @@
         tooltipsCallback: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw} ห้อง`
     };
 
-    // ฟังก์ชั่นสร้างกราฟ
+    
     function createChart(chartId, chartData) {
         const data = {
             labels: chartData.labels,

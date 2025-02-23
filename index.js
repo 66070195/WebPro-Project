@@ -14,7 +14,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Connect to SQLite database
-let db = new sqlite3.Database('MyWebData.db', (err) => {
+let db = new sqlite3.Database('MyWebData - New.db', (err) => {
   if (err) {
     return console.error(err.message);
   }
@@ -36,6 +36,14 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false }
 }));
+
+function isAdmin(req, res, next) {
+  if (req.user && req.user.role === 1) {
+      return next();
+  } else {
+      res.status(403).send('Access denied');
+  }
+}
 
 //Middleware กำหนด user
 app.use((req, res, next) => {
@@ -81,7 +89,7 @@ app.get('/', function (req, res) {
   res.render('login', { layout: false, shake: false, formdata: "" });
 });
 
-app.get('/manageuser', (req, res) => { 
+app.get('/manageuser', isAdmin, (req, res) => { 
   // const query = "SELECT users.*, tenants.*, CONCAT(users.fname, ' ', users.lname) AS fullname FROM user LEFT JOIN tenants ON users.id = tenants.user_id";
   const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
   db.all(query, (err, rows) => {
@@ -143,7 +151,7 @@ app.get('/graph', async (req, res) => {
   }
 });
 
-app.get('/manageroom', (req, res) => {
+app.get('/manageroom', isAdmin, (req, res) => {
   const query = 'SELECT * FROM rooms ORDER BY id;';
   db.all(query, (err, rows) => {
     if (err) {
@@ -157,7 +165,7 @@ app.get('/manageroom', (req, res) => {
 
 
 // app.get('/managemeter', renderPage('managemeter'));
-app.get('/managemeter', function (req, res) {
+app.get('/managemeter', isAdmin, function (req, res) {
   let sql = `SELECT elec_rate, water_rate FROM meters LIMIT 1;`;
   db.all(sql, (err, rows) => {
       if (err) {
@@ -170,7 +178,7 @@ app.get('/managemeter', function (req, res) {
 });
 
 
-app.get('/editroom', function (req, res) {
+app.get('/editroom', isAdmin, function (req, res) {
   let sql = `SELECT * FROM rooms WHERE id = '${req.query.id}'`;
   db.all(sql, (err, rows) => {
       if (err) {
@@ -182,7 +190,7 @@ app.get('/editroom', function (req, res) {
     });
 });
 
-app.get('/edituser', function (req, res) {
+app.get('/edituser', isAdmin, function (req, res) {
   let sql = `SELECT * FROM users WHERE id = '${req.query.id}'`;
   db.all(sql, (err, rows) => {
       if (err) {
@@ -196,7 +204,7 @@ app.get('/edituser', function (req, res) {
 // app.get('/editroom', renderPage('editroom', '/manageroom'));
 
 
-app.get('/bookroom', function (req, res) {
+app.get('/bookroom', isAdmin, function (req, res) {
   let sql1 = `SELECT * FROM rooms WHERE status = 0 ORDER BY id;`;
   // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE role = 2;`;
   let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2 AND tenants.user_id IS NULL`;
@@ -216,18 +224,18 @@ app.get('/bookroom', function (req, res) {
 // app.get('/bookroom', renderPage('bookroom'));
 
 
-app.get('/adduser', renderPage('adduser', '/manageuser'));
-app.get('/fixpage', renderPage('fixpage'));
+app.get('/adduser', isAdmin, renderPage('adduser', '/manageuser'));
+app.get('/fixpage', isAdmin, renderPage('fixpage'));
 // InvoicePage
-app.get('/invoice', renderPage('invoice'));
-app.get('/showinvoice', renderPage('showinvoice', '/invoice'));
-app.get('/showreceipt', renderPage('showreceipt', '/invoice'));
-app.get('/addinvoice', renderPage('addinvoice', '/invoice'));
-app.get('/addreceipt', renderPage('addreceipt', '/invoice'));
+app.get('/invoice', isAdmin, renderPage('invoice'));
+app.get('/showinvoice', isAdmin, renderPage('showinvoice', '/invoice'));
+app.get('/showreceipt', isAdmin, renderPage('showreceipt', '/invoice'));
+app.get('/addinvoice', isAdmin, renderPage('addinvoice', '/invoice'));
+app.get('/addreceipt', isAdmin, renderPage('addreceipt', '/invoice'));
 
 
-app.get('/parcelpage', function (req, res) {
-  let sql1 = `SELECT * FROM pacels`;
+app.get('/parcelpage', isAdmin, function (req, res) {
+  let sql1 = `SELECT * FROM parcels`;
   let sql2 = `SELECT id FROM rooms`;
   db.all(sql1, (err1, rows1) => {
       if (err1) {
@@ -264,7 +272,7 @@ app.post('/home', function (req, res) {
 
       if (row.role === 2) {
         console.log('login successful');
-        res.redirect("manageuser");
+        res.redirect("graph");
       } else if (row.role === 1) {
         console.log('login successful');
         res.redirect("graph");
@@ -542,6 +550,22 @@ app.get('/testquery', (req, res) => {
       res.send(JSON.stringify(rows));        
   });
 });
+
+
+
+
+
+
+
+
+// NORMAL USER ROUTING
+app.get('/parcel', function (req, res) {
+  res.render('parcel');
+});
+
+
+
+
 
 // Starting the server
 app.listen(port, () => {

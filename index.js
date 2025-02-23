@@ -217,6 +217,131 @@ app.get('/editroom', isAdmin, function (req, res) {
     });
 });
 
+app.get('/invoice', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    r.id AS room_id, 
+    u.fname, 
+    u.lname, 
+    b.start_date, 
+    r.rent, 
+    bi.status AS bill_status
+FROM rooms r
+LEFT JOIN tenants t ON r.id = t.room_id
+LEFT JOIN booking b ON r.id = b.room_id
+LEFT JOIN users u ON t.user_id = u.id
+LEFT JOIN bills bi ON r.id = bi.room_id
+WHERE t.status = 1;
+`;
+  db.all(sql, (err, rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('invoice', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+});
+
+app.get('/addinvoice', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    me.id AS meter_id, 
+    me.room_id, 
+    me.water_unit, 
+    me.elec_unit, 
+    me.water_rate, 
+    me.elec_rate, 
+    me.read_date AS meter_read_date
+FROM meters me
+WHERE me.room_id ='${req.query.id}'`;
+  db.all(sql, (err, rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('addinvoice', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+});
+app.get('/exportInvoice', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    u.fname, 
+    u.lname, 
+    r.id AS room_id, 
+    b.created_at, 
+    b.due_date, 
+    me.elec_rate, 
+    me.elec_unit, 
+    b.elec_amount, 
+    me.water_rate, 
+    me.water_unit, 
+    b.water_amount, 
+    b.total_amount
+FROM users u
+JOIN tenants t ON u.id = t.user_id
+JOIN rooms r ON t.room_id = r.id
+JOIN bills b ON r.id = b.room_id
+LEFT JOIN meters me ON r.id = me.room_id
+WHERE r.id = 
+'${req.query.id}'`;
+  db.all(sql, (err, rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('exportInvoice', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+});
+
+app.post('/insertBill/:id', (req, res) => {
+  const roomId = req.params.id;
+  const { water_amount, elec_amount, total_amount } = req.body;
+  console.log('Room ID:', roomId);
+
+  console.log(water_amount,elec_amount,total_amount);
+  const sql = `
+    UPDATE bills
+    SET water_amount = ?, elec_amount = ?, total_amount = ?, status = 0
+    WHERE room_id = ?
+  `;
+  const values = [water_amount, elec_amount, total_amount, roomId]; 
+  db.run(sql, values, (err) => {
+    if (err) {
+      console.error('Error updating data:', err.message);
+      return res.status(500).send('Error updating data');
+    }
+    console.log('Bill updated successfully');
+    console.log('Values to update:', values);
+    res.redirect('/showinvoice');
+
+  });
+});
+
+app.get('/showinvoice', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    r.id AS room_id, 
+    u.fname || ' ' || u.lname AS tenant_name,
+    b.start_date AS tenant_start_date,
+    bi.due_date,
+    bi.due_date AS payment_due_date,
+    bi.total_amount,
+    CASE 
+        WHEN bi.status = 0 THEN 'ยังไม่ชำระ' 
+        ELSE 'ชำระแล้ว' 
+    END AS bill_status 
+FROM rooms r
+LEFT JOIN booking b ON r.id = b.room_id
+LEFT JOIN tenants t ON r.id = t.room_id
+LEFT JOIN users u ON t.user_id = u.id
+LEFT JOIN bills bi ON r.id = bi.room_id WHERE r.status = 1 AND bi.total_amount > 0;;
+
+;
+`;
+  db.all(sql, (err, rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('showinvoice', { data : rows, role: req.user.role, currentPath: 'req.path', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+});
 app.get('/edituser', isAdmin, function (req, res) {
   let sql = `SELECT * FROM users WHERE id = '${req.query.id}'`;
   db.all(sql, (err, rows) => {
@@ -254,10 +379,10 @@ app.get('/bookroom', isAdmin, function (req, res) {
 app.get('/adduser', isAdmin, renderPage('adduser', '/manageuser'));
 // app.get('/fixpage', isAdmin, renderPage('fixpage'));
 // InvoicePage
-app.get('/invoice', isAdmin, renderPage('invoice'));
-app.get('/showinvoice', isAdmin, renderPage('showinvoice', '/invoice'));
+// app.get('/invoice', isAdmin, renderPage('invoice'));
+// app.get('/showinvoice', isAdmin, renderPage('showinvoice', '/invoice'));
 app.get('/showreceipt', isAdmin, renderPage('showreceipt', '/invoice'));
-app.get('/addinvoice', isAdmin, renderPage('addinvoice', '/invoice'));
+// app.get('/addinvoice', isAdmin, renderPage('addinvoice', '/invoice'));
 app.get('/addreceipt', isAdmin, renderPage('addreceipt', '/invoice'));
 
 

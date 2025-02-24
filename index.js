@@ -201,14 +201,47 @@ app.get('/manageroom', isAdmin, (req, res) => {
 
 // app.get('/managemeter', renderPage('managemeter'));
 app.get('/managemeter', isAdmin, function (req, res) {
-  let sql = `SELECT elec_rate, water_rate FROM meters LIMIT 1;`;
+  let sql = `SELECT elec_rate, water_rate FROM rate LIMIT 1;`;
+  let sql2 = `SELECT id FROM rooms`;
   db.all(sql, (err, rows) => {
     if (err) {
       console.log(err.message);
     }
-    console.log(rows);
-    res.render('managemeter', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    db.all(sql2, (err, rows2) => {
+      if (err) {
+        console.log(err.message);
+      }
+      // console.log(rows);
+      res.render('managemeter', { data: rows, room : rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
     // res.render('editroom', { data : rows });
+  });
+  // res.render('managemeter', {  role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+});
+
+app.get('/get-latest-meter/:roomId', (req, res) => {
+  const roomId = req.params.roomId;
+
+  db.get('SELECT water_unit, elec_unit, strftime("%d-%m-%Y", read_date) AS get_date FROM meters WHERE room_id = ? ORDER BY read_date DESC LIMIT 1', [roomId], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (row) {
+      res.json({
+        water_unit: row.water_unit,
+        elec_unit: row.elec_unit,
+        water_date: row.get_date,
+        elec_date: row.get_date
+      });
+    } else {
+      res.json({
+        water_unit: 0,
+        elec_unit: 0,
+        water_date: 'N/A',
+        elec_date: 'N/A'
+      });
+    }
   });
 });
 
@@ -700,73 +733,79 @@ app.post('/editroom-submit/:id', (req, res) => {
   });
 });
 
-
 app.post('/bookroom-submit', (req, res) => {
   const { selectroom, selectuser, movein, checkout, invoice, duepayment } = req.body;
-  // insert ข้อมูลลง database ละ redirect กลับหน้า book room
-  // แปลงค่า date เป็น datetime
-  const startDateTime = movein + ' 00:00:00';
-  const endDateTime = checkout + ' 00:00:00';
-  const invoiceDateTime = invoice + ' 00:00:00';
-  const dueDateTime = duepayment + ' 00:00:00';
+  const startDateTime = `${movein} 00:00:00`;
+  const endDateTime = `${checkout} 00:00:00`;
+  const invoiceDateTime = `${invoice} 00:00:00`;
+  const dueDateTime = `${duepayment} 00:00:00`;
 
   db.serialize(() => {
-    // ตรวจสอบว่ามีข้อมูลในตาราง meters หรือไม่
+    db.run('BEGIN TRANSACTION');
+
     db.get('SELECT water_unit, elec_unit FROM meters WHERE room_id = ? ORDER BY read_date DESC LIMIT 1', [selectroom], (err, row) => {
       if (err) {
+        db.run('ROLLBACK');
         return console.error(err.message);
       }
 
-      let water_amount = 0.0;
-      let elec_amount = 0.0;
+      const water_amount = row ? row.water_unit : 0.0;
+      const elec_amount = row ? row.elec_unit : 0.0;
 
-      if (row) {
-        water_amount = row.water_unit;
-        elec_amount = row.elec_unit;
-      }
-
-      // เพิ่มข้อมูลในตาราง tenants
-      db.run('INSERT INTO tenants (user_id, room_id, status) VALUES (?, ?, ?)', [selectuser, selectroom, 1], (err) => {
+      db.get('SELECT water_rate, elec_rate FROM rate WHERE id = 1', (err, rateRow) => {
         if (err) {
+          db.run('ROLLBACK');
           return console.error(err.message);
         }
 
-        // เพิ่มข้อมูลในตาราง booking
-        db.run('INSERT INTO booking (room_id, user_id, start_date, end_date, bill_id) VALUES (?, ?, ?, ?, ?)', [selectroom, selectuser, startDateTime, endDateTime, null], (err) => {
+        const water_rate = rateRow.water_rate;
+        const elec_rate = rateRow.elec_rate;
+
+        db.run('INSERT INTO tenants (user_id, room_id, status) VALUES (?, ?, ?)', [selectuser, selectroom, 1], (err) => {
           if (err) {
+            db.run('ROLLBACK');
             return console.error(err.message);
           }
 
-          // เพิ่มข้อมูลในตาราง meters
-          db.run('INSERT INTO meters (room_id, water_unit, elec_unit, water_rate, elec_rate, read_date) VALUES (?, ?, ?, ?, ?, ?)', [selectroom, water_amount, elec_amount, 10.0, 5.0, startDateTime], function (err) {
+          db.run('INSERT INTO booking (room_id, user_id, start_date, end_date, bill_id) VALUES (?, ?, ?, ?, ?)', [selectroom, selectuser, startDateTime, endDateTime, null], (err) => {
             if (err) {
+              db.run('ROLLBACK');
               return console.error(err.message);
             }
 
-            const meter_id = this.lastID;
-
-            // เพิ่มข้อมูลในตาราง bills
-            db.run('INSERT INTO bills (user_id, room_id, meter_id, water_amount, elec_amount, total_amount, maintenance_id, due_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [selectuser, selectroom, meter_id, water_amount, elec_amount, water_amount + elec_amount, null, dueDateTime, 0], function (err) {
+            db.run('INSERT INTO meters (room_id, water_unit, elec_unit, rate_id, read_date) VALUES (?, ?, ?, ?, ?)', [selectroom, water_amount, elec_amount, 1, startDateTime], function (err) {
               if (err) {
+                db.run('ROLLBACK');
                 return console.error(err.message);
               }
 
-              const bill_id = this.lastID;
+              const meter_id = this.lastID;
 
-              // อัปเดตค่า bill_id ในตาราง booking
-              db.run('UPDATE booking SET bill_id = ? WHERE room_id = ? AND user_id = ?', [bill_id, selectroom, selectuser], (err) => {
-                if (err) {
-                  return console.error(err.message);
-                }
+              // db.run('INSERT INTO bills (user_id, room_id, meter_id, water_amount, elec_amount, total_amount, due_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [selectuser, selectroom, meter_id, 0, 0, 0, dueDateTime, 0], function (err) {
+              //   if (err) {
+              //     db.run('ROLLBACK');
+              //     return console.error(err.message);
+              //   }
 
-                // อัปเดตสถานะห้องในตาราง rooms
-                db.run('UPDATE rooms SET status = 1 WHERE id = ?', [selectroom], (err) => {
-                  if (err) {
-                    return console.error(err.message);
-                  }
-                  res.redirect('/bookroom');
-                });
-              });
+              //   const bill_id = this.lastID;
+
+                // db.run('UPDATE booking SET bill_id = ? WHERE room_id = ? AND user_id = ?', [bill_id, selectroom, selectuser], (err) => {
+                //   if (err) {
+                //     db.run('ROLLBACK');
+                //     return console.error(err.message);
+                //   }
+
+                  db.run('UPDATE rooms SET status = 1 WHERE id = ?', [selectroom], (err) => {
+                    if (err) {
+                      db.run('ROLLBACK');
+                      return console.error(err.message);
+                    }
+
+                    db.run('COMMIT');
+                    res.redirect('/bookroom');
+                  });
+                // });
+              // });
             });
           });
         });
@@ -823,19 +862,24 @@ app.post('/editmeter', (req, res) => {
   console.log('Edit Elec/Water Meter:', req.body);
   const { selectroom, electricmeter, watermeter } = req.body;
   // Update ข้อมูลลง database ละ redirect กลับหน้า manage meter
-  res.redirect('managemeter');
+  db.run('INSERT INTO meters (room_id, water_unit, elec_unit, rate_id) VALUES (?, ?, ?, ?)', [selectroom, watermeter, electricmeter, 1], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    res.redirect('managemeter');
+  });
 });
 app.post('/editprice', (req, res) => {
   console.log('Edit Elec/Water Price:', req.body);
   const { electricprice, waterprice } = req.body;
   // Update ข้อมูลลง database ละ redirect กลับหน้า manage meter
-  const sql = `UPDATE meters SET elec_rate = ?, water_rate = ?`;
+  const sql = `UPDATE rate SET elec_rate = ?, water_rate = ?`;
 
   db.run(sql, [electricprice, waterprice], (err) => {
     if (err) {
       return console.error('Error modify data:', err.message);
     }
-    console.log('Meter price modified successful');
+    console.log('Rate price modified successful');
     res.redirect('/managemeter');
   });
 });
@@ -1034,7 +1078,22 @@ app.get('/home', function (req, res) {
 });
 
 app.get('/meter', function (req, res) {
-  res.render('meter');
+  // res.render('meter');
+  const userId = req.session.user.id;
+  // const query = `SESELECT water_unit, elec_unit, strftime("%d-%m-%Y", read_date) AS read_date FROM meters WHERE room_id = ? ORDER BY read_date DESC LIMIT 1 `
+  const sql = `SELECT room_id FROM tenants WHERE user_id = ${userId} `;
+  const sql2 = `SELECT water_rate, elec_rate FROM rate LIMIT 1`;
+  db.all(sql, (err, rows1) => {
+    if (err) {
+      console.log(err.message);
+    }
+    db.all(sql2, (err, rows2) => {
+      if (err) {
+        console.log(err.message);
+      }
+      res.render('meter', { room: rows1, data: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+  });
 });
 
 // Starting the server

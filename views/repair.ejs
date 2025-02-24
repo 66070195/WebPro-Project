@@ -49,6 +49,7 @@
                 <th>ประเภทงาน</th>
                 <th>รายละเอียด</th>
                 <th>วันที่แจ้งซ่อม</th>
+                <th>ค่าใช้จ่ายเพิ่มเติม</th>
                 <th>สถานะ</th>
             </tr>
         </thead>
@@ -59,6 +60,7 @@
                     <td data-title="ประเภทงาน"><%=item.type %></td>
                     <td data-title="รายละเอียด"><%=item.detail %></td>
                     <td data-title="วันที่แจ้งซ่อม"><%=item.request_date %></td>
+                    <td data-title="ค่าใช้จ่ายเพิ่มเติม"><%=item.cost %></td>
                     <td data-title="สถานะ">
                         <% if (item.status === 0) { %>
                             แจ้งเรื่อง

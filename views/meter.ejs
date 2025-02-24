@@ -1,1 +1,58 @@
-<h4>meter</h4>
+<div class="d-flex justify-content-between align-items-center">
+    <div class="">
+        <h4 class="title">ตรวจบันทึกมิเตอร์</h4>
+        <p>ตรวจบันทึก <span class="text-danger">มิเตอร์</span></p>
+    </div>
+</div>
+
+<div class="bg-white p-3 mt-3 rounded shadowing">
+    <h4 class="title">บันทึกมิเตอร์ไฟฟ้า & น้ำ</h4>
+    <hr>
+    <div class="row mb-3">
+        <div class="col-12">
+            <label for="room_id" class="form-label fw-bold">เลือกห้องที่ต้องการเช็คมิเตอร์</label>
+            <select name="room_id" id="room_id" class="form-control" onchange="meterSelectChange(event)" required>
+                <option value="">-</option>
+                <% room.forEach((item)=>{ %>
+                    <option value="<%= item.room_id %>">
+                        <%= item.room_id %>
+                    </option>
+                    <% }); %>
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-lg-6 col-sm-12 mb-2">
+            <label for="electricmeter" class="form-label text-warning fw-bold">มิเตอร์ค่าไฟฟ้า</label>
+            <input type="number" class="form-control mb-2" id="electricmeter" name="electricmeter" required readonly>
+            <p class="p-0 m-0 text-danger fw-bold electric-date">วันที่บันทึกมิเตอร์ไฟฟ้าล่าสุด : (วันที่)</p>
+        </div>
+        <div class="col-lg-6 col-sm-12 mb-2">
+            <label for="watermeter" class="form-label text-info fw-bold">มิเตอร์ค่าน้ำ</label>
+            <input type="number" class="form-control mb-2" id="watermeter" name="watermeter" required readonly>
+            <p class="p-0 m-0 text-danger fw-bold water-date">วันที่บันทึกมิเตอร์น้ำล่าสุด : (วันที่)</p>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white p-4 mt-4 rounded shadowing">
+    <h4 class="title">ราคา - ไฟฟ้า / น้ำ</h4>
+    <p><span class="text-danger">หมายเหตุ : ราคาต่อหน่วยเท่ากันทุกห้อง</span></p>
+    <hr>
+    <div class="row mb-3">
+        <% data.forEach((item)=>{ %>
+            <div class="col-lg-6 col-sm-12 mb-2">
+                <label for="electricprice" class="form-label text-warning fw-bold">ค่าไฟฟ้า / หน่วย</label>
+                <input type="number" class="form-control mb-2" id="electricprice" name="electricprice"
+                    value="<%=item.elec_rate%>" readonly>
+            </div>
+            <div class="col-lg-6 col-sm-12 mb-2">
+                <label for="waterprice" class="form-label text-info fw-bold">ค่าน้ำ / หน่วย</label>
+                <input type="number" class="form-control mb-2" id="waterprice" name="waterprice"
+                    value="<%=item.water_rate%>" readonly>
+            </div>
+            <% }); %>
+    </div>
+</div>
+
+<script src="viewMeter.js"></script>

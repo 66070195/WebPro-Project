@@ -9,6 +9,7 @@
 </div>
 
 <div class="row">
+    <% data.forEach((item) => { %>
     <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
         <div class="bg-white p-5 mt-3 rounded flex-fill shadowing">
             <div class="text-center">
@@ -27,11 +28,11 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td data-title="มิเตอร์ไฟฟ้าจากวัน">xx</td>
-                            <td data-title="มิเตอร์ไฟฟ้าถึงวัน">xx</td>
-                            <td data-title="ใช้ไฟฟ้าไป">xx</td>
-                            <td data-title="ราคา/หน่วย">xx</td>
-                            <td data-title="ราคารวม">xx</td>
+                            <td data-title="มิเตอร์ไฟฟ้าจากวัน"><%= item.meter_start_date %></td>
+                            <td data-title="มิเตอร์ไฟฟ้าถึงวัน"><%= item.meter_read_date %></td>
+                            <td data-title="ใช้ไฟฟ้าไป"><%= item.elec_unit %></td>
+                            <td data-title="ราคา/หน่วย"><%= item.elec_rate %></td>
+                            <td data-title="ราคารวม"><%= item.elec_amount %></td>
                         </tr>
                     </tbody>
                 </table>
@@ -56,11 +57,11 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td data-title="มิเตอร์น้ำจากวัน">xx</td>
-                            <td data-title="มิเตอร์น้ำถึงวัน">xx</td>
-                            <td data-title="ใช้น้ำไป">xx</td>
-                            <td data-title="ราคา/หน่วย">xx</td>
-                            <td data-title="ราคารวม">xx</td>
+                            <td data-title="มิเตอร์น้ำจากวัน"><%= item.meter_start_date %></td>
+                            <td data-title="มิเตอร์น้ำถึงวัน"><%= item.meter_read_date %></td>
+                            <td data-title="ใช้น้ำไป"><%= item.water_unit %></td>
+                            <td data-title="ราคา/หน่วย"><%= item.water_rate %></td>
+                            <td data-title="ราคารวม"><%= item.water_amount %></td>
                         </tr>
                     </tbody>
                 </table>
@@ -83,13 +84,14 @@
         </thead>
         <tbody id="extra">
             <tr>
-                <td><input type="text" class="form-control" placeholder="รายการ"></td>
-                <td><input type="number" class="form-control" placeholder="ราคา"></td>
+                <td><input type="text" class="form-control" placeholder="รายการ" value="<%= item.addon_cost %>" readonly></td>
+                <td><input type="number" class="form-control" placeholder="ราคา" value="<%= item.total_amount - (item.elec_amount + item.water_amount) %>" readonly></td>
+
             </tr>
         </tbody>
     </table>
 
-    <form id="receiptSubmit" action="/receipt-submit" method="post">
+    <form id="insertPayment" action="/insertPayment/<%= item.room_id %>" method="post">
         <div class="d-flex justify-content-end">
             <div class="d-flex flex-column px-6">
                 <p class="fw-bold mt-1 mb-2">ช่องทางการชำระเงิน</p>
@@ -112,8 +114,10 @@
         </div>
         
         <div class="d-flex justify-content-end mt-3">
-            <input type="number" id="amount" name="amount" class="form-control w-auto text-center mx-3" placeholder="ราคารวม" >
-            <button type="submit" class="btn btn-success text-nowrap px-2 py-3">ยืนยันการสร้าง</button>
+            
+                <input type="number" id="amount" name="amount" class="form-control w-auto text-center mx-3" placeholder="ราคารวม"value="<%= item.total_amount %>">
+                <button type="submit" class="btn btn-success text-nowrap px-2 py-3">ยืนยันการสร้าง</button>
         </div>
+        <% }); %>
     </form>
 </div>

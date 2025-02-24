@@ -16,9 +16,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Connect to SQLite database
 let db = new sqlite3.Database('MyWebData - New.db', (err) => {
   if (err) {
-    return console.error(err.message);
+      console.error(err.message);
+  } else {
+      console.log('Connected to the database.');
+      db.run('PRAGMA foreign_keys = ON;', (err) => {
+          if (err) {
+              console.error('Error enabling foreign keys:', err.message);
+          } else {
+              console.log('Foreign keys enabled.');
+          }
+      });
   }
-  console.log('Connected to the SQlite database.');
 });
 
 
@@ -39,9 +47,9 @@ app.use(session({
 
 function isAdmin(req, res, next) {
   if (req.user && req.user.role === 1) {
-      return next();
+    return next();
   } else {
-      res.status(403).send('Access denied');
+    res.status(403).send('Access denied');
   }
 }
 
@@ -54,16 +62,42 @@ app.use((req, res, next) => {
 });
 
 // Middleware กำหนด Notification badge
+// app.use((req, res, next) => {
+//   // เดะ Query จำนวนแถวแจ้งซ่อมที่ สถานะแจ้งเรื่อง ไปโชว์ตรง Notification
+//   db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
+//     if (err) {
+//       return next(err);
+//     }
+//     // console.log(row.count)
+//     res.locals.rowCount = row.count;
+//     // res.locals.role = req.user.role;
+//     res.locals.role = req.user ? req.user.role : 2;
+//     res.locals.currentPath = req.path;
+//     res.locals.sidebarClass = req.session.sidebarClass;
+//     next();
+//   });
+// });
 app.use((req, res, next) => {
-  // เดะ Query จำนวนแถวแจ้งซ่อมที่ สถานะแจ้งเรื่อง ไปโชว์ตรง Notification
-  db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
+  const role = req.user ? req.user.role : 2;
+  const userId = req.user ? req.user.id : 0;
+  let query;
+
+  if (role === 1) {
+    query = 'SELECT COUNT(*) FROM maintenance WHERE status != 2';
+  } else if (role === 2) {
+    query = `SELECT COUNT(*) FROM parcels
+                  WHERE status = 0 AND room_id IN (
+                  SELECT room_id FROM tenants
+                  WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
+                );`;
+  }
+
+  db.get(query, (err, row) => {
     if (err) {
       return next(err);
     }
-    // console.log(row.count)
-    res.locals.rowCount = row.count;
-    // res.locals.role = req.user.role;
-    res.locals.role = req.user ? req.user.role : 2;
+    res.locals.rowCount = row['COUNT(*)'];
+    res.locals.role = role;
     res.locals.currentPath = req.path;
     res.locals.sidebarClass = req.session.sidebarClass;
     next();
@@ -89,15 +123,16 @@ app.get('/', function (req, res) {
   res.render('login', { layout: false, shake: false, formdata: "" });
 });
 
-app.get('/manageuser', isAdmin, (req, res) => { 
+app.get('/manageuser', isAdmin, (req, res) => {
   // const query = "SELECT users.*, tenants.*, CONCAT(users.fname, ' ', users.lname) AS fullname FROM user LEFT JOIN tenants ON users.id = tenants.user_id";
-  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
+  // const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
+  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users";
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
     }
     console.log(rows);
-    res.render('manageuser', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    res.render('manageuser', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
   });
 });
 
@@ -123,7 +158,7 @@ app.get('/graph', async (req, res) => {
 
     const [userStats, roomStats] = await Promise.all([getUsers, getRooms]);
 
-    
+
     let maleUsers = 0, femaleUsers = 0, otherUsers = 0;
     let roomsAvailable = 0, roomsRented = 0;
 
@@ -158,7 +193,7 @@ app.get('/manageroom', isAdmin, (req, res) => {
       console.log(err.message);
     }
     console.log(rows);
-    res.render('manageroom', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    res.render('manageroom', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
   });
 });
 // app.get('/manageroom', renderPage('manageroom'));
@@ -168,38 +203,301 @@ app.get('/manageroom', isAdmin, (req, res) => {
 app.get('/managemeter', isAdmin, function (req, res) {
   let sql = `SELECT elec_rate, water_rate FROM meters LIMIT 1;`;
   db.all(sql, (err, rows) => {
-      if (err) {
-        console.log(err.message);
-      }
-      console.log(rows);
-      res.render('managemeter', { data : rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-      // res.render('editroom', { data : rows });
-    });
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('managemeter', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    // res.render('editroom', { data : rows });
+  });
 });
 
 
 app.get('/editroom', isAdmin, function (req, res) {
   let sql = `SELECT * FROM rooms WHERE id = '${req.query.id}'`;
   db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('editroom', { data: rows, role: req.user.role, currentPath: '/manageroom', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    // res.render('editroom', { data : rows });
+  });
+});
+
+app.get('/invoice', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    r.id AS room_id, 
+    u.fname, 
+    u.lname, 
+    strftime('%d-%m-%Y', b.start_date) AS start_date, 
+    r.rent, 
+    bi.status AS bill_status
+FROM rooms r
+LEFT JOIN tenants t ON r.id = t.room_id
+LEFT JOIN booking b ON r.id = b.room_id
+LEFT JOIN users u ON t.user_id = u.id
+LEFT JOIN bills bi ON r.id = bi.room_id
+WHERE t.status = 1;
+`;
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('invoice', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
+});
+
+app.get('/addinvoice', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    me.id AS meter_id, 
+    me.room_id, 
+    me.water_unit, 
+    me.elec_unit, 
+    me.water_rate, 
+    me.elec_rate, 
+    strftime('%d-%m-%Y', me.read_date) AS meter_read_date,
+    me.start_date AS meter_start_date 
+FROM meters me
+WHERE me.room_id = '${req.query.id}';
+`;
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('addinvoice', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
+});
+
+app.get('/addreceipt', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    b.*, 
+    m.water_unit, 
+    m.elec_unit, 
+    m.water_rate, 
+    m.elec_rate, 
+    strftime('%d-%m-%Y', m.read_date) AS meter_read_date,
+    m.start_date AS meter_start_date
+FROM bills b
+LEFT JOIN meters m ON b.meter_id = m.id
+WHERE b.room_id = '${req.query.id}';
+;
+';
+
+`;
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('addreceipt', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
+});
+
+app.get('/exportInvoice', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    u.fname, 
+    u.lname, 
+    r.id AS room_id, 
+    r.rent,
+    b.created_at, 
+    b.due_date, 
+    me.elec_rate, 
+    me.elec_unit, 
+    b.elec_amount, 
+    me.water_rate, 
+    me.water_unit, 
+    b.water_amount, 
+    b.total_amount,
+    b.addon_cost
+FROM users u
+JOIN tenants t ON u.id = t.user_id
+JOIN rooms r ON t.room_id = r.id
+JOIN bills b ON r.id = b.room_id
+LEFT JOIN meters me ON r.id = me.room_id
+WHERE r.id ='${req.query.id}'`;
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('exportInvoice', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
+});
+
+app.get('/exportReceipt', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    u.fname, 
+    u.lname, 
+    r.id AS room_id, 
+    r.rent,
+    b.created_at, 
+    b.due_date, 
+    me.elec_rate, 
+    me.elec_unit, 
+    b.elec_amount, 
+    me.water_rate, 
+    me.water_unit, 
+    b.water_amount, 
+    b.total_amount,
+    b.addon_cost
+FROM users u
+JOIN tenants t ON u.id = t.user_id
+JOIN rooms r ON t.room_id = r.id
+JOIN bills b ON r.id = b.room_id
+LEFT JOIN meters me ON r.id = me.room_id
+WHERE r.id ='${req.query.id}'
+;
+`;
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('exportReciept', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
+});
+
+app.post('/insertBill/:id', (req, res) => {
+  const roomId = req.params.id;
+  const { water_amount, elec_amount, total_amount, extraID } = req.body;
+  // console.log('Room ID:', roomId);
+  console.log('Received extraItems:', extraID);
+  // console.log(water_amount,elec_amount,total_amount);
+  const sql = `
+    UPDATE bills
+    SET water_amount = ?, elec_amount = ?, total_amount = ?, status = 1, addon_cost = ?
+    WHERE room_id = ?
+  `;
+  const values = [water_amount, elec_amount, total_amount, extraID, roomId];
+  db.run(sql, values, (err) => {
+    if (err) {
+      console.error('Error updating data:', err.message);
+      return res.status(500).send('Error updating data');
+    }
+    console.log('Bill updated successfully');
+    console.log('Values to update:', values);
+    res.redirect('/showinvoice');
+
+  });
+});
+
+app.post('/insertPayment/:id', (req, res) => {
+  const roomId = req.params.id;
+  const { selectPayment } = req.body;
+  console.log(selectPayment);
+
+  if (!selectPayment) {
+    return res.status(400).send('Payment method is required');
+  }
+
+  db.serialize(() => {
+    const sqlInsert = `
+      INSERT INTO payments (bill_id, method, paid_date)
+      SELECT id, ?, CURRENT_TIMESTAMP
+      FROM bills
+      WHERE room_id = ?
+      ORDER BY created_at DESC LIMIT 1;
+    `;
+
+    db.run(sqlInsert, [selectPayment, roomId], function (err) {
       if (err) {
-        console.log(err.message);
+        console.error('Error inserting payment:', err.message);
+        return res.status(500).send('Error inserting payment');
       }
-      console.log(rows);
-      res.render('editroom', { data : rows, role: req.user.role, currentPath: '/manageroom', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-      // res.render('editroom', { data : rows });
+      console.log('Payment inserted successfully');
+      const sqlUpdate = `
+        UPDATE bills
+        SET status = 2
+        WHERE room_id = ? AND id = (
+          SELECT id FROM bills WHERE room_id = ? AND status IN (0, 1) ORDER BY created_at DESC LIMIT 1
+        );
+      `;
+
+      db.run(sqlUpdate, [roomId, roomId], function (err) {
+        if (err) {
+          console.error('Error updating bill status:', err.message);
+          return res.status(500).send('Error updating bill status');
+        }
+
+        console.log('Bill status updated to 2');
+        res.redirect('/showreceipt');
+      });
     });
+  });
+});
+
+
+app.get('/showinvoice', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    r.id AS room_id, 
+    u.fname || ' ' || u.lname AS tenant_name,
+    strftime('%d-%m-%Y', b.start_date) AS tenant_start_date,
+    strftime('%d-%m-%Y', bi.due_date) AS due_date,
+    strftime('%d-%m-%Y', bi.due_date) AS payment_due_date,
+    bi.total_amount,
+    CASE 
+        WHEN bi.status = 2 THEN 'ชำระแล้ว' 
+        ELSE 'ยังไม่ชำระ' 
+    END AS bill_status 
+FROM rooms r
+LEFT JOIN booking b ON r.id = b.room_id
+LEFT JOIN tenants t ON r.id = t.room_id
+LEFT JOIN users u ON t.user_id = u.id
+LEFT JOIN bills bi ON r.id = bi.room_id
+WHERE r.status = 1 AND bi.total_amount > 0;
+;
+`;
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('showinvoice', { data: rows, role: req.user.role, currentPath: 'req.path', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
+});
+
+app.get('/showreceipt', isAdmin, function (req, res) {
+  let sql = `SELECT 
+    r.id AS room_id, 
+    u.fname || ' ' || u.lname AS tenant_name,
+    strftime('%d-%m-%Y', b.start_date) AS tenant_start_date,
+    strftime('%d-%m-%Y', bi.due_date) AS due_date,
+    strftime('%d-%m-%Y', bi.due_date) AS payment_due_date,
+    bi.total_amount,
+    CASE 
+        WHEN bi.status = 2 THEN 'ชำระแล้ว' 
+        ELSE 'ยังไม่ชำระ' 
+    END AS bill_status 
+FROM rooms r
+LEFT JOIN booking b ON r.id = b.room_id
+LEFT JOIN tenants t ON r.id = t.room_id
+LEFT JOIN users u ON t.user_id = u.id
+LEFT JOIN bills bi ON r.id = bi.room_id
+WHERE r.status = 1 AND bi.total_amount > 0;
+
+`;
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('showreceipt', { data: rows, role: req.user.role, currentPath: 'req.path', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  });
 });
 
 app.get('/edituser', isAdmin, function (req, res) {
   let sql = `SELECT * FROM users WHERE id = '${req.query.id}'`;
   db.all(sql, (err, rows) => {
-      if (err) {
-        console.log(err.message);
-      }
-      console.log(rows);
-      res.render('edituser', { data : rows, role: req.user.role, currentPath: '/manageuser', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-      // res.render('editroom', { data : rows });
-    });
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('edituser', { data: rows, role: req.user.role, currentPath: '/manageuser', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    // res.render('editroom', { data : rows });
+  });
 });
 // app.get('/editroom', renderPage('editroom', '/manageroom'));
 
@@ -207,48 +505,72 @@ app.get('/edituser', isAdmin, function (req, res) {
 app.get('/bookroom', isAdmin, function (req, res) {
   let sql1 = `SELECT * FROM rooms WHERE status = 0 ORDER BY id;`;
   // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE role = 2;`;
-  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2 AND tenants.user_id IS NULL`;
+  // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2 AND tenants.user_id IS NULL`;
+  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE users.role = 2`;
   db.all(sql1, (err1, rows1) => {
-      if (err1) {
-        console.log(err1.message);
+    if (err1) {
+      console.log(err1.message);
+    }
+    console.log(rows1);
+    db.all(sql2, (err2, rows2) => {
+      if (err2) {
+        console.log(err2.message);
       }
-      console.log(rows1);
-      db.all(sql2, (err2, rows2) => {
-        if (err2) {
-          console.log(err2.message);
-        }
-        res.render('bookroom', { data : rows1, user : rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-      });
+      res.render('bookroom', { data: rows1, user: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
     });
+  });
 });
 // app.get('/bookroom', renderPage('bookroom'));
 
 
 app.get('/adduser', isAdmin, renderPage('adduser', '/manageuser'));
-app.get('/fixpage', isAdmin, renderPage('fixpage'));
+// app.get('/fixpage', isAdmin, renderPage('fixpage'));
 // InvoicePage
-app.get('/invoice', isAdmin, renderPage('invoice'));
-app.get('/showinvoice', isAdmin, renderPage('showinvoice', '/invoice'));
-app.get('/showreceipt', isAdmin, renderPage('showreceipt', '/invoice'));
-app.get('/addinvoice', isAdmin, renderPage('addinvoice', '/invoice'));
-app.get('/addreceipt', isAdmin, renderPage('addreceipt', '/invoice'));
+// app.get('/invoice', isAdmin, renderPage('invoice'));
+// app.get('/showinvoice', isAdmin, renderPage('showinvoice', '/invoice'));
+// app.get('/showreceipt', isAdmin, renderPage('showreceipt', '/invoice'));
+// app.get('/addinvoice', isAdmin, renderPage('addinvoice', '/invoice'));
+// app.get('/addreceipt', isAdmin, renderPage('addreceipt', '/invoice'));
 
+
+app.get('/repairs', function (req, res) {
+  const userRole = req.session.user.role;
+  if (userRole == 1) {
+    let sql = `SELECT * FROM maintenance WHERE status != 2`;
+    let sql2 = `SELECT * FROM maintenance WHERE status = 2`;
+    db.all(sql, (err, rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      db.all(sql2, (err, rows2) => {
+        if (err) {
+          console.log(err.message);
+        }
+        res.render('fixpage', { data: rows, data3: rows2, role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      });
+      // res.render('editroom', { data : rows });
+    });
+    // res.render('fixpage', { role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+  } else {
+    res.redirect('parcel');
+  }
+});
 
 app.get('/parcelpage', isAdmin, function (req, res) {
   let sql1 = `SELECT * FROM parcels`;
   let sql2 = `SELECT id FROM rooms`;
   db.all(sql1, (err1, rows1) => {
-      if (err1) {
-        console.log(err1.message);
+    if (err1) {
+      console.log(err1.message);
+    }
+    console.log(rows1);
+    db.all(sql2, (err2, rows2) => {
+      if (err2) {
+        console.log(err2.message);
       }
-      console.log(rows1);
-      db.all(sql2, (err2, rows2) => {
-        if (err2) {
-          console.log(err2.message);
-        }
-        res.render('parcelpage', { data : rows1, room : rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
-      });
+      res.render('parcelpage', { data: rows1, room: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
     });
+  });
 });
 // app.get('/parcelpage', renderPage('parcelpage'));
 
@@ -309,14 +631,14 @@ app.post('/edituser-submit/:id', (req, res) => {
   const { fname, lname, gender, idcard, phone, password } = req.body;
   // update ข้อมูลลง database ละ redirect กลับหน้า manage room
   const sql = `UPDATE users SET fname = ?, lname = ?, sex = ?, id_card = ?, phone = ?, password = ? WHERE id = ?`;
-  
-    db.run(sql, [fname, lname, gender, idcard, phone, password, userId], (err) => {
-        if (err) {
-            return console.error('Error modify data:', err.message);
-        }
-        console.log('User modified successful');
-        res.redirect('/manageuser');
-    });
+
+  db.run(sql, [fname, lname, gender, idcard, phone, password, userId], (err) => {
+    if (err) {
+      return console.error('Error modify data:', err.message);
+    }
+    console.log('User modified successful');
+    res.redirect('/manageuser');
+  });
 });
 
 
@@ -324,12 +646,12 @@ app.post('/manageuser/delete/:id', (req, res) => {
   const userId = req.params.id;
   const query = 'DELETE FROM users WHERE id = ?';
   db.run(query, [userId], (err) => {
-      if (err) {
-          console.error(err.message);
-          return res.status(500).send('Error deleting user');
-      }
-      console.log('User deleted.');
-      res.redirect('/manageuser');
+    if (err) {
+      console.error(err.message);
+      return res.status(500).send('Error deleting user');
+    }
+    console.log('User deleted.');
+    res.redirect('/manageuser');
   });
 });
 
@@ -353,12 +675,12 @@ app.post('/manageroom/delete/:id', (req, res) => {
   const query = 'DELETE FROM rooms WHERE id = ?';
   db.run(query, [roomId], (err) => {
     if (err) {
-        console.error(err.message);
-        return res.status(500).send('Error deleting room');
+      console.error(err.message);
+      return res.status(500).send('Error deleting room');
     }
     console.log('Rooms deleted.');
     res.redirect('/manageroom');
-});
+  });
 })
 
 
@@ -368,14 +690,14 @@ app.post('/editroom-submit/:id', (req, res) => {
   const { noroom, roomprice, roominfo } = req.body;
   // update ข้อมูลลง database ละ redirect กลับหน้า manage room
   const sql = `UPDATE rooms SET id = ?, rent = ?, description = ? WHERE id = ?`;
-  
-    db.run(sql, [noroom, roomprice, roominfo, roomId], (err) => {
-        if (err) {
-            return console.error('Error modify data:', err.message);
-        }
-        console.log('Room modified successful');
-        res.redirect('/manageroom');
-    });
+
+  db.run(sql, [noroom, roomprice, roominfo, roomId], (err) => {
+    if (err) {
+      return console.error('Error modify data:', err.message);
+    }
+    console.log('Room modified successful');
+    res.redirect('/manageroom');
+  });
 });
 
 
@@ -416,7 +738,7 @@ app.post('/bookroom-submit', (req, res) => {
           }
 
           // เพิ่มข้อมูลในตาราง meters
-          db.run('INSERT INTO meters (room_id, water_unit, elec_unit, water_rate, elec_rate, read_date) VALUES (?, ?, ?, ?, ?, ?)', [selectroom, water_amount, elec_amount, 10.0, 5.0, startDateTime], function(err) {
+          db.run('INSERT INTO meters (room_id, water_unit, elec_unit, water_rate, elec_rate, read_date) VALUES (?, ?, ?, ?, ?, ?)', [selectroom, water_amount, elec_amount, 10.0, 5.0, startDateTime], function (err) {
             if (err) {
               return console.error(err.message);
             }
@@ -424,7 +746,7 @@ app.post('/bookroom-submit', (req, res) => {
             const meter_id = this.lastID;
 
             // เพิ่มข้อมูลในตาราง bills
-            db.run('INSERT INTO bills (user_id, room_id, meter_id, water_amount, elec_amount, total_amount, maintenance_id, due_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [selectuser, selectroom, meter_id, water_amount, elec_amount, water_amount + elec_amount, null, dueDateTime, 0], function(err) {
+            db.run('INSERT INTO bills (user_id, room_id, meter_id, water_amount, elec_amount, total_amount, maintenance_id, due_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [selectuser, selectroom, meter_id, water_amount, elec_amount, water_amount + elec_amount, null, dueDateTime, 0], function (err) {
               if (err) {
                 return console.error(err.message);
               }
@@ -454,19 +776,19 @@ app.post('/bookroom-submit', (req, res) => {
 });
 
 
-app.post('/receipt-submit', (req, res) => {
-  console.log('Receipt Submitted:', req.body);
-  const { selectPayment, amount } = req.body;
-  // insert ข้อมูลลง database ละ redirect กลับหน้า showreceipt
-  res.redirect('showreceipt');
-});
+// app.post('/receipt-submit', (req, res) => {
+//   console.log('Receipt Submitted:', req.body);
+//   const { selectPayment, amount } = req.body;
+//   // insert ข้อมูลลง database ละ redirect กลับหน้า showreceipt
+//   res.redirect('showreceipt');
+// });
 
 
 app.post('/notifyparcel', (req, res) => {
   console.log('Parcel Sent:', req.body);
   const { room_id, receiver_name, size } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า parcelpage
-  db.run('INSERT INTO pacels (room_id, receiver_name, size) VALUES (?, ?, ?)', [room_id, receiver_name, size], (err) => {
+  db.run('INSERT INTO parcels (room_id, receiver_name, size) VALUES (?, ?, ?)', [room_id, receiver_name, size], (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -476,7 +798,7 @@ app.post('/notifyparcel', (req, res) => {
 });
 
 // test
-app.get('/test', renderPage('exportReciept'));
+// app.get('/test', renderPage('exportReciept'));
 
 // Invoices
 // app.get("/createinvoice", (req, res) => {
@@ -508,46 +830,62 @@ app.post('/editprice', (req, res) => {
   const { electricprice, waterprice } = req.body;
   // Update ข้อมูลลง database ละ redirect กลับหน้า manage meter
   const sql = `UPDATE meters SET elec_rate = ?, water_rate = ?`;
-  
-    db.run(sql, [electricprice, waterprice], (err) => {
-        if (err) {
-            return console.error('Error modify data:', err.message);
-        }
-        console.log('Meter price modified successful');
-        res.redirect('/managemeter');
-    });
+
+  db.run(sql, [electricprice, waterprice], (err) => {
+    if (err) {
+      return console.error('Error modify data:', err.message);
+    }
+    console.log('Meter price modified successful');
+    res.redirect('/managemeter');
+  });
 });
 
 
 app.post('/managefix', (req, res) => {
   console.log('Manage fix:', req.body);
-  const { selectroom, extrapayment, description, fixStatus } = req.body;
+  const { id, cost, description, fixStatus } = req.body;
   // Update ข้อมูลลง database ละ redirect กลับหน้า fixpage
-  res.redirect('fixpage');
+  const sql = `UPDATE maintenance SET status = ?, cost = ? WHERE id = ?`;
+
+  db.run(sql, [fixStatus, cost, id], (err) => {
+    if (err) {
+      return console.error('Error modify data:', err.message);
+    }
+    console.log('Request repair modified successful');
+    res.redirect('repairs');
+  });
 });
 
 
 app.post('/getuserdetails', (req, res) => {
   const userId = req.body.id;
-  const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id WHERE users.id = ?';
+  // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id WHERE users.id = ?';
+  const query = `
+    SELECT users.*, GROUP_CONCAT(tenants.room_id) AS room_ids
+    FROM users
+    LEFT JOIN tenants ON users.id = tenants.user_id
+    WHERE users.id = ?
+    GROUP BY users.id
+  `;
   db.get(query, [userId], (err, row) => {
-      if (err) {
-          console.error(err.message);
-          return res.status(500).send('Error retrieving user details');
-      }
-      res.json(row);
+    if (err) {
+      console.error(err.message);
+      return res.status(500).send('Error retrieving user details');
+    }
+    res.json(row);
   });
 });
 
 app.get('/testquery', (req, res) => {
-  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
+  const userId = req.session.user.id;
+  const query = `SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id WHERE users.id = ${userId}`
   // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
   db.all(query, (err, rows) => {
-      if (err) {
-          console.log(err.message);
-      }
-      console.log(rows);
-      res.send(JSON.stringify(rows));        
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.send(JSON.stringify(rows));
   });
 });
 
@@ -563,27 +901,132 @@ app.get('/count-parcels', (req, res) => {
       ORDER BY arrival_day;
   `;
   db.all(query, [], (err, rows) => {
-      if (err) {
-          throw err;
-      }
-      res.json(rows);
+    if (err) {
+      throw err;
+    }
+    res.json(rows);
   });
 });
+
+
+// NORMAL USER ROUTING
+app.get('/parcel', function (req, res) {
+  const userId = req.session.user.id;
+  // const query = 'SELECT * FROM parcels WHERE;';
+  const query1 = `SELECT * FROM parcels
+                  WHERE status = 0 AND room_id IN (
+                  SELECT room_id FROM tenants
+                  WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
+                );`;
+  const query2 = `SELECT * FROM parcels
+                  WHERE status = 1 AND room_id IN (
+                  SELECT room_id FROM tenants
+                  WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
+                ) ORDER BY receive_date DESC;`;
+  const query3 = `SELECT room_id FROM tenants WHERE user_id = ${userId} `
+  db.all(query1, (err, rows1) => {
+    if (err) {
+      console.log(err.message);
+    }
+    db.all(query2, (err, rows2) => {
+      if (err) {
+        console.log(err.message);
+      }
+      db.all(query3, (err, rows3) => {
+        if (err) {
+          console.log(err.message);
+        }
+        res.render('parcel', { data1: rows1, data2: rows2, data3: rows3, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      });
+    });
+  });
+});
+// app.get('/parcel', function (req, res) {
+//   const userId = req.session.user.id;
+
+//   const query1 = `SELECT parcels.*, tenants.room_id FROM parcels
+//                   LEFT JOIN tenants ON parcels.room_id = tenants.room_id
+//                   LEFT JOIN users ON tenants.user_id = users.id
+//                   WHERE parcels.status = 0 AND (users.id = ${userId} OR tenants.user_id IS NULL);`;
+
+//   const query2 = `SELECT parcels.*, tenants.room_id FROM parcels
+//                   LEFT JOIN tenants ON parcels.room_id = tenants.room_id
+//                   LEFT JOIN users ON tenants.user_id = users.id
+//                   WHERE parcels.status = 1 AND (users.id = ${userId} OR tenants.user_id IS NULL);`;
+
+//   db.all(query1, (err, rows1) => {
+//     if (err) {
+//       console.log(err.message);
+//     }
+//     db.all(query2, (err, rows2) => {
+//       if (err) {
+//         console.log(err.message);
+//       }
+//       console.log(rows2);
+//       res.render('parcel', { data1: rows1, data2: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+//     });
+//   });
+// });
+
 app.post('/accept-parcel/:id', (req, res) => {
   const parcelId = req.params.id;
   console.log(parcelId);
   const query = `UPDATE parcels SET status = 1, receive_date = CURRENT_TIMESTAMP WHERE id = ?`;
-    db.run(query, [parcelId], (err) => {
-        if (err) {
-            return console.error('Error modify data:', err.message);
-        }
-        console.log('Parcel update successful');
-        res.redirect('/parcel');
-    });
+  db.run(query, [parcelId], (err) => {
+    if (err) {
+      return console.error('Error modify data:', err.message);
+    }
+    console.log('Parcel update successful');
+    res.redirect('/parcel');
+  });
+});
+
+// app.get('/some-route', function (req, res) {
+//   const userId = req.session.user.id;
+//   console.log('User ID:', userId);
+//   res.send('User ID is ' + userId);
+// });
+
+app.get('/api/item/:id', (req, res) => {
+  const id = req.params.id;
+  db.get('SELECT detail, cost, status FROM maintenance WHERE id = ?', [id], (err, row) => {
+    if (err) {
+      return res.status(500).send('Error fetching item');
+    }
+    res.json(row);
+  });
 });
 
 app.get('/repair', function (req, res) {
-  res.render('repair');
+  const userId = req.session.user.id;
+  const query = `SELECT room_id FROM tenants WHERE user_id = ${userId} `
+  const query2 = `SELECT maintenance.*
+                FROM maintenance
+                JOIN tenants ON maintenance.room_id = tenants.room_id
+                JOIN users ON tenants.user_id = users.id
+                WHERE users.id = ${userId};`;
+  db.all(query, (err, rows1) => {
+    if (err) {
+      console.log(err.message);
+    }
+    db.all(query2, (err, rows2) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows1);
+      res.render('repair', { room: rows1, data: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+  });
+});
+
+app.post('/request-repair', (req, res) => {
+  const { room_id, type, detail } = req.body;
+  db.run('INSERT INTO maintenance (room_id, type, detail) VALUES (?, ?, ?)', [room_id, type, detail], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    res.redirect('repair');
+  });
 });
 
 app.get('/home', function (req, res) {

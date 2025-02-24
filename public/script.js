@@ -118,7 +118,7 @@ $(document).ready(function() {
 			}));
 		} else if ($(this).hasClass('request-fix-table')) {
 			$(this).DataTable($.extend({}, commonSetting, {
-                "order": [[3, "asc"]],
+                "order": [[3, "desc"]],
 				"lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "ทั้งหมด"]]
 			}));
 		} else if ($(this).hasClass('invoice-table')) {
@@ -171,6 +171,7 @@ function confirmDelete(formId) {
     return false;
 }
 
+
 function showDetails(itemId) {
     fetch('/getuserdetails', {
         method: 'POST',
@@ -187,19 +188,30 @@ function showDetails(itemId) {
         detailsBox.style.top = '50%';
         detailsBox.style.left = '50%';
         detailsBox.style.transform = 'translate(-50%, -50%)';
+        
+        let rooms = '';
+        if (data.room_ids) {
+            let roomArray = data.room_ids.split(',');
+            roomArray.forEach(room => {
+                rooms += `<p><span class="fw-bold">ห้องพัก:</span> ${room}</p>`;
+            });
+        } else {
+            rooms = `<p><span class="fw-bold">ห้องพัก:</span> ไม่มีห้องพัก</p>`;
+        }
+
         detailsBox.innerHTML = `
             <div class="card border-secondary mb-3 shadowing">
                 <div class="card-header fs-2">รายละเอียดผู้ใช้ : ${data.id}</div>
                 <div class="card-body">
                     <p><span class="fw-bold">ชื่อเต็ม:</span> ${data.fname} ${data.lname}</p>
                     <p><span class="fw-bold">เลขบัตรประชาชน:</span> ${data.id_card}</p>
-					<hr>
+                    <hr>
                     <p><span class="fw-bold">เบอร์โทรศัพท์:</span> ${data.phone}</p>
                     <p><span class="fw-bold">รหัสผ่าน:</span> ${data.password}</p>
-					<hr>
-                    <p><span class="fw-bold">ห้องพัก:</span> ${data.room_id == null ? 'ไม่มีห้องพัก' : data.room_id}</p>
                     <hr>
-					<button class="btn form-control btn-danger" onclick="document.body.removeChild(document.getElementById('detailsBox'));">ปิด</button>
+                    <div>${rooms}</div>
+                    <hr>
+                    <button class="btn form-control btn-danger" onclick="document.body.removeChild(document.getElementById('detailsBox'));">ปิด</button>
                 </div>
             </div>
         `;
@@ -208,3 +220,73 @@ function showDetails(itemId) {
     .catch(error => console.error('Error:', error));
 }
 
+
+// function showDetails(itemId) {
+//     fetch('/getuserdetails', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ id: itemId })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         let detailsBox = document.createElement('div');
+//         detailsBox.id = 'detailsBox';
+//         detailsBox.style.position = 'fixed';
+//         detailsBox.style.top = '50%';
+//         detailsBox.style.left = '50%';
+//         detailsBox.style.transform = 'translate(-50%, -50%)';
+//         detailsBox.innerHTML = `
+//             <div class="card border-secondary mb-3 shadowing">
+//                 <div class="card-header fs-2">รายละเอียดผู้ใช้ : ${data.id}</div>
+//                 <div class="card-body">
+//                     <p><span class="fw-bold">ชื่อเต็ม:</span> ${data.fname} ${data.lname}</p>
+//                     <p><span class="fw-bold">เลขบัตรประชาชน:</span> ${data.id_card}</p>
+// 					<hr>
+//                     <p><span class="fw-bold">เบอร์โทรศัพท์:</span> ${data.phone}</p>
+//                     <p><span class="fw-bold">รหัสผ่าน:</span> ${data.password}</p>
+// 					<hr>
+//                     <p><span class="fw-bold">ห้องพัก:</span>
+// 						${Array.isArray(data.room_id) ? 
+// 						data.room_id.map(room => `<p>${room}</p>`).join('') : 
+// 						`<p>${data.room_id == null ? 'ไม่มีห้องพัก' : data.room_id}</p>`}
+// 					</p>
+//                     <hr>
+// 					<button class="btn form-control btn-danger" onclick="document.body.removeChild(document.getElementById('detailsBox'));">ปิด</button>
+//                 </div>
+//             </div>
+//         `;
+//         document.body.appendChild(detailsBox);
+//     })
+//     .catch(error => console.error('Error:', error));
+// }
+
+
+function repairSelectChange(event) {
+	const selectedId = event.target.value;
+	const detailField = document.getElementById('description');
+	const costField = document.getElementById('cost');
+
+	if (selectedId) {
+		// ถ้ามี value ใน option ที่เลือก
+		fetch(`/api/item/${selectedId}`)
+			.then(response => response.json())
+			.then(data => {
+				detailField.value = data.detail;
+				costField.value = data.cost;
+				document.getElementById(`inlineRadio${data.status}`).checked = true;
+			})
+			.catch(error => console.error('Error:', error));
+	} else {
+		detailField.value = '';
+		costField.value = '0';
+		document.querySelectorAll('input[name="fixStatus"]').forEach(radio => radio.checked = false);
+	}
+	// fetch(`/api/item/${selectedId}`)
+	// 	.then(response => response.json())
+	// 	.then(data => {
+	// 		inputField.value = data.detail;
+	// 	})
+	// 	.catch(error => console.error('Error:', error));
+}

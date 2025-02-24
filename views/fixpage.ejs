@@ -18,34 +18,23 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td data-title="ห้องพัก">B402</td>
-                <td data-title="ประเภทงาน">ซ่อม</td>
-                <td data-title="รายละเอียด">แอร์</td>
-                <td data-title="วันที่แจ้งซ่อม">22/2/2568 14:24:52</td>
-                <td data-title="สถานะ">แจ้งเรื่อง</td>
-            </tr>
-            <tr>
-                <td data-title="ห้องพัก">A101</td>
-                <td data-title="ประเภทงาน">ซ่อม</td>
-                <td data-title="รายละเอียด">แอร์</td>
-                <td data-title="วันที่แจ้งซ่อม">22/2/2568 12:52:14</td>
-                <td data-title="สถานะ">แจ้งเรื่อง</td>
-            </tr>
-            <tr>
-                <td data-title="ห้องพัก">D101</td>
-                <td data-title="ประเภทงาน">ซ่อม</td>
-                <td data-title="รายละเอียด">แอร์</td>
-                <td data-title="วันที่แจ้งซ่อม">24/2/2568 12:52:14</td>
-                <td data-title="สถานะ">แจ้งเรื่อง</td>
-            </tr>
-            <tr>
-                <td data-title="ห้องพัก">J201</td>
-                <td data-title="ประเภทงาน">ซ่อม</td>
-                <td data-title="รายละเอียด">แอร์</td>
-                <td data-title="วันที่แจ้งซ่อม">14/2/2568 12:52:14</td>
-                <td data-title="สถานะ">แจ้งเรื่อง</td>
-            </tr>
+            <% data.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="ห้องพัก"><%=item.room_id %></td>
+                    <td data-title="ประเภทงาน"><%=item.type %></td>
+                    <td data-title="รายละเอียด"><%=item.detail %></td>
+                    <td data-title="วันที่แจ้งซ่อม"><%=item.request_date %></td>
+                    <td data-title="สถานะ">
+                        <% if (item.status === 0) { %>
+                            แจ้งเรื่อง
+                        <% } else if (item.status === 1) { %>
+                            กำลังดำเนินการ
+                        <% } else { %>
+                            เสร็จสิ้น
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
         </tbody>
     </table>
 </div>
@@ -56,39 +45,79 @@
     <form id="managefix-form" action="/managefix" method="post">
         <div class="row">
             <div class="col-lg-6 col-sm-12 mb-2">
-                <label for="selectroom" class="form-label fw-bold">เลือกห้อง</label>
-                <select name="selectroom" id="selectroom" class="form-control" required>
-                    <option value="roomno-fromdb">เลขห้องที่แจ้งซ่อม/สถานะยังไม่เสร็จสิ้น ดึงจาก db เอา</option>
+                <label for="id" class="form-label fw-bold">เลือกห้อง</label>
+                <select name="id" id="id" class="form-control" onchange="repairSelectChange(event)" required>
+                    <option value="">-</option>
+                    <% data.forEach((item)=>{ %>
+                        <option value="<%=item.id %>"><%=item.room_id %> - <%=item.type %></option>
+                    <% }); %>
                 </select>
             </div>
             <div class="col-lg-6 col-sm-12 mb-2">
-                <label for="extrapayment" class="form-label fw-bold">ค่าใช้จ่ายเพิ่มเติม</label>
-                <input type="number" class="form-control" id="extrapayment" name="extrapayment" value="0">
+                <label for="cost" class="form-label fw-bold">ค่าใช้จ่ายเพิ่มเติม</label>
+                <input type="number" class="form-control" id="cost" name="cost" value="0" required>
             </div>
         </div>
         <div class="row mb-2">
             <div class="col-lg-6 col-sm-12">
                 <label for="description" class="form-label fw-bold">รายละเอียด</label>
-                <input type="text" class="form-control mb-2" id="description" name="description">
+                <input type="text" class="form-control mb-2" id="description" name="description" readonly>
             </div>
             <div class="col-lg-6 col-sm-12 mb-3">
                 <div class="col-12 text-nowrap">
                     <p class="fw-bold mt-1 mb-2">เปลี่ยนสถานะ</p>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="fixStatus" id="inlineRadio1" value="แจ้งเรื่อง">
-                        <label class="form-check-label" for="inlineRadio1">แจ้งเรื่อง</label>
+                        <input class="form-check-input" type="radio" name="fixStatus" id="inlineRadio0" value="0">
+                        <label class="form-check-label" for="inlineRadio0">แจ้งเรื่อง</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="fixStatus" id="inlineRadio2" value="กำลังดำเนินการ" required>
-                        <label class="form-check-label" for="inlineRadio2">กำลังดำเนินการ</label>
+                        <input class="form-check-input" type="radio" name="fixStatus" id="inlineRadio1" value="1" required>
+                        <label class="form-check-label" for="inlineRadio1">กำลังดำเนินการ</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="fixStatus" id="inlineRadio3" value="เสร็จสิ้น">
-                        <label class="form-check-label" for="inlineRadio3">เสร็จสิ้น</label>
+                        <input class="form-check-input" type="radio" name="fixStatus" id="inlineRadio2" value="2">
+                        <label class="form-check-label" for="inlineRadio2">เสร็จสิ้น</label>
                     </div>
                 </div>
             </div>
         </div>
         <button type="submit" class="btn btn-success form-control py-3">ยืนยันการเปลี่ยนสถานะ</button>
     </form>
+</div>
+
+<div class="bg-white p-3 mt-4 rounded shadowing">
+    <h5 class="title">ประวัติการซ่อมที่เสร็จสิ้น</h5>
+    <hr>
+    <table class="table py-2 text-center" id="no-more-tables"> 
+        <thead class="table-dark">
+            <tr>
+                <th>ห้องพัก</th>
+                <th>ประเภทงาน</th>
+                <th>รายละเอียด</th>
+                <th>วันที่แจ้งซ่อม</th>
+                <th>ค่าใช้จ่ายเพิ่มเติม</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% data3.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="ห้องพัก"><%=item.room_id %></td>
+                    <td data-title="ประเภทงาน"><%=item.type %></td>
+                    <td data-title="รายละเอียด"><%=item.detail %></td>
+                    <td data-title="วันที่แจ้งซ่อม"><%=item.request_date %></td>
+                    <td data-title="ค่าใช้จ่ายเพิ่มเติม"><%=item.cost %></td>
+                    <td data-title="สถานะ">
+                        <% if (item.status === 0) { %>
+                            แจ้งเรื่อง
+                        <% } else if (item.status === 1) { %>
+                            กำลังดำเนินการ
+                        <% } else { %>
+                            เสร็จสิ้น
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
 </div>

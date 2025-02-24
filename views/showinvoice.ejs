@@ -23,21 +23,22 @@
             </tr>
         </thead>
         <tbody>
+            <% data.forEach((item) => { %>
             <tr>
-                <td data-title="ห้อง">db-1</td>
-                <td data-title="ชื่อผู้เช่า">db-1</td>
-                <td data-title="วันที่เข้าพัก">db-1</td>
-                <td data-title="วันออกใบแจ้งหนี้">db-1</td>
-                <td data-title="กำหนดชำระเงิน">db-1</td>
-                <td data-title="ยอดชำระ">db-1</td>
-                <td data-title="สถานะ">db-1</td>
+                <td data-title="ห้อง"><%= item.room_id %></td>
+                <td data-title="ชื่อผู้เช่า"><%= item.tenant_name %></td>
+                <td data-title="วันที่เข้าพัก"><%= item.tenant_start_date %></td>
+                <td data-title="วันออกใบแจ้งหนี้"><%= item.tenant_start_date %></td>
+                <td data-title="กำหนดชำระเงิน"><%= item.payment_due_date %></td>
+                <td data-title="ยอดชำระ"><%= item.total_amount %></td>
+                <td data-title="สถานะ"><%= item.bill_status %></td>
                 <td data-title="ดำเนินการ" class="text-center">
                     <div class="btn-table">
-                        <!-- database ดึงข้อมูลตอนเลือกตอน loop กด click add  ตอนนั้น -->
-                        <a href="/showinvoice" class="btn btn-warning text-light btn-sm px-lg-4 px-md-3 mx-1">ใบแจ้งหนี้</a>
+                        <a href="/exportInvoice?id=<%= item.room_id %>" class="btn btn-warning text-light btn-sm px-lg-4 px-md-3 mx-1">ใบแจ้งหนี้</a>
                     </div>
                 </td>
             </tr>
+            <% }); %>
         </tbody>
     </table>
 </div>

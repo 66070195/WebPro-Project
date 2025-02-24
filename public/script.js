@@ -171,6 +171,7 @@ function confirmDelete(formId) {
     return false;
 }
 
+
 function showDetails(itemId) {
     fetch('/getuserdetails', {
         method: 'POST',
@@ -187,19 +188,30 @@ function showDetails(itemId) {
         detailsBox.style.top = '50%';
         detailsBox.style.left = '50%';
         detailsBox.style.transform = 'translate(-50%, -50%)';
+        
+        let rooms = '';
+        if (data.room_ids) {
+            let roomArray = data.room_ids.split(',');
+            roomArray.forEach(room => {
+                rooms += `<p><span class="fw-bold">ห้องพัก:</span> ${room}</p>`;
+            });
+        } else {
+            rooms = `<p><span class="fw-bold">ห้องพัก:</span> ไม่มีห้องพัก</p>`;
+        }
+
         detailsBox.innerHTML = `
             <div class="card border-secondary mb-3 shadowing">
                 <div class="card-header fs-2">รายละเอียดผู้ใช้ : ${data.id}</div>
                 <div class="card-body">
                     <p><span class="fw-bold">ชื่อเต็ม:</span> ${data.fname} ${data.lname}</p>
                     <p><span class="fw-bold">เลขบัตรประชาชน:</span> ${data.id_card}</p>
-					<hr>
+                    <hr>
                     <p><span class="fw-bold">เบอร์โทรศัพท์:</span> ${data.phone}</p>
                     <p><span class="fw-bold">รหัสผ่าน:</span> ${data.password}</p>
-					<hr>
-                    <p><span class="fw-bold">ห้องพัก:</span> ${data.room_id == null ? 'ไม่มีห้องพัก' : data.room_id}</p>
                     <hr>
-					<button class="btn form-control btn-danger" onclick="document.body.removeChild(document.getElementById('detailsBox'));">ปิด</button>
+                    <div>${rooms}</div>
+                    <hr>
+                    <button class="btn form-control btn-danger" onclick="document.body.removeChild(document.getElementById('detailsBox'));">ปิด</button>
                 </div>
             </div>
         `;
@@ -207,6 +219,48 @@ function showDetails(itemId) {
     })
     .catch(error => console.error('Error:', error));
 }
+
+
+// function showDetails(itemId) {
+//     fetch('/getuserdetails', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ id: itemId })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         let detailsBox = document.createElement('div');
+//         detailsBox.id = 'detailsBox';
+//         detailsBox.style.position = 'fixed';
+//         detailsBox.style.top = '50%';
+//         detailsBox.style.left = '50%';
+//         detailsBox.style.transform = 'translate(-50%, -50%)';
+//         detailsBox.innerHTML = `
+//             <div class="card border-secondary mb-3 shadowing">
+//                 <div class="card-header fs-2">รายละเอียดผู้ใช้ : ${data.id}</div>
+//                 <div class="card-body">
+//                     <p><span class="fw-bold">ชื่อเต็ม:</span> ${data.fname} ${data.lname}</p>
+//                     <p><span class="fw-bold">เลขบัตรประชาชน:</span> ${data.id_card}</p>
+// 					<hr>
+//                     <p><span class="fw-bold">เบอร์โทรศัพท์:</span> ${data.phone}</p>
+//                     <p><span class="fw-bold">รหัสผ่าน:</span> ${data.password}</p>
+// 					<hr>
+//                     <p><span class="fw-bold">ห้องพัก:</span>
+// 						${Array.isArray(data.room_id) ? 
+// 						data.room_id.map(room => `<p>${room}</p>`).join('') : 
+// 						`<p>${data.room_id == null ? 'ไม่มีห้องพัก' : data.room_id}</p>`}
+// 					</p>
+//                     <hr>
+// 					<button class="btn form-control btn-danger" onclick="document.body.removeChild(document.getElementById('detailsBox'));">ปิด</button>
+//                 </div>
+//             </div>
+//         `;
+//         document.body.appendChild(detailsBox);
+//     })
+//     .catch(error => console.error('Error:', error));
+// }
 
 
 function repairSelectChange(event) {

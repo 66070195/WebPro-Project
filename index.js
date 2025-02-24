@@ -16,9 +16,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Connect to SQLite database
 let db = new sqlite3.Database('MyWebData - New.db', (err) => {
   if (err) {
-    return console.error(err.message);
+      console.error(err.message);
+  } else {
+      console.log('Connected to the database.');
+      db.run('PRAGMA foreign_keys = ON;', (err) => {
+          if (err) {
+              console.error('Error enabling foreign keys:', err.message);
+          } else {
+              console.log('Foreign keys enabled.');
+          }
+      });
   }
-  console.log('Connected to the SQlite database.');
 });
 
 
@@ -117,7 +125,8 @@ app.get('/', function (req, res) {
 
 app.get('/manageuser', isAdmin, (req, res) => {
   // const query = "SELECT users.*, tenants.*, CONCAT(users.fname, ' ', users.lname) AS fullname FROM user LEFT JOIN tenants ON users.id = tenants.user_id";
-  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
+  // const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
+  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users";
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -497,7 +506,7 @@ app.get('/bookroom', isAdmin, function (req, res) {
   let sql1 = `SELECT * FROM rooms WHERE status = 0 ORDER BY id;`;
   // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE role = 2;`;
   // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2 AND tenants.user_id IS NULL`;
-  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2`;
+  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE users.role = 2`;
   db.all(sql1, (err1, rows1) => {
     if (err1) {
       console.log(err1.message);
@@ -528,12 +537,17 @@ app.get('/repairs', function (req, res) {
   const userRole = req.session.user.role;
   if (userRole == 1) {
     let sql = `SELECT * FROM maintenance WHERE status != 2`;
+    let sql2 = `SELECT * FROM maintenance WHERE status = 2`;
     db.all(sql, (err, rows) => {
       if (err) {
         console.log(err.message);
       }
-      console.log(rows);
-      res.render('fixpage', { data: rows, role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      db.all(sql2, (err, rows2) => {
+        if (err) {
+          console.log(err.message);
+        }
+        res.render('fixpage', { data: rows, data3: rows2, role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      });
       // res.render('editroom', { data : rows });
     });
     // res.render('fixpage', { role: req.user.role, currentPath: '/fixpage', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
@@ -845,7 +859,14 @@ app.post('/managefix', (req, res) => {
 
 app.post('/getuserdetails', (req, res) => {
   const userId = req.body.id;
-  const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id WHERE users.id = ?';
+  // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id WHERE users.id = ?';
+  const query = `
+    SELECT users.*, GROUP_CONCAT(tenants.room_id) AS room_ids
+    FROM users
+    LEFT JOIN tenants ON users.id = tenants.user_id
+    WHERE users.id = ?
+    GROUP BY users.id
+  `;
   db.get(query, [userId], (err, row) => {
     if (err) {
       console.error(err.message);
@@ -857,8 +878,7 @@ app.post('/getuserdetails', (req, res) => {
 
 app.get('/testquery', (req, res) => {
   const userId = req.session.user.id;
-  console.log(userId + 'ke');
-  const query = `SELECT room_id FROM tenants WHERE user_id = ${userId}`
+  const query = `SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id WHERE users.id = ${userId}`
   // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
   db.all(query, (err, rows) => {
     if (err) {
@@ -902,7 +922,7 @@ app.get('/parcel', function (req, res) {
                   WHERE status = 1 AND room_id IN (
                   SELECT room_id FROM tenants
                   WHERE user_id = (SELECT id FROM users WHERE id = ${userId})
-                );`;
+                ) ORDER BY receive_date DESC;`;
   const query3 = `SELECT room_id FROM tenants WHERE user_id = ${userId} `
   db.all(query1, (err, rows1) => {
     if (err) {
@@ -980,7 +1000,11 @@ app.get('/api/item/:id', (req, res) => {
 app.get('/repair', function (req, res) {
   const userId = req.session.user.id;
   const query = `SELECT room_id FROM tenants WHERE user_id = ${userId} `
-  let query2 = `SELECT * FROM maintenance`;
+  const query2 = `SELECT maintenance.*
+                FROM maintenance
+                JOIN tenants ON maintenance.room_id = tenants.room_id
+                JOIN users ON tenants.user_id = users.id
+                WHERE users.id = ${userId};`;
   db.all(query, (err, rows1) => {
     if (err) {
       console.log(err.message);

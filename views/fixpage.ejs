@@ -84,3 +84,40 @@
         <button type="submit" class="btn btn-success form-control py-3">ยืนยันการเปลี่ยนสถานะ</button>
     </form>
 </div>
+
+<div class="bg-white p-3 mt-4 rounded shadowing">
+    <h5 class="title">ประวัติการซ่อมที่เสร็จสิ้น</h5>
+    <hr>
+    <table class="table py-2 text-center" id="no-more-tables"> 
+        <thead class="table-dark">
+            <tr>
+                <th>ห้องพัก</th>
+                <th>ประเภทงาน</th>
+                <th>รายละเอียด</th>
+                <th>วันที่แจ้งซ่อม</th>
+                <th>ค่าใช้จ่ายเพิ่มเติม</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% data3.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="ห้องพัก"><%=item.room_id %></td>
+                    <td data-title="ประเภทงาน"><%=item.type %></td>
+                    <td data-title="รายละเอียด"><%=item.detail %></td>
+                    <td data-title="วันที่แจ้งซ่อม"><%=item.request_date %></td>
+                    <td data-title="ค่าใช้จ่ายเพิ่มเติม"><%=item.cost %></td>
+                    <td data-title="สถานะ">
+                        <% if (item.status === 0) { %>
+                            แจ้งเรื่อง
+                        <% } else if (item.status === 1) { %>
+                            กำลังดำเนินการ
+                        <% } else { %>
+                            เสร็จสิ้น
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>

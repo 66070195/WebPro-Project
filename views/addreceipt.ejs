@@ -84,8 +84,10 @@
         </thead>
         <tbody id="extra">
             <tr>
-                <td><input type="text" class="form-control" placeholder="รายการ" value="<%= item.addon_cost %>" readonly></td>
-                <td><input type="number" class="form-control" placeholder="ราคา" value="<%= item.total_amount - (item.elec_amount + item.water_amount) %>" readonly></td>
+                <td><input type="text" class="form-control"  value="<%= item.addon_cost == 0 ? '-' : item.addon_cost %>"
+                    readonly></td>
+                <td><input type="number" class="form-control"  value="<%= (item.total_amount - (item.elec_amount + item.water_amount)) == 0 ? '-' : (item.total_amount - (item.elec_amount + item.water_amount)) %>"
+                    readonly></td>
 
             </tr>
         </tbody>

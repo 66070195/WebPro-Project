@@ -31,15 +31,22 @@
                         <td data-title="ยอดชำระ"><%= item.rent %></td>
                         <td data-title="สถานะ">
                             <%= item.bill_status === 2 ? 'ชำระแล้ว' : 'ยังไม่ชำระ' %>
+                            <!-- <%= typeof item.bill_status %> : <%= item.bill_status %> -->
                           </td>
                           
                         <td data-title="ดำเนินการ" class="text-center">
                             <div class="btn-table">
-                                <% if (item.bill_status === 1) { %>
+                                <a href="/addinvoice?id=<%= item.room_id %>" class="btn btn-secondary btn-sm px-lg-4 px-md-3 mx-1">
+                                    สร้างใบแจ้งหนี้
+                                </a>
+                                <a href="/addreceipt?id=<%= item.room_id %>" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1">
+                                    สร้างใบเสร็จรับเงิน
+                                </a>
+                                <!-- <% if (item.bill_status === '1') { %>
                                     <a href="/addreceipt?id=<%= item.room_id %>" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1">
                                         สร้างใบเสร็จรับเงิน
                                     </a>
-                                <% } else if (item.bill_status === 3) { %>
+                                <% } else if (item.bill_status === '2') { %>
                                     <a href="/home" class="btn btn-dark btn-sm px-lg-4 px-md-3 mx-1">
                                         ชำระแล้ว
                                     </a>
@@ -50,7 +57,7 @@
                                     <a href="/addreceipt?id=<%= item.room_id %>" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1">
                                         สร้างใบเสร็จรับเงิน
                                     </a>
-                                <% } %>
+                                <% } %> -->
                             </div>
                         </td>
                     </tr>

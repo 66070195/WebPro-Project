@@ -292,16 +292,16 @@ WHERE r.id =
 
 app.post('/insertBill/:id', (req, res) => {
   const roomId = req.params.id;
-  const { water_amount, elec_amount, total_amount } = req.body;
-  console.log('Room ID:', roomId);
-
-  console.log(water_amount,elec_amount,total_amount);
+  const { water_amount, elec_amount, total_amount,extraID} = req.body;
+  // console.log('Room ID:', roomId);
+  console.log('Received extraItems:', extraID);
+  // console.log(water_amount,elec_amount,total_amount);
   const sql = `
     UPDATE bills
-    SET water_amount = ?, elec_amount = ?, total_amount = ?, status = 1
+    SET water_amount = ?, elec_amount = ?, total_amount = ?, status = 1, addon_cost = ?
     WHERE room_id = ?
   `;
-  const values = [water_amount, elec_amount, total_amount, roomId]; 
+  const values = [water_amount, elec_amount, total_amount,extraID, roomId]; 
   db.run(sql, values, (err) => {
     if (err) {
       console.error('Error updating data:', err.message);

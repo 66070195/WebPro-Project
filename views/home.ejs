@@ -1,1 +1,102 @@
-<h4>Home</h4>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div class="bg-white p-3 mt-3 w-75 rounded-5 shadowing row">
+        <div class="col-3">
+            <img class="rounded-circle w-100" style="box-shadow: 0 0 10px gray;" src="/img/LOGO.png" alt="login" id="logoImg" >
+        </div>
+        <div class="col-9" style="display: flex; align-items: center;">
+            <div class="w-100">
+                <h2 style="font-size: 2vw;">ยินดีต้อนรับ, <%= data[0].fname %></h2><br>
+                <div class="table-responsive">
+                <table class="w-100">
+                    <tr>
+                        <th>ห้อง: </th>
+                        <th>ค้างชำระ: </th>
+                        <th>พัสดุ: </th>
+                    </tr>
+                    <tr>
+                        <td><%= data[0].room_id %></td>
+                        <td>
+                            <% if (data[0].bill_status == null){ %>
+                            ไม่มี
+                            <%}else if (data[0].bill_status == 0) {%>
+                            ค้างชำระ
+                            <%}else if (data[0].bill_status == 1) {%>
+                            ชำระแล้ว
+                            <% } %>
+                        </td>
+                        <td><%= data[0].parcel_count %> ชื้น</td>
+                    </tr>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="bg-white p-3 mt-4 rounded shadowing">
+    <h5 class="title">ค่าใช้จ่ายแต่ละเดือน</h5>
+    <hr>
+    <canvas id="barChart"></canvas>
+</div>
+<div class="bg-white p-3 mt-4 rounded shadowing">
+    <h5 class="title">รายการ(ที่ต้อง)ซ่อม</h5>
+    <hr>
+    <table class="table py-2 request-fix-table text-center" id="no-more-tables"> 
+        <thead class="table-dark">
+            <tr>
+                <th>ประเภทงาน</th>
+                <th>รายละเอียด</th>
+                <th>ค่าใช้จ่ายเพิ่มเติม</th>
+                <th>สถานะ</th>
+                <th>วันที่แจ้งซ่อม</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% maintenance.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="ประเภทงาน"><%=item.type %></td>
+                    <td data-title="รายละเอียด"><%=item.detail %></td>
+                    <td data-title="ค่าใช้จ่ายเพิ่มเติม"><%=item.cost %></td>
+                    <td data-title="สถานะ">
+                        <% if (item.status === 0) { %>
+                            แจ้งเรื่อง
+                        <% } else { %>
+                            กำลังดำเนินการ
+                        <% } %>
+                    </td>
+                    <td data-title="วันที่แจ้งซ่อม"><%=item.request_date %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+<script>
+    //const data = <%= JSON.stringify(bill) %>;
+    const data = [
+        { created_at: '2025-01-01', total_amount: 1000 },
+        { created_at: '2025-02-01', total_amount: 1500 }
+    ];
+    const labels = data.map(item => item.created_at);
+    const values = data.map(item => item.total_amount);
+    const ctx = document.getElementById('barChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'ค่าใช้จ่าย',
+                data: values,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>

@@ -48,10 +48,13 @@
                 <label for="id" class="form-label fw-bold">เลือกห้อง</label>
                 <select name="id" id="id" class="form-control" onchange="repairSelectChange(event)" required>
                     <option value="">-</option>
-                    <% data.forEach((item)=>{ %>
-                        <option value="<%=item.id %>"><%=item.room_id %> - <%=item.type %></option>
+                    <% data.forEach((item) => { %>
+                        <% if (item.status < 2) { %> 
+                            <option value="<%=item.id %>"><%=item.room_id %> - <%=item.type %></option>
+                        <% } %>
                     <% }); %>
                 </select>
+                
             </div>
             <div class="col-lg-6 col-sm-12 mb-2">
                 <label for="cost" class="form-label fw-bold">ค่าใช้จ่ายเพิ่มเติม</label>

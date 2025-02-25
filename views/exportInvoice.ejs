@@ -59,37 +59,53 @@
                             <%= item.rent %>
                         </td>
                     </tr>
-                    <% if (item.addon_cost && item.addon_cost !== '') { %>
+                    <% if (item.addon_cost && item.addon_cost !=='' ) { %>
 
                         <tr>
                             <td style="border: 1px solid #ddd; padding: 8px;">
                                 <%= item.addon_cost %>
                             </td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            
+                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" id="cost1">
+                                <%= Math.max( (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount ||
+                                    0) - (item.rent || 0) - (item.maintenance_cost_half || 0), (item.total_amount || 0)
+                                    - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
+                                    (item.maintenance_cost || 0) ) %>
 
-                                <%= (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0) %>
+
 
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">1</td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                <%= (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0) %>
+                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" id="cost2">
+                                <%= Math.max( (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount ||
+                                    0) - (item.rent || 0) - (item.maintenance_cost_half || 0), (item.total_amount || 0)
+                                    - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
+                                    (item.maintenance_cost || 0) ) %>
 
                             </td>
                         </tr>
                         <% } %>
-                        <% if ((item.maintenance_cost || 0) > 0) { %>
+                            <% if ((item.maintenance_cost || 0)> 0) { %>
 
                                 <tr>
                                     <td style="border: 1px solid #ddd; padding: 8px;">
                                         ค่าซ่อม
                                     </td>
                                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                        <%= item.maintenance_cost %>
+                                        <%= (item.total_amount || 0) - Math.max( (item.total_amount || 0) -
+                                            (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
+                                            (item.maintenance_cost_half || 0), (item.total_amount || 0) -
+                                            (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
+                                            (item.maintenance_cost || 0) ) - item.elec_amount - item.water_amount-item.rent %>
+
+
                                     </td>
                                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">1</td>
                                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                        <%= item.maintenance_cost %>
+                                        <%= (item.total_amount || 0) - Math.max( (item.total_amount || 0) -
+                                            (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
+                                            (item.maintenance_cost_half || 0), (item.total_amount || 0) -
+                                            (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
+                                            (item.maintenance_cost || 0) ) - item.elec_amount - item.water_amount-item.rent %>
                                     </td>
                                 </tr>
                                 <% } %>
@@ -124,4 +140,11 @@
         doc.addImage(imgData, "PNG", 10, 10, 190, 0);
         doc.save("receipt.pdf");
     });
+    document.addEventListener("DOMContentLoaded", function () {
+        const value1 = (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost_half || 0);
+        const value2 = (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0);
+        const maxValue = Math.max(value1, value2);
+        document.getElementById("cost1").innerText = maxValue;
+    });
+
 </script>

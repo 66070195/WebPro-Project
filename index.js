@@ -631,7 +631,7 @@ app.get('/showinvoice', isAdmin, function (req, res) {
   let sql = `SELECT u.fname, u.lname, b.*
 FROM bills b
 JOIN users u ON b.user_id = u.id
-WHERE b.status = 1;
+WHERE b.status >= 1;
 
 ;
 `;

@@ -66,12 +66,14 @@
                                 <%= item.addon_cost %>
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                <%= (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost_half || 0) %>
+                            
+
+                                <%= (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0) %>
 
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">1</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                <%= (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost_half || 0) %>
+                                <%= (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0) %>
 
                             </td>
                         </tr>
@@ -83,11 +85,11 @@
                                         ค่าซ่อม
                                     </td>
                                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                        <%= item.maintenance_cost_half %>
+                                        <%= item.maintenance_cost %>
                                     </td>
                                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">1</td>
                                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                        <%= item.maintenance_cost_half %>
+                                        <%= item.maintenance_cost %>
                                     </td>
                                 </tr>
                                 <% } %>

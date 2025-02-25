@@ -453,18 +453,20 @@ GROUP BY
 });
 
 app.get('/exportInvoice', isAdmin, function (req, res) {
-  let sql = `SELECT DISTINCT u.fname, u.lname, b.*, m.elec_unit, m.water_unit, r.elec_rate, r.water_rate, rm.rent
-  FROM bills b
-  JOIN users u ON b.user_id = u.id
-  JOIN meters m ON b.room_id = m.room_id
-  JOIN rate r ON m.rate_id = r.id
-  JOIN rooms rm ON b.room_id = rm.id  -- ดึงค่า rent จากตาราง rooms
-  WHERE b.id = '${req.query.id}'
-  AND m.id = (
-      SELECT MAX(id)
-      FROM meters
-      WHERE room_id = b.room_id
-  );`
+  let sql = `SELECT DISTINCT u.fname, u.lname, b.*, m.elec_unit, m.water_unit, r.elec_rate, r.water_rate, rm.rent,
+       b.maintenance_cost / 2 AS maintenance_cost_half
+FROM bills b
+JOIN users u ON b.user_id = u.id
+JOIN meters m ON b.room_id = m.room_id
+JOIN rate r ON m.rate_id = r.id
+JOIN rooms rm ON b.room_id = rm.id  -- Get rent from rooms
+WHERE b.id = '${req.query.id}'
+AND m.id = (
+    SELECT MAX(id)
+    FROM meters
+    WHERE room_id = b.room_id
+);
+`
 
 
   db.all(sql, (err, rows) => {
@@ -477,18 +479,19 @@ app.get('/exportInvoice', isAdmin, function (req, res) {
 });
 
 app.get('/exportReceipt', isAdmin, function (req, res) {
-  let sql = `SELECT DISTINCT u.fname, u.lname, b.*, m.elec_unit, m.water_unit, r.elec_rate, r.water_rate, rm.rent
-  FROM bills b
-  JOIN users u ON b.user_id = u.id
-  JOIN meters m ON b.room_id = m.room_id
-  JOIN rate r ON m.rate_id = r.id
-  JOIN rooms rm ON b.room_id = rm.id  -- ดึงค่า rent จากตาราง rooms
-  WHERE b.id = '${req.query.id}'
-  AND m.id = (
-      SELECT MAX(id)
-      FROM meters
-      WHERE room_id = b.room_id
-  );`
+  let sql = `SELECT DISTINCT u.fname, u.lname, b.*, m.elec_unit, m.water_unit, r.elec_rate, r.water_rate, rm.rent,
+       b.maintenance_cost / 2 AS maintenance_cost_half
+FROM bills b
+JOIN users u ON b.user_id = u.id
+JOIN meters m ON b.room_id = m.room_id
+JOIN rate r ON m.rate_id = r.id
+JOIN rooms rm ON b.room_id = rm.id  -- Get rent from rooms
+WHERE b.id = '${req.query.id}'
+AND m.id = (
+    SELECT MAX(id)
+    FROM meters
+    WHERE room_id = b.room_id
+);`
 
 
   db.all(sql, (err, rows) => {

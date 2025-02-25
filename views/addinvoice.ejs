@@ -12,7 +12,7 @@
 </div>
 
 <div class="row">
-    <% data.forEach((item) => { %>
+    <% data.forEach((item)=> { %>
         <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
             <div class="bg-white p-5 mt-3 rounded flex-fill shadowing">
                 <div class="text-center">
@@ -31,11 +31,20 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><%= item.meter_start_date %></td>
-                                <td><%= item.meter_read_date %></td>
-                                <td><%= item.elec_unit %></td>
-                                <td><%= item.elec_rate %></td>
-                                <td><%= item.elec_unit * item.elec_rate %></td>
+                                <td id="start-of-month"></td>
+                                </td>
+                                <td>
+                                    <%= item.read_date %>
+                                </td>
+                                <td>
+                                    <%= item.elec_unit %>
+                                </td>
+                                <td>
+                                    <%= item.elec_rate %>
+                                </td>
+                                <td>
+                                    <%= item.elec_unit * item.elec_rate %>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -61,11 +70,19 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><%= item.meter_start_date %></td>
-                                <td><%= item.meter_read_date %></td>
-                                <td><%= item.water_unit %></td>
-                                <td><%= item.water_rate %></td>
-                                <td><%= item.water_unit * item.water_rate %></td>
+                                <td id="start-of-months"></td>
+                                <td>
+                                    <%= item.read_date %>
+                                </td>
+                                <td>
+                                    <%= item.water_unit %>
+                                </td>
+                                <td>
+                                    <%= item.water_rate %>
+                                </td>
+                                <td>
+                                    <%= item.water_unit * item.water_rate %>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -87,59 +104,105 @@
                 </thead>
                 <tbody id="extra">
                     <tr>
-                        <td><input type="text" class="form-control" id="inputExtra<%= item.room_id %>" name="inputExtra" placeholder="รายการ"></td>
-                        <td><input type="number" class="form-control" placeholder="ราคา" id="numExtra<%= item.room_id %>"></td>
+                        <td><input type="text" class="form-control" id="inputExtra1" name="inputExtra1"
+                                placeholder="รายการ" value="ค่าเช่า" readonly></td>
+                        <td><input type="number" class="form-control" placeholder="ราคา" id="numExtra1"
+                                value="<%= item.rent %>"></td>
                     </tr>
+
+                    <% if (item.maintenance_cost> 0) { %>
+                        <tr>
+                            <td><input type="text" class="form-control" id="inputExtra2" name="inputExtra2"
+                                    placeholder="รายการ" value="ค่าบำรุงรักษา" readonly></td>
+                            <td><input type="number" class="form-control" placeholder="ราคา" id="numExtra2"
+                                    value="<%= item.maintenance_cost %>" readonly></td>
+                        </tr>
+                        <% } %>
+                            <tr>
+                                <td><input type="text" class="form-control" id="inputExtra3" name="inputExtra3"
+                                        placeholder="รายการ">
+                                </td>
+                                <td><input type="number" class="form-control" placeholder="ราคา" id="numExtra3"
+                                        name="numExtra3">
+                                </td>
+                            </tr>
                 </tbody>
             </table>
 
             <div class="d-flex justify-content-end align-items-center">
                 <form action="/insertBill/<%= item.room_id %>" method="POST" class="d-flex">
-                    <input type="text" id="amount<%= item.room_id %>" name="total_amount" class="form-control w-auto text-center mx-3"
-                        placeholder="ราคารวม"
-                        value="<%= (item.elec_unit * item.elec_rate) + (item.water_unit * item.water_rate) %>" readonly>
+                    <input type="text" id="amount<%= item.room_id %>" name="total_amount"
+                        class="form-control w-auto text-center mx-3" placeholder="ราคารวม"
+                        value="<%= (item.elec_unit * item.elec_rate) + (item.water_unit * item.water_rate) + item.rent + item.maintenance_cost %>"
+                        readonly>
+
                     <input type="hidden" name="elec_amount" value="<%= item.elec_unit * item.elec_rate %>">
                     <input type="hidden" name="water_amount" value="<%= item.water_unit * item.water_rate %>">
+                    <input type="hidden" name="rent_amount" value="<%= item.rent %>">
+                    <input type="hidden" name="maintenance_amount" value="<%= item.maintenance_cost %>">
                     <input type="hidden" name="extraID" id="extraID<%= item.room_id %>">
-
                     <button type="submit" class="btn btn-success text-nowrap px-2 py-3">ยืนยันการสร้าง</button>
                 </form>
+
             </div>
         </div>
-    <% }); %>
+        <% }); %>
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
     <% data.forEach((item) => { %>
-        document.querySelector('form[action="/insertBill/<%= item.room_id %>"]').addEventListener('submit', function(event) {
-            const inputExtra = document.getElementById('inputExtra<%= item.room_id %>');
-            const numExtra = document.getElementById('numExtra<%= item.room_id %>');
-            const extraID = document.getElementById('extraID<%= item.room_id %>');
+        updateTotalAmount('<%= item.room_id %>'); // คำนวณราคารวมครั้งแรก
 
+        // เมื่อส่งฟอร์ม
+        document.querySelector('form[action="/insertBill/<%= item.room_id %>"]').addEventListener('submit', function (event) {
+            const inputExtra = document.getElementById('inputExtra3');
+            const numExtra = document.getElementById('numExtra3');
+            const extraID = document.getElementById('extraID<%= item.room_id %>');  // แก้ไขเป็น extraID<%= item.room_id %>
+
+            // ตรวจสอบว่ามีการกรอกข้อมูลเพิ่มเติมหรือไม่
             if (inputExtra.value.trim() === '') {
-                inputExtra.value = '0';
+                inputExtra.value = '';
             }
 
             if (numExtra.value.trim() === '') {
-                numExtra.value = '0';
+                numExtra.value = '0';  // ถ้าไม่กรอกให้เป็น 0
             }
+
+            // เก็บค่าใน hidden input
             extraID.value = inputExtra.value;
-            const elecAmount = parseFloat(document.querySelector('[name="elec_amount"]').value);
-            const waterAmount = parseFloat(document.querySelector('[name="water_amount"]').value);
-            const extraAmount = parseFloat(numExtra.value);
 
-            const totalAmount = elecAmount + waterAmount + extraAmount;
-
-            document.getElementById('amount<%= item.room_id %>').value = totalAmount;
+            // อัพเดทยอดรวม
+            updateTotalAmount('<%= item.room_id %>');
         });
 
-        document.getElementById('numExtra<%= item.room_id %>').addEventListener('input', function() {
-            const numExtraValue = parseFloat(document.getElementById('numExtra<%= item.room_id %>').value) || 0;
-            const elecAmount = parseFloat(document.querySelector('[name="elec_amount"]').value);
-            const waterAmount = parseFloat(document.querySelector('[name="water_amount"]').value);
-
-            const totalAmount = elecAmount + waterAmount + numExtraValue;
-            document.getElementById('amount<%= item.room_id %>').value = totalAmount;
+        // คำนวณยอดรวมเมื่อมีการเปลี่ยนแปลงในค่าเพิ่มเติม
+        document.getElementById('numExtra3').addEventListener('input', function () {
+            updateTotalAmount('<%= item.room_id %>');
         });
+
+        // ฟังก์ชันคำนวณราคารวม
+        function updateTotalAmount(roomId) {
+            const elecAmount = parseFloat(document.querySelector('[name="elec_amount"]').value) || 0;
+            const waterAmount = parseFloat(document.querySelector('[name="water_amount"]').value) || 0;
+            const rentAmount = parseFloat(document.querySelector('[name="rent_amount"]').value) || 0;
+            const maintenanceAmount = parseFloat(document.querySelector('[name="maintenance_amount"]').value) || 0;
+            const extraAmount = parseFloat(document.getElementById('numExtra3').value) || 0;
+
+            // คำนวณยอดรวม
+            const totalAmount = elecAmount + waterAmount + rentAmount + maintenanceAmount + extraAmount;
+
+            // อัพเดทในช่องยอดรวม
+            document.getElementById('amount' + roomId).value = totalAmount;
+        }
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().split('T')[0];
+
+        console.log(formattedDate); 
+
+        document.getElementById("start-of-month").textContent = formattedDate;
+        document.getElementById("start-of-months").textContent = formattedDate;
+
     <% }); %>
+});
 </script>

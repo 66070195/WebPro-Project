@@ -1,67 +1,159 @@
 <div class="d-flex justify-content-between align-items-center">
     <div class="">
-        <h4 class="title">รายการแจ้งหนี้ & ใบเสร็จ</h4>
-        <p>จัดการ <span class="text-danger">ใบแจ้งหนี้ & ใบเสร็จ</span></p>
+        <h4 class="title">จัดการธุรกรรม</h4>
+        <p>จัดการ <span class="text-danger">ธุรกรรม</span></p>
     </div>
     <div class="">
+        <h5 class="title text-end" id="time"></h5>
         <a href="/showreceipt" class="btn btn-primary text-light btn-lg form-button"> ใบเสร็จรับเงิน</a>
         <a href="/showinvoice" class="btn btn-primary text-light btn-lg form-button"> ใบแจ้งหนี้</a>
     </div>
+    
 </div>
 
+
+    <div class="col-sm-12 d-flex align-items-stretch">
+        <div class="bg-white p-3 mt-3 rounded flex-fill shadowing">
+            <h5 class="title">สร้างใบ???</h5>
+            
+            <hr>
+            <form id="insert-bill-form" method="POST" action="/insertbill">
+                <div class="row">
+                    <div class="col-4">
+                        <label for="noroom" class="form-label fw-bold">ห้อง</label>
+                        <select name="room_id" id="room_id" class="form-select" required>
+                            <option value=""></option>
+                            <% data.forEach((item) => { %>
+                                <option value="<%= item.room_id %>" 
+                                        data-owner="<%= item.owner_name %>"
+                                        data-rent="<%= item.rent %>"
+                                        data-meter="<%= item.meter_id %>"
+                                        data-user="<%= item.user_id %>"
+                                        data-cost="<%= item.maintenance_cost_filtered %>"><%= item.room_id %> (Meter: <%= item.meter_id %>)</option>
+                            <% }); %>
+                        </select>
+                        
+                        <input type="hidden" class="form-control" id="user_id" name="user_id" readonly>
+                        <input type="hidden" class="form-control" id="meter_id" name="meter_id" readonly>
+                        <input type="hidden" class="form-control" id="cost_id" name="cost_id" readonly>
+                        <!-- maincost -->
+                    </div>
+                    <div class="col-4">
+                        <label for="owner-name" class="form-label fw-bold">ชื่อเจ้าของห้อง</label>
+                        <input type="text" class="form-control" id="owner-name" name="owner-name" readonly>
+                    </div>
+                    <div class="col-4">
+                        <label for="rent" class="form-label fw-bold">ค่าเช่าห้อง</label>
+                        <input type="text" class="form-control" id="rent" name="rent" readonly>
+                    </div>
+                </div>
+
+                
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <label for="createDay" class="form-label fw-bold">วันออกบิล</label>
+                        <input type="date" class="form-control" id="createDay" name="createDay" required>
+                    </div>
+                    <div class="col-6">
+                        <label for="paidDay" class="form-label fw-bold">วันกำหนดชำระ</label>
+                        <input type="date" class="form-control" id="paidDay" name="paidDay">
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary form-control form-button py-3">เพิ่มบิล</button>
+                </div>
+            </form>
+        </div>
+    
+    </div>
+    
 <div class="bg-white p-3 mt-3 rounded shadowing">
-    <table class="table py-2 invoice-table" id="no-more-tables">
+    <table class="table py-2 manage-user-table" id="no-more-tables">
         <thead class="align-middle">
             <tr>
+                <th>#</th>
                 <th>ห้อง</th>
-                <th>ชื่อผู้เช่า</th>
-                <th>วันที่เข้าพัก</th>
+                <th>วันออกบิล</th>
+                <th>วันกำหนดชำระ</th>
                 <th>สถานะ</th>
                 <th class="text-center">ดำเนินการ</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <% data.forEach((item) => { %>
-                    <tr>
-                        <td data-title="ห้อง"><%= item.room_id %></td>
-                        <td data-title="ชื่อผู้เช่า"><%= item.fname %> <%= item.lname %></td>
-                        <td data-title="วันที่เข้าพัก"><%= item.start_date %></td>
-                        <td data-title="สถานะ">
-                            <%= item.bill_status === '2' ? 'ชำระแล้ว' : 'ยังไม่ชำระ' %>
-                            <!-- <%= typeof item.bill_status %> : <%= item.bill_status %> -->
-                          </td>
-                          
-                        <td data-title="ดำเนินการ" class="text-center">
-                            <div class="btn-table">
-                                <!-- <a href="/addinvoice?id=<%= item.room_id %>" class="btn btn-secondary btn-sm px-lg-4 px-md-3 mx-1">
+            <% bills.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="#"><%=item.id%></td>
+                    <td data-title="ห้อง"><%=item.room_id%></td>
+                    <td data-title="วันออกบิล">
+                        <%=item.created_at%>
+                      </td>
+                    <td data-title="วันออกกำหนดชำระ"><%=item.due_date%></td>
+                    <td data-title="สถานะ">
+                        <% if (item.status == '2') { %>
+                            ชำระแล้ว
+                           
+                        <% } else { %>
+                            ยังไม่ชำระ
+                        <% } %>
+                    </td>
+                    
+                    <td data-title="ดำเนินการ" class="text-center">
+                        <div class="btn-table">
+                            <% if (item.status == '1') { %>
+                                <a href="/addreceipt?id=<%= item.room_id %>" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1">
+                                    สร้างใบเสร็จรับเงิน
+                                </a>
+                            <% } else if (item.status == '2') { %>
+                                <a href="/home" class="btn btn-dark btn-sm px-lg-4 px-md-3 mx-1">
+                                    ชำระแล้ว
+                                </a>
+                            <% } else { %>
+                                <a href="/addinvoice?id=<%= item.room_id %>" class="btn btn-secondary btn-sm px-lg-4 px-md-3 mx-1">
                                     สร้างใบแจ้งหนี้
                                 </a>
                                 <a href="/addreceipt?id=<%= item.room_id %>" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1">
                                     สร้างใบเสร็จรับเงิน
-                                </a> -->
-                                <% if (item.bill_status === '1') { %>
-                                    <a href="/addreceipt?id=<%= item.room_id %>" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1">
-                                        สร้างใบเสร็จรับเงิน
-                                    </a>
-                                <% } else if (item.bill_status === '2') { %>
-                                    <a href="/home" class="btn btn-dark btn-sm px-lg-4 px-md-3 mx-1">
-                                        ชำระแล้ว
-                                    </a>
-                                <% } else { %>
-                                    <a href="/addinvoice?id=<%= item.room_id %>" class="btn btn-secondary btn-sm px-lg-4 px-md-3 mx-1">
-                                        สร้างใบแจ้งหนี้
-                                    </a>
-                                    <a href="/addreceipt?id=<%= item.room_id %>" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1">
-                                        สร้างใบเสร็จรับเงิน
-                                    </a>
-                                <% } %>
-                            </div>
-                        </td>
-                    </tr>
-                <% }); %>
-                
-            </tr>
+                                </a>
+                            <% } %>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %> 
         </tbody>
     </table>
 </div>
+    
+
+<script>
+    document.getElementById('room_id').addEventListener('change', function() {
+    var selectedOption = this.options[this.selectedIndex];
+    var roomId = selectedOption.value;
+    var ownerName = selectedOption.getAttribute('data-owner');
+    var rent = selectedOption.getAttribute('data-rent');
+    var meterId = selectedOption.getAttribute('data-meter');
+    var userId = selectedOption.getAttribute('data-user');
+    var costId = selectedOption.getAttribute('data-cost');
+    document.getElementById('owner-name').value = ownerName;
+    document.getElementById('rent').value = rent;
+    document.getElementById('meter_id').value = meterId;
+    document.getElementById('user_id').value = userId;
+    document.getElementById('cost_id').value = costId;
+});
+function updateDate() {
+    const currentDate = new Date();
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // เดือนจะเริ่มต้นที่ 0
+    const year = currentDate.getFullYear();
+    const formattedDate = `${day}/${month}/${year}`;
+
+    document.getElementById('time').textContent = formattedDate;
+}
+
+setInterval(updateDate, 1000);
+
+updateDate();
+
+
+
+    document.getElementById('createDay').value = new Date().toISOString().split('T')[0];
+</script>

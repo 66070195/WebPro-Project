@@ -258,42 +258,150 @@ app.get('/editroom', isAdmin, function (req, res) {
   });
 });
 
-app.get('/invoice', isAdmin, function (req, res) {
-  let sql = `SELECT 
-    r.id AS room_id, 
-    u.fname, 
-    u.lname, 
-    strftime('%d-%m-%Y', b.start_date) AS start_date, 
-    r.rent, 
-    bi.status AS bill_status
-FROM rooms r
-LEFT JOIN tenants t ON r.id = t.room_id
-LEFT JOIN booking b ON r.id = b.room_id
-LEFT JOIN users u ON t.user_id = u.id
-LEFT JOIN bills bi ON r.id = bi.room_id
-WHERE t.status = 1;
-`;
-  db.all(sql, (err, rows) => {
+
+app.get('/getBillInfo', function (req, res) {
+  const roomId = req.query.room_id;
+
+  if (!roomId) {
+    return res.status(400).send('Room ID is required');
+  }
+
+  let sql = `
+      SELECT 
+          b.water_amount,
+          b.elec_amount,
+          b.total_amount,
+          b.addon_cost,
+          b.maintenance_cost,
+          m.water_unit,
+          m.elec_unit,
+          b.billinfo
+      FROM 
+          bills b
+      JOIN 
+          meters m ON b.meter_id = m.id
+      WHERE 
+          b.room_id = ?;
+  `;
+
+  db.get(sql, [roomId], (err, row) => {
     if (err) {
       console.log(err.message);
+      return res.status(500).send('Error querying the database');
     }
-    console.log(rows);
-    res.render('invoice', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+
+    if (row) {
+      return res.json({
+        water_unit: row.water_unit,
+        elec_unit: row.elec_unit,
+        billinfo: row.billinfo,
+        water_amount: row.water_amount,
+        elec_amount: row.elec_amount,
+        total_amount: row.total_amount,
+        addon_cost: row.addon_cost,
+        maintenance_cost: row.maintenance_cost
+      });
+    } else {
+      return res.status(404).send('Bill information not found');
+    }
   });
 });
 
+// แก้ main.status = 2
+app.get('/invoice', isAdmin, function (req, res) {
+  let sql = `SELECT rooms.id AS room_id, 
+       MAX(meters.id) AS meter_id,
+       users.fname || ' ' || users.lname AS owner_name,
+       users.id AS user_id,
+       rooms.rent,
+       COALESCE(SUM(CASE WHEN maintenance.status == 2 THEN maintenance.cost ELSE 0 END), 0) AS maintenance_cost_filtered,
+       COALESCE(SUM(maintenance.cost), 0) AS maintenance_cost_total
+FROM rooms
+JOIN tenants ON rooms.id = tenants.room_id
+JOIN users ON tenants.user_id = users.id
+JOIN meters ON rooms.id = meters.room_id
+LEFT JOIN maintenance ON rooms.id = maintenance.room_id
+WHERE rooms.status = 1
+GROUP BY rooms.id, users.fname, users.lname, users.id, rooms.rent;
+`;
+
+  let sql2 = `SELECT * from bills`;
+
+
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+      return res.status(500).send('Error querying the database');
+    }
+
+
+    if (!rows || rows.length === 0) {
+      return res.status(404).send('No data found');
+    }
+
+
+    db.all(sql2, (err, rows2) => {
+      if (err) {
+        console.log(err.message);
+        return res.status(500).send('Error querying the database');
+      }
+
+      
+      console.log(rows), console.log(rows2)
+      res.render('invoice', {
+        data: rows,  
+        bills: rows2, 
+        role: req.user.role,
+        currentPath: '/invoice',
+        sidebarClass: req.session.sidebarClass,
+        rowCount: res.locals.rowCount
+      });
+    });
+  });
+});
+
+app.post('/insertbill', isAdmin, function (req, res) {
+
+  const { room_id, rent, meter_id, createDay, paidDay, user_id, cost_id } = req.body;
+
+  console.log(room_id, rent, meter_id, createDay, paidDay, user_id, cost_id);
+
+  const sql = `INSERT INTO bills (user_id, room_id, meter_id, created_at, due_date,maintenance_cost,water_amount,elec_amount,total_amount,status,addon_cost)
+VALUES (?, ?, ?, ?, ?,?,0,0,0,0,0);`;
+  const params = [user_id, room_id, meter_id, createDay, paidDay, cost_id];
+
+  db.run(sql, params, function (err) {
+    if (err) {
+      console.log(err.message);
+      res.status(500).send('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      return;
+    }
+    res.redirect('/invoice');
+  });
+
+});
+
+
 app.get('/addinvoice', isAdmin, function (req, res) {
-  let sql = `SELECT 
-    me.id AS meter_id, 
-    me.room_id, 
-    me.water_unit, 
-    me.elec_unit, 
-    me.water_rate, 
-    me.elec_rate, 
-    strftime('%d-%m-%Y', me.read_date) AS meter_read_date,
-    me.start_date AS meter_start_date 
-FROM meters me
-WHERE me.room_id = '${req.query.id}';
+  let sql = `SELECT
+    r.water_rate,
+    r.elec_rate,
+    m.water_unit,
+    m.elec_unit,
+    rm.rent,  -- เพิ่มค่าเช่าห้อง
+    m.room_id,
+    m.id AS meter_id,
+    m.read_date,
+    COALESCE(b.maintenance_cost, 0) AS maintenance_cost
+FROM
+    meters m
+JOIN rate r ON r.id = m.rate_id
+JOIN rooms rm ON m.room_id = rm.id  -- ดึงข้อมูลค่าเช่าจากตาราง rooms
+LEFT JOIN bills b ON b.room_id = m.room_id 
+    AND b.id = (SELECT MAX(b2.id) FROM bills b2 WHERE b2.room_id = m.room_id)
+WHERE
+    m.id = (SELECT MAX(m2.id) FROM meters m2 WHERE m2.room_id = m.room_id)
+    AND m.room_id = '${req.query.id}'
 `;
   db.all(sql, (err, rows) => {
     if (err) {
@@ -305,19 +413,29 @@ WHERE me.room_id = '${req.query.id}';
 });
 
 app.get('/addreceipt', isAdmin, function (req, res) {
-  let sql = `SELECT 
-    b.*, 
-    m.water_unit, 
-    m.elec_unit, 
-    m.water_rate, 
-    m.elec_rate, 
-    strftime('%d-%m-%Y', m.read_date) AS meter_read_date,
-    m.start_date AS meter_start_date
-FROM bills b
-LEFT JOIN meters m ON b.meter_id = m.id
-WHERE b.room_id = '${req.query.id}';
-;
-';
+  let sql = `SELECT
+    r.water_rate,
+    r.elec_rate,
+    m.water_unit,
+    m.elec_unit,
+    rm.rent,  -- ค่าเช่าห้อง
+    m.room_id,
+    m.id AS meter_id,
+    m.read_date,
+    COALESCE(b.maintenance_cost, 0) AS maintenance_cost,
+    COALESCE(b.addon_cost, 0) AS addon_cost,
+    b.total_amount,
+    b.due_date, 
+    b.status
+FROM
+    meters m
+JOIN rate r ON r.id = m.rate_id
+JOIN rooms rm ON m.room_id = rm.id 
+LEFT JOIN bills b ON b.room_id = m.room_id 
+    AND b.id = (SELECT MAX(b2.id) FROM bills b2 WHERE b2.room_id = m.room_id)
+WHERE
+    m.id = (SELECT MAX(m2.id) FROM meters m2 WHERE m2.room_id = m.room_id)
+    AND m.room_id = '${req.query.id}'
 
 `;
   db.all(sql, (err, rows) => {
@@ -330,27 +448,20 @@ WHERE b.room_id = '${req.query.id}';
 });
 
 app.get('/exportInvoice', isAdmin, function (req, res) {
-  let sql = `SELECT 
-    u.fname, 
-    u.lname, 
-    r.id AS room_id, 
-    r.rent,
-    b.created_at, 
-    b.due_date, 
-    me.elec_rate, 
-    me.elec_unit, 
-    b.elec_amount, 
-    me.water_rate, 
-    me.water_unit, 
-    b.water_amount, 
-    b.total_amount,
-    b.addon_cost
-FROM users u
-JOIN tenants t ON u.id = t.user_id
-JOIN rooms r ON t.room_id = r.id
-JOIN bills b ON r.id = b.room_id
-LEFT JOIN meters me ON r.id = me.room_id
-WHERE r.id ='${req.query.id}'`;
+  let sql = `SELECT DISTINCT u.fname, u.lname, b.*, m.elec_unit, m.water_unit, r.elec_rate, r.water_rate, rm.rent
+  FROM bills b
+  JOIN users u ON b.user_id = u.id
+  JOIN meters m ON b.room_id = m.room_id
+  JOIN rate r ON m.rate_id = r.id
+  JOIN rooms rm ON b.room_id = rm.id  -- ดึงค่า rent จากตาราง rooms
+  WHERE b.id = '${req.query.id}'
+  AND m.id = (
+      SELECT MAX(id)
+      FROM meters
+      WHERE room_id = b.room_id
+  );`
+
+
   db.all(sql, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -361,29 +472,20 @@ WHERE r.id ='${req.query.id}'`;
 });
 
 app.get('/exportReceipt', isAdmin, function (req, res) {
-  let sql = `SELECT 
-    u.fname, 
-    u.lname, 
-    r.id AS room_id, 
-    r.rent,
-    b.created_at, 
-    b.due_date, 
-    me.elec_rate, 
-    me.elec_unit, 
-    b.elec_amount, 
-    me.water_rate, 
-    me.water_unit, 
-    b.water_amount, 
-    b.total_amount,
-    b.addon_cost
-FROM users u
-JOIN tenants t ON u.id = t.user_id
-JOIN rooms r ON t.room_id = r.id
-JOIN bills b ON r.id = b.room_id
-LEFT JOIN meters me ON r.id = me.room_id
-WHERE r.id ='${req.query.id}'
-;
-`;
+  let sql = `SELECT DISTINCT u.fname, u.lname, b.*, m.elec_unit, m.water_unit, r.elec_rate, r.water_rate, rm.rent
+  FROM bills b
+  JOIN users u ON b.user_id = u.id
+  JOIN meters m ON b.room_id = m.room_id
+  JOIN rate r ON m.rate_id = r.id
+  JOIN rooms rm ON b.room_id = rm.id  -- ดึงค่า rent จากตาราง rooms
+  WHERE b.id = '${req.query.id}'
+  AND m.id = (
+      SELECT MAX(id)
+      FROM meters
+      WHERE room_id = b.room_id
+  );`
+
+
   db.all(sql, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -395,27 +497,63 @@ WHERE r.id ='${req.query.id}'
 
 app.post('/insertBill/:id', (req, res) => {
   const roomId = req.params.id;
-  const { water_amount, elec_amount, total_amount, extraID } = req.body;
-  // console.log('Room ID:', roomId);
-  console.log('Received extraItems:', extraID);
-  // console.log(water_amount,elec_amount,total_amount);
+  const { water_amount, elec_amount, rent_amount, maintenance_amount, total_amount, extraID } = req.body;
+
+  // Log ค่าที่ได้รับจากฟอร์ม
+  const pkq = `SELECT id 
+              FROM bills 
+              WHERE room_id = '${roomId}' 
+              ORDER BY id DESC 
+              LIMIT 1;`;
+
+  console.log('Received data:', {
+    roomId,
+    water_amount,
+    elec_amount,
+    rent_amount,
+    maintenance_amount,
+    extraID,
+    total_amount
+  });
+
   const sql = `
     UPDATE bills
-    SET water_amount = ?, elec_amount = ?, total_amount = ?, status = 1, addon_cost = ?
-    WHERE room_id = ?
+    SET 
+      water_amount = ?, 
+      elec_amount = ?, 
+      total_amount = ?,  
+      addon_cost = ?, 
+      total_amount = ?, 
+      status = 1
+    WHERE id = ?
   `;
-  const values = [water_amount, elec_amount, total_amount, extraID, roomId];
-  db.run(sql, values, (err) => {
+
+  const values = [water_amount, elec_amount, rent_amount, extraID, total_amount, roomId];
+
+  
+  console.log('SQL Query:', sql);
+  console.log('Values to update:', values);
+
+  db.all(pkq, (err, rows1) => {
     if (err) {
       console.error('Error updating data:', err.message);
-      return res.status(500).send('Error updating data');
     }
-    console.log('Bill updated successfully');
-    console.log('Values to update:', values);
-    res.redirect('/showinvoice');
-
+    const billId = rows1[0].id;
+    console.log(rows1);
+    db.run(sql, [water_amount, elec_amount, rent_amount, extraID, total_amount, billId], (err) => {
+      if (err) {
+        console.error('Error updating data:', err.message);
+        return res.status(500).send('Error updating data');
+      }
+      console.log('Bill updated successfully');
+      res.redirect('/showinvoice');
+    });
   });
 });
+
+
+
+
 
 app.post('/insertPayment/:id', (req, res) => {
   const roomId = req.params.id;
@@ -441,7 +579,8 @@ app.post('/insertPayment/:id', (req, res) => {
         return res.status(500).send('Error inserting payment');
       }
       console.log('Payment inserted successfully');
-      const sqlUpdate = `
+
+      const sqlUpdateBill = `
         UPDATE bills
         SET status = 2
         WHERE room_id = ? AND id = (
@@ -449,38 +588,43 @@ app.post('/insertPayment/:id', (req, res) => {
         );
       `;
 
-      db.run(sqlUpdate, [roomId, roomId], function (err) {
+      db.run(sqlUpdateBill, [roomId, roomId], function (err) {
         if (err) {
           console.error('Error updating bill status:', err.message);
           return res.status(500).send('Error updating bill status');
         }
 
         console.log('Bill status updated to 2');
-        res.redirect('/showreceipt');
+
+        // อัปเดตสถานะของ maintenance เป็น 3
+        const sqlUpdateMaintenance = `
+          UPDATE maintenance
+          SET status = 3
+          WHERE room_id = ?;
+        `;
+
+        db.run(sqlUpdateMaintenance, [roomId], function (err) {
+          if (err) {
+            console.error('Error updating maintenance status:', err.message);
+            return res.status(500).send('Error updating maintenance status');
+          }
+
+          console.log('Maintenance status updated to 3');
+          res.redirect('/showreceipt');
+        });
       });
     });
   });
 });
 
 
+
 app.get('/showinvoice', isAdmin, function (req, res) {
-  let sql = `SELECT 
-    r.id AS room_id, 
-    u.fname || ' ' || u.lname AS tenant_name,
-    strftime('%d-%m-%Y', b.start_date) AS tenant_start_date,
-    strftime('%d-%m-%Y', bi.due_date) AS due_date,
-    strftime('%d-%m-%Y', bi.due_date) AS payment_due_date,
-    bi.total_amount,
-    CASE 
-        WHEN bi.status = 2 THEN 'ชำระแล้ว' 
-        ELSE 'ยังไม่ชำระ' 
-    END AS bill_status 
-FROM rooms r
-LEFT JOIN booking b ON r.id = b.room_id
-LEFT JOIN tenants t ON r.id = t.room_id
-LEFT JOIN users u ON t.user_id = u.id
-LEFT JOIN bills bi ON r.id = bi.room_id
-WHERE r.status = 1 AND bi.total_amount > 0;
+  let sql = `SELECT u.fname, u.lname, b.*
+FROM bills b
+JOIN users u ON b.user_id = u.id
+WHERE b.status = 1;
+
 ;
 `;
   db.all(sql, (err, rows) => {
@@ -493,24 +637,10 @@ WHERE r.status = 1 AND bi.total_amount > 0;
 });
 
 app.get('/showreceipt', isAdmin, function (req, res) {
-  let sql = `SELECT 
-    r.id AS room_id, 
-    u.fname || ' ' || u.lname AS tenant_name,
-    strftime('%d-%m-%Y', b.start_date) AS tenant_start_date,
-    strftime('%d-%m-%Y', bi.due_date) AS due_date,
-    strftime('%d-%m-%Y', bi.due_date) AS payment_due_date,
-    bi.total_amount,
-    CASE 
-        WHEN bi.status = 2 THEN 'ชำระแล้ว' 
-        ELSE 'ยังไม่ชำระ' 
-    END AS bill_status 
-FROM rooms r
-LEFT JOIN booking b ON r.id = b.room_id
-LEFT JOIN tenants t ON r.id = t.room_id
-LEFT JOIN users u ON t.user_id = u.id
-LEFT JOIN bills bi ON r.id = bi.room_id
-WHERE r.status = 1 AND bi.total_amount > 0;
-
+  let sql = `SELECT u.fname, u.lname, b.*
+FROM bills b
+JOIN users u ON b.user_id = u.id
+WHERE b.status = 2;
 `;
   db.all(sql, (err, rows) => {
     if (err) {
@@ -520,7 +650,6 @@ WHERE r.status = 1 AND bi.total_amount > 0;
     res.render('showreceipt', { data: rows, role: req.user.role, currentPath: 'req.path', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
   });
 });
-
 app.get('/edituser', isAdmin, function (req, res) {
   let sql = `SELECT * FROM users WHERE id = '${req.query.id}'`;
   db.all(sql, (err, rows) => {
@@ -570,7 +699,7 @@ app.get('/repairs', function (req, res) {
   const userRole = req.session.user.role;
   if (userRole == 1) {
     let sql = `SELECT * FROM maintenance WHERE status != 2`;
-    let sql2 = `SELECT * FROM maintenance WHERE status = 2`;
+    let sql2 = `SELECT * FROM maintenance WHERE status = 2 or status = 3`;
     db.all(sql, (err, rows) => {
       if (err) {
         console.log(err.message);
@@ -588,6 +717,7 @@ app.get('/repairs', function (req, res) {
     res.redirect('parcel');
   }
 });
+
 
 app.get('/parcelpage', isAdmin, function (req, res) {
   let sql1 = `SELECT * FROM parcels`;

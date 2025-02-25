@@ -388,20 +388,24 @@ app.get('/addinvoice', isAdmin, function (req, res) {
     r.elec_rate,
     m.water_unit,
     m.elec_unit,
-    rm.rent,  -- เพิ่มค่าเช่าห้อง
+    rm.rent,
     m.room_id,
     m.id AS meter_id,
     m.read_date,
-    COALESCE(b.maintenance_cost, 0) AS maintenance_cost
+    COALESCE(SUM(mn.cost), 0) AS maintenance_cost
 FROM
     meters m
 JOIN rate r ON r.id = m.rate_id
-JOIN rooms rm ON m.room_id = rm.id  -- ดึงข้อมูลค่าเช่าจากตาราง rooms
+JOIN rooms rm ON m.room_id = rm.id
+LEFT JOIN maintenance mn ON mn.room_id = m.room_id
+    AND mn.status != 3
 LEFT JOIN bills b ON b.room_id = m.room_id 
     AND b.id = (SELECT MAX(b2.id) FROM bills b2 WHERE b2.room_id = m.room_id)
 WHERE
     m.id = (SELECT MAX(m2.id) FROM meters m2 WHERE m2.room_id = m.room_id)
     AND m.room_id = '${req.query.id}'
+GROUP BY
+    r.water_rate, r.elec_rate, m.water_unit, m.elec_unit, rm.rent, m.room_id, m.id, m.read_date
 `;
   db.all(sql, (err, rows) => {
     if (err) {
@@ -418,25 +422,26 @@ app.get('/addreceipt', isAdmin, function (req, res) {
     r.elec_rate,
     m.water_unit,
     m.elec_unit,
-    rm.rent,  -- ค่าเช่าห้อง
+    rm.rent,  -- เพิ่มค่าเช่าห้อง
     m.room_id,
     m.id AS meter_id,
     m.read_date,
-    COALESCE(b.maintenance_cost, 0) AS maintenance_cost,
-    COALESCE(b.addon_cost, 0) AS addon_cost,
-    b.total_amount,
-    b.due_date, 
-    b.status
+    COALESCE(SUM(mn.cost), 0) AS maintenance_cost,
+    b.addon_cost AS addon_cost,  -- ไม่ใช้ COALESCE
+    COALESCE(b.total_amount, 0) AS total_amount  -- ดึง total_amount จากตาราง bills
 FROM
     meters m
 JOIN rate r ON r.id = m.rate_id
-JOIN rooms rm ON m.room_id = rm.id 
+JOIN rooms rm ON m.room_id = rm.id
+LEFT JOIN maintenance mn ON mn.room_id = m.room_id
+    AND mn.status != 3  -- ใช้ข้อมูลที่ status ไม่เท่ากับ 3
 LEFT JOIN bills b ON b.room_id = m.room_id 
-    AND b.id = (SELECT MAX(b2.id) FROM bills b2 WHERE b2.room_id = m.room_id)
+    AND b.id = (SELECT MAX(b2.id) FROM bills b2 WHERE b2.room_id = m.room_id)  -- ดึงข้อมูล bill ล่าสุด
 WHERE
     m.id = (SELECT MAX(m2.id) FROM meters m2 WHERE m2.room_id = m.room_id)
     AND m.room_id = '${req.query.id}'
-
+GROUP BY
+    r.water_rate, r.elec_rate, m.water_unit, m.elec_unit, rm.rent, m.room_id, m.id, m.read_date, b.total_amount
 `;
   db.all(sql, (err, rows) => {
     if (err) {

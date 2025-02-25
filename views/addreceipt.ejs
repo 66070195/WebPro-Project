@@ -97,7 +97,7 @@
                             value="<%= item.maintenance_cost %>" readonly></td>
                 </tr>
                 <% } %>
-                <% if (item.addon_cost !== '') { %>
+                <% if (item.addon_cost != '') { %>
                     <tr>
                         <td><input type="text" class="form-control" id="inputExtra2" name="inputExtra2"
                                 placeholder="รายการ" value="<%= item.addon_cost %>" readonly></td>
@@ -139,7 +139,7 @@
         
         <div class="d-flex justify-content-end mt-3">
             
-                <input type="number" id="amount" name="amount" class="form-control w-auto text-center mx-3" placeholder="ราคารวม"value="<%= item.total_amount %>">
+                <input type="number" id="amount" name="amount" class="form-control w-auto text-center mx-3" placeholder="ราคารวม"value="<%= item.total_amount%>">
                 <button type="submit" class="btn btn-success text-nowrap px-2 py-3">ยืนยันการสร้าง</button>
         </div>
         <% }); %>

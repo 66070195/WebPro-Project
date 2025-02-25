@@ -73,8 +73,18 @@
 <script>
     //const data = <%= JSON.stringify(bill) %>;
     const data = [
-        { created_at: '2025-01-01', total_amount: 1000 },
-        { created_at: '2025-02-01', total_amount: 1500 }
+        { created_at: '2025-01-01', total_amount: 5200 },
+        { created_at: '2025-02-01', total_amount: 5100 },
+        { created_at: '2025-03-01', total_amount: 5500 },
+        { created_at: '2025-04-01', total_amount: 5300 },
+        { created_at: '2025-05-01', total_amount: 5400 },
+        { created_at: '2025-06-01', total_amount: 5200 },
+        { created_at: '2025-07-01', total_amount: 5100 },
+        { created_at: '2025-08-01', total_amount: 5500 },
+        { created_at: '2025-09-01', total_amount: 5300 },
+        { created_at: '2025-10-01', total_amount: 5400 },
+        { created_at: '2025-11-01', total_amount: 5200 },
+        { created_at: '2025-12-01', total_amount: 5100 }
     ];
     const labels = data.map(item => item.created_at);
     const values = data.map(item => item.total_amount);

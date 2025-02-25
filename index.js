@@ -83,7 +83,7 @@ app.use((req, res, next) => {
   let query;
 
   if (role === 1) {
-    query = 'SELECT COUNT(*) FROM maintenance WHERE status != 2';
+    query = 'SELECT COUNT(*) FROM maintenance WHERE status < 2';
   } else if (role === 2) {
     query = `SELECT COUNT(*) FROM parcels
                   WHERE status = 0 AND room_id IN (
@@ -703,7 +703,7 @@ app.get('/adduser', isAdmin, renderPage('adduser', '/manageuser'));
 app.get('/repairs', function (req, res) {
   const userRole = req.session.user.role;
   if (userRole == 1) {
-    let sql = `SELECT * FROM maintenance WHERE status != 2`;
+    let sql = `SELECT * FROM maintenance WHERE status < 2`;
     let sql2 = `SELECT * FROM maintenance WHERE status = 2 or status = 3`;
     db.all(sql, (err, rows) => {
       if (err) {

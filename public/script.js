@@ -127,7 +127,7 @@ $(document).ready(function() {
 			}));
 		} else if ($(this).hasClass('showinvoice-table')) {
 			$(this).DataTable($.extend({}, commonSetting, {
-                "order": [[3, "asc"]]
+                "order": [[0, "desc"]]
 			}));
 		} else if ($(this).hasClass('showreceipt-table')) {
 			$(this).DataTable($.extend({}, commonSetting, {
@@ -142,6 +142,11 @@ $(document).ready(function() {
 			$(this).DataTable($.extend({}, commonSetting, {
                 "order": [[3, "desc"]],
 				"lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "ทั้งหมด"]]
+			}));
+		}
+		else if ($(this).hasClass('invoice-tables')) {
+			$(this).DataTable($.extend({}, commonSetting, {
+                "order": [[0, "desc"]]
 			}));
 		}
 	});

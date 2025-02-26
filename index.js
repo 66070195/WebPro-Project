@@ -438,6 +438,7 @@ app.get('/addreceipt', isAdmin, function (req, res) {
     m.read_date,
     COALESCE(SUM(mn.cost), 0) AS maintenance_cost,
     b.addon_cost AS addon_cost,
+    b.id as bill_id,
     b.addon_details as addon_details,
     COALESCE(b.total_amount, 0) AS total_amount  -- ดึง total_amount จากตาราง bills
 FROM
@@ -577,7 +578,8 @@ app.post('/insertBill/:id', (req, res) => {
 app.post('/insertPayment/:id', (req, res) => {
   const roomId = req.params.id;
   const { selectPayment } = req.body;
-  console.log(selectPayment);
+  const { bill_id } = req.body;
+  console.log(selectPayment,bill_id);
 
   if (!selectPayment) {
     return res.status(400).send('Payment method is required');
@@ -586,13 +588,13 @@ app.post('/insertPayment/:id', (req, res) => {
   db.serialize(() => {
     const sqlInsert = `
       INSERT INTO payments (bill_id, method, paid_date)
-      SELECT id, ?, CURRENT_TIMESTAMP
+      SELECT ?, ?, CURRENT_TIMESTAMP
       FROM bills
       WHERE room_id = ?
       ORDER BY created_at DESC LIMIT 1;
     `;
 
-    db.run(sqlInsert, [selectPayment, roomId], function (err) {
+    db.run(sqlInsert, [bill_id,selectPayment, roomId], function (err) {
       if (err) {
         console.error('Error inserting payment:', err.message);
         return res.status(500).send('Error inserting payment');

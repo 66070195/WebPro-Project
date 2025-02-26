@@ -309,20 +309,30 @@ app.get('/getBillInfo', function (req, res) {
 
 // แก้ main.status = 2
 app.get('/invoice', isAdmin, function (req, res) {
-  let sql = `SELECT rooms.id AS room_id, 
-       MAX(meters.id) AS meter_id,
-       users.fname || ' ' || users.lname AS owner_name,
-       users.id AS user_id,
-       rooms.rent,
-       COALESCE(SUM(CASE WHEN maintenance.status == 2 THEN maintenance.cost ELSE 0 END), 0) AS maintenance_cost_filtered,
-       COALESCE(SUM(maintenance.cost), 0) AS maintenance_cost_total
+  let sql = `WITH maintenance_summary AS (
+    SELECT 
+        room_id,
+        SUM(CASE WHEN status = 2 THEN cost ELSE 0 END) AS maintenance_cost_filtered,
+        SUM(cost) AS maintenance_cost_total
+    FROM maintenance
+    GROUP BY room_id
+)
+SELECT 
+    rooms.id AS room_id, 
+    MAX(meters.id) AS meter_id,
+    users.fname || ' ' || users.lname AS owner_name,
+    users.id AS user_id,
+    rooms.rent,
+    COALESCE(ms.maintenance_cost_filtered, 0) AS maintenance_cost_filtered,
+    COALESCE(ms.maintenance_cost_total, 0) AS maintenance_cost_total
 FROM rooms
 JOIN tenants ON rooms.id = tenants.room_id
 JOIN users ON tenants.user_id = users.id
 JOIN meters ON rooms.id = meters.room_id
-LEFT JOIN maintenance ON rooms.id = maintenance.room_id
+LEFT JOIN maintenance_summary ms ON rooms.id = ms.room_id
 WHERE rooms.status = 1
-GROUP BY rooms.id, users.fname, users.lname, users.id, rooms.rent;
+GROUP BY rooms.id, users.fname, users.lname, users.id, rooms.rent, ms.maintenance_cost_filtered, ms.maintenance_cost_total;
+
 `;
 
   let sql2 = `SELECT * from bills`;
@@ -398,7 +408,7 @@ FROM
 JOIN rate r ON r.id = m.rate_id
 JOIN rooms rm ON m.room_id = rm.id
 LEFT JOIN maintenance mn ON mn.room_id = m.room_id
-    AND mn.status != 3
+    AND mn.status = 2
 LEFT JOIN bills b ON b.room_id = m.room_id 
     AND b.id = (SELECT MAX(b2.id) FROM bills b2 WHERE b2.room_id = m.room_id)
 WHERE
@@ -427,14 +437,14 @@ app.get('/addreceipt', isAdmin, function (req, res) {
     m.id AS meter_id,
     m.read_date,
     COALESCE(SUM(mn.cost), 0) AS maintenance_cost,
-    b.addon_cost AS addon_cost,  -- ไม่ใช้ COALESCE
+    b.addon_cost AS addon_cost, 
     COALESCE(b.total_amount, 0) AS total_amount  -- ดึง total_amount จากตาราง bills
 FROM
     meters m
 JOIN rate r ON r.id = m.rate_id
 JOIN rooms rm ON m.room_id = rm.id
 LEFT JOIN maintenance mn ON mn.room_id = m.room_id
-    AND mn.status != 3  -- ใช้ข้อมูลที่ status ไม่เท่ากับ 3
+    AND mn.status = 2  -- ใช้ข้อมูลที่ status ไม่เท่ากับ 3
 LEFT JOIN bills b ON b.room_id = m.room_id 
     AND b.id = (SELECT MAX(b2.id) FROM bills b2 WHERE b2.room_id = m.room_id)  -- ดึงข้อมูล bill ล่าสุด
 WHERE
@@ -608,7 +618,7 @@ app.post('/insertPayment/:id', (req, res) => {
         const sqlUpdateMaintenance = `
           UPDATE maintenance
           SET status = 3
-          WHERE room_id = ?;
+          WHERE room_id = ? and status = 2;
         `;
 
         db.run(sqlUpdateMaintenance, [roomId], function (err) {

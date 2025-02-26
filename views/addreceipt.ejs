@@ -100,18 +100,21 @@
                 <% if (item.addon_cost != '') { %>
                     <tr>
                         <td><input type="text" class="form-control" id="inputExtra2" name="inputExtra2"
-                                placeholder="รายการ" value="<%= item.addon_cost %>" readonly></td>
+                                placeholder="รายการ" value="<%= item.addon_details %>" readonly></td>
                         <td><input type="number" class="form-control" placeholder="ราคา" id="numExtra2"
                             value="<%= 
+                            item.addon_cost
+                          %>"
+                           readonly></td>
+                    </tr>
+                    <% } %>
+                    <!-- value="<%= 
                             (Number(item.total_amount) || 0) - 
                             ((Number(item.elec_rate) || 0) * (Number(item.elec_unit) || 0)) - 
                             ((Number(item.water_rate) || 0) * (Number(item.water_unit) || 0)) - 
                             (Number(item.rent) || 0) - 
                             (Number(item.maintenance_cost) || 0) 
-                          %>"
-                           readonly></td>
-                    </tr>
-                    <% } %>
+                          %>" -->
         </tbody>
     </table>
 

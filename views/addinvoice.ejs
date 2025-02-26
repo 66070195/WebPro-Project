@@ -32,7 +32,6 @@
                         <tbody>
                             <tr>
                                 <td id="start-of-month"></td>
-                                </td>
                                 <td>
                                     <%= item.read_date %>
                                 </td>
@@ -122,8 +121,8 @@
                                 <td><input type="text" class="form-control" id="inputExtra3" name="inputExtra3"
                                         placeholder="รายการ">
                                 </td>
-                                <td><input type="number" class="form-control" placeholder="ราคา" id="numExtra3"
-                                        name="numExtra3">
+                                <td><input type="number" class="form-control" placeholder="ราคา" id="numExtra3" name="extra_amount">
+
                                 </td>
                             </tr>
                 </tbody>
@@ -135,12 +134,12 @@
                         class="form-control w-auto text-center mx-3" placeholder="ราคารวม"
                         value="<%= (item.elec_unit * item.elec_rate) + (item.water_unit * item.water_rate) + item.rent + item.maintenance_cost %>"
                         readonly>
-
                     <input type="hidden" name="elec_amount" value="<%= item.elec_unit * item.elec_rate %>">
                     <input type="hidden" name="water_amount" value="<%= item.water_unit * item.water_rate %>">
                     <input type="hidden" name="rent_amount" value="<%= item.rent %>">
                     <input type="hidden" name="maintenance_amount" value="<%= item.maintenance_cost %>">
                     <input type="hidden" name="extraID" id="extraID<%= item.room_id %>">
+                    <input type="hidden" name="numExtra" id="extraNum<%= item.room_id %>">
                     <button type="submit" class="btn btn-success text-nowrap px-2 py-3">ยืนยันการสร้าง</button>
                 </form>
 
@@ -159,7 +158,9 @@
             const inputExtra = document.getElementById('inputExtra3');
             const numExtra = document.getElementById('numExtra3');
             const extraID = document.getElementById('extraID<%= item.room_id %>');  // แก้ไขเป็น extraID<%= item.room_id %>
+            const hiddenNumExtra = document.getElementById('extraNum<%= item.room_id %>');
 
+            
             // ตรวจสอบว่ามีการกรอกข้อมูลเพิ่มเติมหรือไม่
             if (inputExtra.value.trim() === '') {
                 inputExtra.value = '';
@@ -171,7 +172,7 @@
 
             // เก็บค่าใน hidden input
             extraID.value = inputExtra.value;
-
+            hiddenNumExtra.value = numExtra.value;
             // อัพเดทยอดรวม
             updateTotalAmount('<%= item.room_id %>');
         });

@@ -59,28 +59,27 @@
                             <%= item.rent %>
                         </td>
                     </tr>
-                    <% if (item.addon_cost && item.addon_cost !=='' ) { %>
-
+                    <% if (item.addon_cost && item.addon_cost != '0' ) { %>
                         <tr>
                             <td style="border: 1px solid #ddd; padding: 8px;">
-                                <%= item.addon_cost %>
+                                <%= item.addon_details %>
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" id="cost1">
-                                <%= Math.max( (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount ||
+                                <!-- <%= Math.max( (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount ||
                                     0) - (item.rent || 0) - (item.maintenance_cost || 0), (item.total_amount || 0)
                                     - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
-                                    (item.maintenance_cost || 0) ) %>
-
+                                    (item.maintenance_cost || 0) ) %> -->
+                                    <%= item.addon_cost %>
 
 
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">1</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" id="cost2">
-                                <%= Math.max( (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount ||
+                                <!-- <%= Math.max( (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount ||
                                     0) - (item.rent || 0) - (item.maintenance_cost || 0), (item.total_amount || 0)
                                     - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
-                                    (item.maintenance_cost || 0) ) %>
-
+                                    (item.maintenance_cost || 0) ) %> -->
+                                    <%= item.addon_cost %>
                             </td>
                         </tr>
                         <% } %>

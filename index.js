@@ -376,8 +376,8 @@ app.post('/insertbill', isAdmin, function (req, res) {
 
   console.log(room_id, rent, meter_id, createDay, paidDay, user_id, cost_id);
 
-  const sql = `INSERT INTO bills (user_id, room_id, meter_id, created_at, due_date,maintenance_cost,water_amount,elec_amount,total_amount,status,addon_cost)
-VALUES (?, ?, ?, ?, ?,?,0,0,0,0,0);`;
+  const sql = `INSERT INTO bills (user_id, room_id, meter_id, created_at, due_date,maintenance_cost,water_amount,elec_amount,total_amount,status,addon_cost,addon_details)
+VALUES (?, ?, ?, ?, ?,?,0,0,0,0,0,0);`;
   const params = [user_id, room_id, meter_id, createDay, paidDay, cost_id];
 
   db.run(sql, params, function (err) {
@@ -437,7 +437,8 @@ app.get('/addreceipt', isAdmin, function (req, res) {
     m.id AS meter_id,
     m.read_date,
     COALESCE(SUM(mn.cost), 0) AS maintenance_cost,
-    b.addon_cost AS addon_cost, 
+    b.addon_cost AS addon_cost,
+    b.addon_details as addon_details,
     COALESCE(b.total_amount, 0) AS total_amount  -- ดึง total_amount จากตาราง bills
 FROM
     meters m
@@ -515,8 +516,7 @@ AND m.id = (
 
 app.post('/insertBill/:id', (req, res) => {
   const roomId = req.params.id;
-  const { water_amount, elec_amount, rent_amount, maintenance_amount, total_amount, extraID } = req.body;
-
+  const { water_amount, elec_amount, rent_amount, maintenance_amount, total_amount, extraID,numExtra } = req.body;
   // Log ค่าที่ได้รับจากฟอร์ม
   const pkq = `SELECT id 
               FROM bills 
@@ -531,7 +531,8 @@ app.post('/insertBill/:id', (req, res) => {
     rent_amount,
     maintenance_amount,
     extraID,
-    total_amount
+    total_amount,
+    numExtra
   });
 
   const sql = `
@@ -540,13 +541,13 @@ app.post('/insertBill/:id', (req, res) => {
       water_amount = ?, 
       elec_amount = ?, 
       total_amount = ?,  
-      addon_cost = ?, 
-      total_amount = ?, 
+      addon_cost = ?,
+      addon_details = ?,
       status = 1
     WHERE id = ?
   `;
 
-  const values = [water_amount, elec_amount, rent_amount, extraID, total_amount, roomId];
+  const values = [water_amount, elec_amount, rent_amount, extraID, total_amount, roomId,numExtra];
 
   
   console.log('SQL Query:', sql);
@@ -558,7 +559,7 @@ app.post('/insertBill/:id', (req, res) => {
     }
     const billId = rows1[0].id;
     console.log(rows1);
-    db.run(sql, [water_amount, elec_amount, rent_amount, extraID, total_amount, billId], (err) => {
+    db.run(sql, [water_amount, elec_amount, total_amount, numExtra, extraID, billId], (err) => {
       if (err) {
         console.error('Error updating data:', err.message);
         return res.status(500).send('Error updating data');

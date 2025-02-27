@@ -14,19 +14,21 @@
                         <th>ค้างชำระ: </th>
                         <th>พัสดุ: </th>
                     </tr>
+                    <% data.forEach((item)=>{ %>
                     <tr>
-                        <td><%= data[0].room_id %></td>
+                        <td><%= item.room_id %></td>
                         <td>
-                            <% if (data[0].bill_status == null){ %>
+                            <% if (item.bill_status == null){ %>
                             ไม่มี
-                            <%}else if (data[0].bill_status == 0) {%>
+                            <%}else if (item.bill_status == 0) {%>
                             ค้างชำระ
-                            <%}else if (data[0].bill_status == 1) {%>
+                            <%}else if (item.bill_status == 1) {%>
                             ชำระแล้ว
                             <% } %>
                         </td>
-                        <td><%= data[0].parcel_count %> ชื้น</td>
+                        <td><%= item.parcel_count %> ชื้น</td>
                     </tr>
+                    <% }); %>
                 </table>
                 </div>
             </div>

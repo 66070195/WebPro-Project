@@ -1233,7 +1233,7 @@ app.get('/home', function (req, res) {
     LEFT JOIN booking ON users.id = booking.user_id
     LEFT JOIN parcels ON booking.room_id = parcels.room_id
     LEFT JOIN bills ON booking.bill_id = bills.id
-    WHERE users.id = ${userId}`;
+    WHERE users.id = ${userId} AND parcels.status = 0`;
   db.all(sql_user, (err, rows_user) => {
     console.log(rows_user);
     if (err) {
@@ -1241,13 +1241,11 @@ app.get('/home', function (req, res) {
     }
     sql_maintenance = `SELECT * FROM maintenance WHERE room_id = '${rows_user[0].room_id}' AND (status = 0 OR status = 1)`;
     db.all(sql_maintenance, (err, rows_maintenance) => {
-      console.log(rows_maintenance);
       if (err) {
         return console.error(err.message);
       }
       sql_bill = `SELECT * FROM bills WHERE user_id = '${rows_user[0].id}' AND status = 2`;
       db.all(sql_bill, (err, rows_bill) => {
-        console.log(rows_bill);
         if (err) {
           return console.error(err.message);
         }

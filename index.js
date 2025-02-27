@@ -1270,27 +1270,25 @@ app.get('/admin', function (req, res) {
       }
       const availableRooms = rows_room.filter(room => room.status === 0).length;
       const occupiedRooms = rows_room.filter(room => room.status === 1).length;
-      db.all(`SELECT * FROM rooms 
-        LEFT JOIN booking ON rooms.id = booking.room_id
-        LEFT JOIN bills ON rooms.id = bills.room_id`, (err, rows_bill) => {
+      db.all(`SELECT booking.*, bills.created_at FROM booking 
+        LEFT JOIN bills ON booking.bill_id = bills.id`, (err, rows_bill) => {
           if (err) {
           return console.error(err.message);
         }
-        db.all(`SELECT * FROM rooms 
-          LEFT JOIN booking ON rooms.id = booking.room_id
-          LEFT JOIN bills ON rooms.id = bills.room_id 
-          WHERE bills.status = 0`, (err, rows_room_notyet) => {
+        db.all(`SELECT * FROM bills
+          WHERE status != 3`, (err, rows_notyet) => {
             if (err) {
             return console.error(err.message);
           }
-          db.all(`SELECT * FROM users 
-            LEFT JOIN booking ON users.id = booking.user_id
+          console.log(rows_notyet);
+          db.all(`SELECT * FROM booking 
+            LEFT JOIN users ON users.id = booking.user_id
             WHERE booking.start_date LIKE '${currentDate}%' `, (err, rows_user_checkin) => {
               if (err) {
               return console.error(err.message);
             }
-            db.all(`SELECT * FROM users 
-              LEFT JOIN booking ON users.id = booking.user_id
+            db.all(`SELECT * FROM booking 
+              LEFT JOIN users ON users.id = booking.user_id
               WHERE booking.end_date LIKE '${currentDate}%' `, (err, rows_user_checkout) => {
                 if (err) {
                 return console.error(err.message);
@@ -1300,7 +1298,7 @@ app.get('/admin', function (req, res) {
                   if (err) {
                   return console.error(err.message);
                 }
-                res.render('admin', { data: rows_admin, bill: rows_bill, notyet: rows_room_notyet, checkin: rows_user_checkin, checkout: rows_user_checkout, overdue: rows_overdue, availableRooms, occupiedRooms, currentDate, currentTime });
+                res.render('admin', { data: rows_admin, bill: rows_bill, notyet: rows_notyet, checkin: rows_user_checkin, checkout: rows_user_checkout, overdue: rows_overdue, availableRooms, occupiedRooms, currentDate, currentTime });
               });
             });
           });

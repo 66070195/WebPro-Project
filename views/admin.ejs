@@ -9,9 +9,9 @@
 <div class="row justify-content-around">
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ห้องที่ต้องออกใบแจ้งหนี้ (<%= currentDate %>)<br>จะเป็นห้องที่สร้างใบเสร็จอันล่าสุดมาแล้ว30วัน</h5>
+            <h5 class="title">ห้องที่ต้องออกใบแจ้งหนี้ (<%= currentDate %>)</h5>
             <hr>
-            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+            <table class="table py-2 text-center menu-table" id="no-more-tables">
                 <thead class="table-dark">
                     <tr>
                         <th>ห้อง</th>
@@ -20,7 +20,7 @@
                 <tbody>
                     <% bill
                     .filter(item => 
-                        currentTime.setDate(currentTime.getDate() - 30) && 
+                        currentTime.setDate(currentTime.getMonth() - 1) && 
                         new Date(item.created_at)<=currentTime)
                     .forEach((item)=>{ %>
                         <tr>
@@ -35,7 +35,7 @@
         <div class="bg-white p-4 mt-3 rounded shadowing">
             <h5 class="title">ห้องที่ยังไม่จ่าย</h5>
             <hr>
-            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+            <table class="table py-2 text-center menu-table" id="no-more-tables">
                 <thead class="table-dark">
                     <tr>
                         <th>ห้อง</th>
@@ -59,9 +59,9 @@
 <div class="row justify-content-around">
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ผู้เช่าที่ย้ายเข้าวันนี้ (<%= currentDate %>)</h5>
+            <h5 class="title">ห้องที่ย้ายเข้าวันนี้ (<%= currentDate %>)</h5>
             <hr>
-            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+            <table class="table py-2 text-center menu-table" id="no-more-tables">
                 <thead class="table-dark">
                     <tr>
                         <th>ห้อง</th>
@@ -81,9 +81,9 @@
     </div>
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ผู้เช่าที่ย้ายออกวันนี้ (<%= currentDate %>)</h5>
+            <h5 class="title">ห้องที่ย้ายออกวันนี้ (<%= currentDate %>)</h5>
             <hr>
-            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+            <table class="table py-2 text-center menu-table" id="no-more-tables">
                 <thead class="table-dark">
                     <tr>
                         <th>ห้อง</th>
@@ -105,7 +105,7 @@
         <div class="bg-white p-4 mt-3 rounded shadowing">
             <h5 class="title">ห้องที่เกินกำหนดชำระ</h5>
             <hr>
-            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+            <table class="table py-2 text-center menu-table" id="no-more-tables">
                 <thead class="table-dark">
                     <tr>
                         <th>ห้อง</th>

@@ -781,7 +781,7 @@ app.post('/welcome', function (req, res) {
         res.redirect("/home");
       } else if (row.role === 1) {
         console.log('login successful');
-        res.redirect("graph");
+        res.redirect("/admin");
       }
     } else {
       console.log('login failed');
@@ -1254,6 +1254,61 @@ app.get('/home', function (req, res) {
         res.render('home', { data: rows_user, maintenance: rows_maintenance, bill: rows_bill});
       });
     });
+  });
+});
+
+app.get('/admin', function (req, res) {
+  const userId = req.session.user.id;
+  const currentTime = new Date();
+  const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
+  const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
+  db.all(`SELECT * FROM users WHERE id = ${userId} AND role = 1`, (err, rows_admin) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    db.all("SELECT * FROM rooms", (err, rows_room) => {
+      if (err) {
+        return console.error(err.message);
+      }
+      const availableRooms = rows_room.filter(room => room.status === 0).length;
+      const occupiedRooms = rows_room.filter(room => room.status === 1).length;
+      db.all(`SELECT * FROM rooms 
+        LEFT JOIN booking ON rooms.id = booking.room_id
+        LEFT JOIN bills ON rooms.id = bills.room_id`, (err, rows_bill) => {
+          if (err) {
+          return console.error(err.message);
+        }
+        db.all(`SELECT * FROM rooms 
+          LEFT JOIN booking ON rooms.id = booking.room_id
+          LEFT JOIN bills ON rooms.id = bills.room_id 
+          WHERE bills.status = 0`, (err, rows_room_notyet) => {
+            if (err) {
+            return console.error(err.message);
+          }
+          db.all(`SELECT * FROM users 
+            LEFT JOIN booking ON users.id = booking.user_id
+            WHERE booking.start_date LIKE '${currentDate}%' `, (err, rows_user_checkin) => {
+              if (err) {
+              return console.error(err.message);
+            }
+            db.all(`SELECT * FROM users 
+              LEFT JOIN booking ON users.id = booking.user_id
+              WHERE booking.end_date LIKE '${currentDate}%' `, (err, rows_user_checkout) => {
+                if (err) {
+                return console.error(err.message);
+              }
+              db.all(`SELECT * FROM bills 
+                WHERE (status = 0) AND due_date < '${yesterDate}' `, (err, rows_overdue) => {
+                  if (err) {
+                  return console.error(err.message);
+                }
+                res.render('admin', { data: rows_admin, bill: rows_bill, notyet: rows_room_notyet, checkin: rows_user_checkin, checkout: rows_user_checkout, overdue: rows_overdue, availableRooms, occupiedRooms, currentDate, currentTime });
+              });
+            });
+          });
+        });
+      });
+    });  
   });
 });
 

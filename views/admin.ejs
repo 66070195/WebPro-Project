@@ -1,6 +1,143 @@
-<div class="bg-white p-4 mt-3 rounded shadowing">
-    <h4 class="title">ยินดีต้อนรับ, <% data %>
-
-    </h4>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<h4 class="title">ยินดีต้อนรับ, <%= data[0].fname %></h4>
+<div class="d-flex flex-wrap justify-content-center bg-white rounded">
+    <div class="card m-2 shadow p-3 w-50">
+        <h5 class="card-title me-3 text-center mt-4">จำนวนห้อง</h5>
+        <canvas id="myChart"></canvas>
+    </div>
 </div>
+<div class="row justify-content-around">
+    <div class="col">
+        <div class="bg-white p-4 mt-3 rounded shadowing">
+            <h5 class="title">ห้องที่ต้องออกใบแจ้งหนี้ (<%= currentDate %>)<br>จะเป็นห้องที่สร้างใบเสร็จอันล่าสุดมาแล้ว30วัน</h5>
+            <hr>
+            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ห้อง</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% bill
+                    .filter(item => 
+                        currentTime.setDate(currentTime.getDate() - 30) && 
+                        new Date(item.created_at)<=currentTime)
+                    .forEach((item)=>{ %>
+                        <tr>
+                            <td data-title="ห้อง"><%= item.room_id %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col">
+        <div class="bg-white p-4 mt-3 rounded shadowing">
+            <h5 class="title">ห้องที่ยังไม่จ่าย</h5>
+            <hr>
+            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ห้อง</th>
+                        <th>ค้างชำระ</th>
+                        <th>วันที่สร้าง</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% notyet.forEach((item)=>{ %>
+                        <tr>
+                            <td data-title="ห้อง"><%= item.room_id %></td>
+                            <td data-title="ค้างชำระ"><%= item.total_amount %></td>
+                            <td data-title="วันที่สร้าง"><%= item.created_at %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-around">
+    <div class="col">
+        <div class="bg-white p-4 mt-3 rounded shadowing">
+            <h5 class="title">ผู้เช่าที่ย้ายเข้าวันนี้ (<%= currentDate %>)</h5>
+            <hr>
+            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ห้อง</th>
+                        <th>ชื่อเจ้าของห้อง</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% checkin.forEach((item)=>{ %>
+                        <tr>
+                            <td data-title="ห้อง"><%= item.room_id %></td>
+                            <td data-title="ชื่อเจ้าของห้อง"><%= item.fname %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col">
+        <div class="bg-white p-4 mt-3 rounded shadowing">
+            <h5 class="title">ผู้เช่าที่ย้ายออกวันนี้ (<%= currentDate %>)</h5>
+            <hr>
+            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ห้อง</th>
+                        <th>ชื่อเจ้าของห้อง</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% checkout.forEach((item)=>{ %>
+                        <tr>
+                            <td data-title="ห้อง"><%= item.room_id %></td>
+                            <td data-title="ชื่อเจ้าของห้อง"><%= item.fname %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col">
+        <div class="bg-white p-4 mt-3 rounded shadowing">
+            <h5 class="title">ห้องที่เกินกำหนดชำระ</h5>
+            <hr>
+            <table class="table py-2 request-fix-table text-center" id="no-more-tables">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ห้อง</th>
+                        <th>ค้างชำระ</th>
+                        <th>วันที่ต้องชำระ</th>
+                        <th>เลยกำหนด(วัน)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% overdue.forEach((item)=>{ %>
+                        <tr>
+                            <td data-title="ห้อง"><%= item.room_id %></td>
+                            <td data-title="ค้างชำระ"><%= item.total_amount %></td>
+                            <td data-title="วันที่ต้องชำระ"><%= item.due_date %></td>
+                            <td data-title="เลยกำหนด(วัน)"><%= new Date(currentDate).getDate() - new Date(item.due_date).getDate() %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script >
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Available', 'Occupied'],
+            datasets: [{
+                data: [<%= availableRooms %>, <%= occupiedRooms %>],
+                backgroundColor: ['#36a2eb', '#ff6384']
+            }]
+        }
+    });
+</script>

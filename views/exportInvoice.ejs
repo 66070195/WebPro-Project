@@ -1,149 +1,396 @@
 <div class="bg-white p-4 mt-3 rounded shadowing d-flex flex-column align-items-center">
-    <div class="receipt" id="receipt" style="width: 500px; margin: auto;">
-        <h3 style="font-weight: bold; text-align: center; margin-bottom: 20px;">ใบเสร็จแจ้งหนี้</h3>
-        <% data.forEach((item)=> { %>
-            <div style="margin-top: 12px;">
-                <p><strong>ชื่อ:</strong>
-                    <%= item.fname %>
-                        <%= item.lname %> <strong>วันที่ออกใบแจ้งหนี้:</strong>
-                            <%= item.created_at %>
-                </p>
-                <p><strong>ห้อง:</strong>
-                    <%= item.room_id %> <strong>วันที่ชำระ:</strong>
-                        <%= item.due_date %>
-                </p>
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                <thead>
-                    <tr style="background-color: #f2f2f2;">
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">รายการ</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">ราคาต่อหน่วย</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">จำนวนหน่วย</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">จำนวนเงิน</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">ค่าไฟ</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            <%= item.elec_rate %>
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            <%= item.elec_unit %>
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            <%= item.elec_amount %>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">ค่าน้ำ</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            <%= item.water_rate %>
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            <%= item.water_unit %>
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            <%= item.water_amount %>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">ค่าเช่า</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            <%= item.rent %>
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            1
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                            <%= item.rent %>
-                        </td>
-                    </tr>
-                    <% if (item.addon_cost && item.addon_cost != '0' ) { %>
+    <div class="receipt" id="receipt">
+        <div class="receipt-wrapper">
+            <div class="receipt-content">
+                <!-- ส่วนหัวใบเสร็จ -->
+                <div class="receipt-header">
+                    <div class="receipt-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div class="receipt-title">ใบเสร็จแจ้งหนี้</div>
+                </div>
+                
+                <!-- ข้อมูลผู้เช่าและใบเสร็จ -->
+                <% data.forEach((item)=> { %>
+                <div class="receipt-details">
+                    <!-- ข้อมูลซ้าย -->
+                    <div class="receipt-info">
+                        <div class="info-row">
+                            <div class="info-label">ชื่อ-นามสกุล:</div>
+                            <div class="info-value"><%= item.fname %> <%= item.lname %></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">ห้อง:</div>
+                            <div class="info-value"><%= item.room_id %></div>
+                        </div>
+                    </div>
+                    
+                    <!-- ข้อมูลขวา -->
+                    <div class="receipt-info">
+                        <div class="info-row">
+                            <div class="info-label">วันออกบิล:</div>
+                            <div class="info-value"><%= item.created_at %></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">วันที่ชำระ:</div>
+                            <div class="info-value"><%= item.due_date %></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ตารางรายการ -->
+                <table class="receipt-table">
+                    <thead>
                         <tr>
-                            <td style="border: 1px solid #ddd; padding: 8px;">
-                                <%= item.addon_details %>
+                            <th>รายการ</th>
+                            <th>ราคาต่อหน่วย</th>
+                            <th>จำนวนหน่วย</th>
+                            <th>จำนวนเงิน</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ค่าไฟ</td>
+                            <td class="text-right"><%= item.elec_rate %></td>
+                            <td class="text-center"><%= item.elec_unit %></td>
+                            <td class="text-right"><%= item.elec_amount %></td>
+                        </tr>
+                        <tr>
+                            <td>ค่าน้ำ</td>
+                            <td class="text-right"><%= item.water_rate %></td>
+                            <td class="text-center"><%= item.water_unit %></td>
+                            <td class="text-right"><%= item.water_amount %></td>
+                        </tr>
+                        <tr>
+                            <td>ค่าเช่า</td>
+                            <td class="text-right"><%= item.rent %></td>
+                            <td class="text-center">1</td>
+                            <td class="text-right"><%= item.rent %></td>
+                        </tr>
+                        <% if (item.addon_cost && item.addon_cost !== '') { %>
+                        <tr>
+                            <td><%= item.addon_details %></td>
+                            <td class="text-right"><%= item.addon_cost %></td>
+                            <td class="text-center">1</td>
+                            <td class="text-right"><%= item.addon_cost %></td>
+                        </tr>
+                        <% } %>
+                        <% if ((item.maintenance_cost || 0) > 0) { %>
+                        <tr>
+                            <td>ค่าซ่อม</td>
+                            <td class="text-right">
+                                <%= (item.total_amount || 0) - Math.max((item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0), (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0)) - item.elec_amount - item.water_amount - item.rent %>
                             </td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" id="cost1">
-                                <!-- <%= Math.max( (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount ||
-                                    0) - (item.rent || 0) - (item.maintenance_cost || 0), (item.total_amount || 0)
-                                    - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
-                                    (item.maintenance_cost || 0) ) %> -->
-                                    <%= item.addon_cost %>
-
-
-                            </td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">1</td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" id="cost2">
-                                <!-- <%= Math.max( (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount ||
-                                    0) - (item.rent || 0) - (item.maintenance_cost || 0), (item.total_amount || 0)
-                                    - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
-                                    (item.maintenance_cost || 0) ) %> -->
-                                    <%= item.addon_cost %>
+                            <td class="text-center">1</td>
+                            <td class="text-right">
+                                <%= (item.total_amount || 0) - Math.max((item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0), (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0)) - item.elec_amount - item.water_amount - item.rent %>
                             </td>
                         </tr>
                         <% } %>
-                            <% if ((item.maintenance_cost || 0)> 0) { %>
-
-                                <tr>
-                                    <td style="border: 1px solid #ddd; padding: 8px;">
-                                        ค่าซ่อม
-                                    </td>
-                                    <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                        <%= (item.total_amount || 0) - Math.max( (item.total_amount || 0) -
-                                            (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
-                                            (item.maintenance_cost || 0), (item.total_amount || 0) -
-                                            (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
-                                            (item.maintenance_cost || 0) ) - item.elec_amount - item.water_amount-item.rent %>
-
-
-                                    </td>
-                                    <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">1</td>
-                                    <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
-                                        <%= (item.total_amount || 0) - Math.max( (item.total_amount || 0) -
-                                            (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
-                                            (item.maintenance_cost || 0), (item.total_amount || 0) -
-                                            (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) -
-                                            (item.maintenance_cost || 0) ) - item.elec_amount - item.water_amount-item.rent %>
-                                    </td>
-                                </tr>
-                                <% } %>
-                </tbody>
-            </table>
-            <div class="mt-3 fw-bold fs-5 text-end" style="font-size: 16px; margin-top: 15px;">รวม: <%=
-                    item.total_amount %> บาท</div>
-            <% }); %>
+                    </tbody>
+                </table>
+                
+                <!-- ยอดรวม -->
+                <div class="receipt-total">
+                    <div class="total-row">
+                        <span>รวมทั้งสิ้น:</span>
+                        <span><%= item.total_amount %> บาท</span>
+                    </div>
+                </div>
+                
+                
+                <!-- ส่วนท้าย -->
+                <div class="receipt-footer">
+                    <p>ขอบคุณที่ใช้บริการ - HavenHub</p>
+                </div>
+                <% }); %>
+            </div>
+        </div>
     </div>
 
     <div class="d-flex justify-content-center mt-3">
-        <button id="downloadPdfBtn" class="btn btn-success">ดาวน์โหลดเป็น PDF</button>
+        <button id="downloadPdfBtn" class="btn btn-success">
+            <i class="fas fa-download"></i> ดาวน์โหลดเป็น PDF
+        </button>
+        <button id="backBtn" class="btn btn-secondary ms-2" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+        </button>
     </div>
 </div>
 
+<style>
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* ฟอนต์ */
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+
+/* สไตล์หลัก */
+.receipt {
+    font-family: 'Prompt', sans-serif;
+    color: #333;
+    line-height: 1.5;
+    width: 148mm; /* A5 width */
+    background-color: white;
+    margin: 0 auto;
+    position: relative;
+}
+
+.receipt-wrapper {
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.receipt-content {
+    padding: 20px;
+}
+
+/* ส่วนหัวใบเสร็จ */
+.receipt-header {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #dc3545;
+}
+
+.receipt-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.receipt-subtitle {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.receipt-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+/* ข้อมูลใบเสร็จ */
+.receipt-details {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.receipt-info {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.info-label {
+    font-weight: 600;
+    min-width: 100px;
+    color: #555;
+}
+
+.info-value {
+    color: #333;
+}
+
+/* ตาราง */
+.receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.receipt-table th {
+    background-color: #dc3545;
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.receipt-table td {
+    padding: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.receipt-table .text-right {
+    text-align: right;
+}
+
+.receipt-table .text-center {
+    text-align: center;
+}
+
+/* รวมทั้งสิ้น */
+.receipt-total {
+    display: flex;
+    justify-content: flex-end;
+    border-top: 2px solid #dc3545;
+    padding-top: 8px;
+    margin-bottom: 20px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #dc3545;
+}
+
+/* ปุ่ม */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Prompt', sans-serif;
+}
+
+.btn-success {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+/* สำหรับการพิมพ์ */
+@media print {
+    @page {
+        size: A5;
+        margin: 0;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .bg-white {
+        padding: 0 !important;
+        margin: 0 !important;
+        background-color: white;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+    
+    .receipt {
+        width: 100%;
+        box-shadow: none;
+    }
+    
+    .receipt-wrapper {
+        border: none;
+        box-shadow: none;
+        margin: 0;
+    }
+    
+    .d-flex.justify-content-center.mt-3,
+    .shadowing,
+    .rounded {
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .d-flex.justify-content-center.mt-3 {
+        display: none !important;
+    }
+    
+    /* ซ่อนทุกองค์ประกอบอื่นๆ */
+    body > :not(.bg-white),
+    .navbar, .sidebar, header, footer {
+        display: none !important;
+    }
+}
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // กำจัด navbar และส่วนที่ไม่ต้องการ
+        const elementsToRemove = [
+            '.navbar', '.nav-menu', '#header', '.header', '#navbar', '.sidebar', 
+            '#sidebar', '.sidemenu', '#sidemenu', '.nav', 'nav', '#nav', 
+            '.topbar', '#topbar', '.menu-bar', '#menu-bar', '.site-header', 
+            '#site-header', 'header', '.menu'
+        ];
+        
+        elementsToRemove.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                if (el && el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+            });
+        });
+    });
+
+    // เมื่อกดปุ่ม ESC ให้กลับไปหน้าก่อนหน้า
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            window.history.back();
+        }
+    });
+    
+    // ปุ่มดาวน์โหลด PDF
     document.getElementById("downloadPdfBtn").addEventListener("click", async function () {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
-            orientation: "p",
+            orientation: "portrait",
             unit: "mm",
-            format: [210, 297]  // A4 size
+            format: "a5"  // A5 size
         });
+        
         const receiptElement = document.getElementById("receipt");
         const canvas = await html2canvas(receiptElement, {
-            scale: 2
+            scale: 2,
+            backgroundColor: "#ffffff"
         });
+        
         const imgData = canvas.toDataURL("image/png");
-        doc.addImage(imgData, "PNG", 10, 10, 190, 0);
-        doc.save("receipt.pdf");
+        
+        // A5 dimensions (148mm × 210mm)
+        const imgWidth = 148;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        doc.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        doc.save("receipt-a5.pdf");
     });
-    document.addEventListener("DOMContentLoaded", function () {
-        const value1 = (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0);
-        const value2 = (item.total_amount || 0) - (item.elec_amount || 0) - (item.water_amount || 0) - (item.rent || 0) - (item.maintenance_cost || 0);
-        const maxValue = Math.max(value1, value2);
-        document.getElementById("cost1").innerText = maxValue;
-    });
-
 </script>

@@ -1256,10 +1256,10 @@ app.get('/home', function (req, res) {
 });
 
 // app.get('/admin', function (req, res) {
-//   const userId = req.session.user.id;
-//   const currentTime = new Date();
-//   const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
-//   const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
+  // const userId = req.session.user.id;
+  // const currentTime = new Date();
+  // const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
+  // const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
 //   db.all(`SELECT * FROM users WHERE id = ${userId} AND role = 1`, (err, rows_admin) => {
 //     if (err) {
 //       return console.error(err.message);
@@ -1311,10 +1311,8 @@ app.get('/home', function (req, res) {
 app.get('/admin', function (req, res) {
   const userId = req.session.user.id;
   const currentTime = new Date();
-  const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')}`;
-  const yesterTime = new Date();
-  yesterTime.setDate(yesterTime.getDate() - 1);
-  const yesterDate = `${yesterTime.getFullYear()}-${String(yesterTime.getMonth() + 1).padStart(2, '0')}-${String(yesterTime.getDate()).padStart(2, '0')}`;
+  const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
+  const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
 
   db.all("SELECT * FROM users WHERE id = ? AND role = 1", [userId], (err, rows_admin) => {
     if (err) return console.error(err.message);

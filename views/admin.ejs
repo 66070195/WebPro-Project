@@ -1,9 +1,17 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <h4 class="title">ยินดีต้อนรับ, <%= data[0].fname %></h4>
-<div class="d-flex flex-wrap justify-content-center bg-white rounded">
-    <div class="card m-2 shadow p-3 w-50">
-        <h5 class="card-title me-3 text-center mt-4">จำนวนห้อง</h5>
-        <canvas id="myChart"></canvas>
+<div class="card shadow" style="padding-bottom: 50px;">
+    <div class="d-flex flex-wrap justify-content-center bg-white">
+        <div class="card m-2 shadow" style="width: 34rem;">
+            <h5 class="card-title me-3 text-center mt-4">จำนวนห้อง</h5>
+            <canvas id="roomChart"></canvas>
+        </div>
+        <div class="card m-2 shadow" style="width: 34rem; padding-bottom: 50px;">
+            <h5 class="card-title me-3 text-center mt-4">เพศ</h5>
+            <canvas id="sexChart"></canvas>
+        </div>
+        
     </div>
 </div>
 <div class="row justify-content-around">
@@ -128,16 +136,91 @@
         </div>
     </div>
 </div>
-<script >
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const myChart = new Chart(ctx, {
+<script>
+    // เปลี่ยน id จาก 'myChart' เป็น 'roomChart'
+    const roomChartData = {
         type: 'pie',
-        data: {
-            labels: ['Available', 'Occupied'],
+        labels: ['ห้องว่าง', 'ห้องไม่ว่าง'],
+        dataValues: [<%= availableRooms %>, <%= occupiedRooms %>],
+        backgroundColors: ['rgba(255, 255, 255, 1)', 'rgba(63, 114, 175, 0.8)'],
+        borderColors: ['rgba(214, 219, 224, 1)', 'rgba(44, 89, 138, 1)'],
+        label: 'จำนวนห้อง',
+        tooltipsCallback: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw} ห้อง`
+    };
+
+    const sexChartData = {
+        type: 'pie',
+        labels: ['ชาย','หญิง','อื่นๆ'],
+        dataValues: [
+        <%= (sexData.filter(s => s.sex === 'M')[0] || {}).count || 0 %>,
+            <%= (sexData.filter(s => s.sex === 'F')[0] || {}).count || 0 %>, 
+
+            <%= (sexData.filter(s => s.sex === 'O')[0] || {}).count || 0 %>
+        ],
+        backgroundColors: [ 'rgba(54, 162, 235, 0.8)','rgba(255, 99, 132, 0.8)', 'rgba(255, 206, 86, 0.8)'],
+        borderColors: [ 'rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)','rgba(255, 206, 86, 1)'],
+        label: 'เพศของผู้ใช้',
+        tooltipsCallback: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw} คน`
+    };
+
+    
+    function createChart(chartId, chartData) {
+        const data = {
+            labels: chartData.labels,
             datasets: [{
-                data: [<%= availableRooms %>, <%= occupiedRooms %>],
-                backgroundColor: ['#36a2eb', '#ff6384']
+                label: chartData.label,
+                data: chartData.dataValues,
+                backgroundColor: chartData.backgroundColors,
+                borderColor: chartData.borderColors,
+                borderWidth: 2
             }]
-        }
-    });
+        };
+
+        const ctx = document.getElementById(chartId).getContext('2d');
+        new Chart(ctx, {
+            type: chartData.type,
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold',
+                            },
+                        },
+                    },
+                    datalabels: {
+                        color: '#000',
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        align: 'center',
+                        formatter: (value) => `${value}`,
+                    }
+                },
+                tooltips: {
+                    enabled: true,
+                    callbacks: {
+                        label: chartData.tooltipsCallback,
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutBounce',
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    window.onload = function() {
+        createChart('roomChart', roomChartData);
+        createChart('sexChart', sexChartData);
+    }
 </script>

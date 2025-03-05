@@ -1255,56 +1255,122 @@ app.get('/home', function (req, res) {
   });
 });
 
+// app.get('/admin', function (req, res) {
+//   const userId = req.session.user.id;
+//   const currentTime = new Date();
+//   const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
+//   const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
+//   db.all(`SELECT * FROM users WHERE id = ${userId} AND role = 1`, (err, rows_admin) => {
+//     if (err) {
+//       return console.error(err.message);
+//     }
+//     db.all("SELECT * FROM rooms", (err, rows_room) => {
+//       if (err) {
+//         return console.error(err.message);
+//       }
+//       const availableRooms = rows_room.filter(room => room.status === 0).length;
+//       const occupiedRooms = rows_room.filter(room => room.status === 1).length;
+//       db.all(`SELECT booking.*, bills.created_at FROM booking 
+//         LEFT JOIN bills ON booking.bill_id = bills.id`, (err, rows_bill) => {
+//           if (err) {
+//           return console.error(err.message);
+//         }
+//         db.all(`SELECT * FROM bills
+//           WHERE status != 3`, (err, rows_notyet) => {
+//             if (err) {
+//             return console.error(err.message);
+//           }
+//           console.log(rows_notyet);
+//           db.all(`SELECT * FROM booking 
+//             LEFT JOIN users ON users.id = booking.user_id
+//             WHERE booking.start_date LIKE '${currentDate}%' `, (err, rows_user_checkin) => {
+//               if (err) {
+//               return console.error(err.message);
+//             }
+//             db.all(`SELECT * FROM booking 
+//               LEFT JOIN users ON users.id = booking.user_id
+//               WHERE booking.end_date LIKE '${currentDate}%' `, (err, rows_user_checkout) => {
+//                 if (err) {
+//                 return console.error(err.message);
+//               }
+//               db.all(`SELECT * FROM bills 
+//                 WHERE (status = 0) AND due_date < '${yesterDate}' `, (err, rows_overdue) => {
+//                   if (err) {
+//                   return console.error(err.message);
+//                 }
+//                 res.render('admin', { data: rows_admin, bill: rows_bill, notyet: rows_notyet, checkin: rows_user_checkin, checkout: rows_user_checkout, overdue: rows_overdue, availableRooms, occupiedRooms, currentDate, currentTime });
+//               });
+//             });
+//           });
+//         });
+//       });
+//     });  
+//   });
+// });
+
 app.get('/admin', function (req, res) {
   const userId = req.session.user.id;
   const currentTime = new Date();
-  const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
-  const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
-  db.all(`SELECT * FROM users WHERE id = ${userId} AND role = 1`, (err, rows_admin) => {
-    if (err) {
-      return console.error(err.message);
-    }
+  const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')}`;
+  const yesterTime = new Date();
+  yesterTime.setDate(yesterTime.getDate() - 1);
+  const yesterDate = `${yesterTime.getFullYear()}-${String(yesterTime.getMonth() + 1).padStart(2, '0')}-${String(yesterTime.getDate()).padStart(2, '0')}`;
+
+  db.all("SELECT * FROM users WHERE id = ? AND role = 1", [userId], (err, rows_admin) => {
+    if (err) return console.error(err.message);
+
     db.all("SELECT * FROM rooms", (err, rows_room) => {
-      if (err) {
-        return console.error(err.message);
-      }
+      if (err) return console.error(err.message);
+
       const availableRooms = rows_room.filter(room => room.status === 0).length;
       const occupiedRooms = rows_room.filter(room => room.status === 1).length;
+
       db.all(`SELECT booking.*, bills.created_at FROM booking 
-        LEFT JOIN bills ON booking.bill_id = bills.id`, (err, rows_bill) => {
-          if (err) {
-          return console.error(err.message);
-        }
-        db.all(`SELECT * FROM bills
-          WHERE status != 3`, (err, rows_notyet) => {
-            if (err) {
-            return console.error(err.message);
-          }
-          console.log(rows_notyet);
+              LEFT JOIN bills ON booking.bill_id = bills.id`, (err, rows_bill) => {
+        if (err) return console.error(err.message);
+
+        db.all("SELECT * FROM bills WHERE status != 3", (err, rows_notyet) => {
+          if (err) return console.error(err.message);
+
           db.all(`SELECT * FROM booking 
-            LEFT JOIN users ON users.id = booking.user_id
-            WHERE booking.start_date LIKE '${currentDate}%' `, (err, rows_user_checkin) => {
-              if (err) {
-              return console.error(err.message);
-            }
+                  LEFT JOIN users ON users.id = booking.user_id
+                  WHERE booking.start_date LIKE '${currentDate}%' `, (err, rows_user_checkin) => {
+            if (err) return console.error(err.message);
+
             db.all(`SELECT * FROM booking 
-              LEFT JOIN users ON users.id = booking.user_id
-              WHERE booking.end_date LIKE '${currentDate}%' `, (err, rows_user_checkout) => {
-                if (err) {
-                return console.error(err.message);
-              }
+                    LEFT JOIN users ON users.id = booking.user_id
+                    WHERE booking.end_date LIKE '${currentDate}%' `, (err, rows_user_checkout) => {
+              if (err) return console.error(err.message);
+
               db.all(`SELECT * FROM bills 
-                WHERE (status = 0) AND due_date < '${yesterDate}' `, (err, rows_overdue) => {
-                  if (err) {
-                  return console.error(err.message);
-                }
-                res.render('admin', { data: rows_admin, bill: rows_bill, notyet: rows_notyet, checkin: rows_user_checkin, checkout: rows_user_checkout, overdue: rows_overdue, availableRooms, occupiedRooms, currentDate, currentTime });
+                      WHERE (status = 0) AND due_date < '${yesterDate}' `, (err, rows_overdue) => {
+                if (err) return console.error(err.message);
+
+                db.all("SELECT sex, COUNT(*) as count FROM users GROUP BY sex", (err, rows_sex) => {
+                  if (err) return console.error(err.message);
+
+                  console.log("sex :", rows_sex);
+
+                  res.render('admin', {
+                    data: rows_admin,
+                    bill: rows_bill,
+                    notyet: rows_notyet,
+                    checkin: rows_user_checkin,
+                    checkout: rows_user_checkout,
+                    overdue: rows_overdue,
+                    availableRooms,
+                    occupiedRooms,
+                    currentDate,
+                    currentTime,
+                    sexData: rows_sex,
+                  });
+                });
               });
             });
           });
         });
       });
-    });  
+    });
   });
 });
 

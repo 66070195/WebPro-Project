@@ -370,27 +370,73 @@ GROUP BY rooms.id, users.fname, users.lname, users.id, rooms.rent, ms.maintenanc
   });
 });
 
-app.post('/insertbill', isAdmin, function (req, res) {
+// app.post('/insertbill', isAdmin, function (req, res) {
 
+//   const { room_id, rent, meter_id, createDay, paidDay, user_id, cost_id } = req.body;
+
+//   console.log(room_id, rent, meter_id, createDay, paidDay, user_id, cost_id);
+
+//   const sql = `INSERT INTO bills (user_id, room_id, meter_id, created_at, due_date,maintenance_cost,water_amount,elec_amount,total_amount,status,addon_cost,addon_details)
+// VALUES (?, ?, ?, ?, ?,?,0,0,0,0,0,0);`;
+//   const params = [user_id, room_id, meter_id, createDay, paidDay, cost_id];
+
+//   db.run(sql, params, function (err) {
+//     if (err) {
+//       console.log(err.message);
+//       res.status(500).send('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+//       return;
+//     }
+//     res.redirect('/invoice');
+//   });
+
+// });
+
+app.post('/insertbill', isAdmin, function (req, res) {
   const { room_id, rent, meter_id, createDay, paidDay, user_id, cost_id } = req.body;
 
   console.log(room_id, rent, meter_id, createDay, paidDay, user_id, cost_id);
 
-  const sql = `INSERT INTO bills (user_id, room_id, meter_id, created_at, due_date,maintenance_cost,water_amount,elec_amount,total_amount,status,addon_cost,addon_details)
-VALUES (?, ?, ?, ?, ?,?,0,0,0,0,0,0);`;
-  const params = [user_id, room_id, meter_id, createDay, paidDay, cost_id];
+  const sqlInsertBill = `
+      INSERT INTO bills (user_id, room_id, meter_id, created_at, due_date, maintenance_cost, water_amount, elec_amount, total_amount, status, addon_cost, addon_details)
+      VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 0);
+  `;
+  const paramsInsert = [user_id, room_id, meter_id, createDay, paidDay, cost_id];
 
-  db.run(sql, params, function (err) {
-    if (err) {
-      console.log(err.message);
-      res.status(500).send('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-      return;
-    }
-    res.redirect('/invoice');
+  db.run(sqlInsertBill, paramsInsert, function (err) {
+      if (err) {
+          console.log("Error inserting bill:", err.message);
+          return res.status(500).send('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      }
+
+      
+      const sqlGetLatestBill = `SELECT id FROM bills WHERE room_id = ? ORDER BY id DESC LIMIT 1;`;
+
+      db.get(sqlGetLatestBill, [room_id], function (err, row) {
+          if (err) {
+              console.log("Error fetching latest bill:", err.message);
+              return res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูลบิลล่าสุด');
+          }
+
+          if (!row) {
+              return res.status(404).send('ไม่พบบิลล่าสุดสำหรับห้องนี้');
+          }
+
+          const latestBillId = row.id;
+
+    
+          const sqlUpdateBooking = `UPDATE booking SET bill_id = ? WHERE room_id = ?;`;
+
+          db.run(sqlUpdateBooking, [latestBillId, room_id], function (err) {
+              if (err) {
+                  console.log("Error updating booking:", err.message);
+                  return res.status(500).send('เกิดข้อผิดพลาดในการอัปเดต booking');
+              }
+
+              res.redirect('/invoice');
+          });
+      });
   });
-
 });
-
 
 app.get('/addinvoice', isAdmin, function (req, res) {
   let sql = `SELECT

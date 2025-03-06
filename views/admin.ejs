@@ -41,8 +41,7 @@
                 <tbody>
                     <% bill
                     .filter(item => 
-                        currentTime.setDate(currentTime.getMonth() - 1) && 
-                        new Date(item.created_at)<=currentTime)
+                        new Date(item.created_at)<=currentTime.setMonth(currentTime.getMonth() - 1))
                     .forEach((item)=>{ %>
                         <tr>
                             <td data-title="ห้อง"><%= item.room_id %></td>

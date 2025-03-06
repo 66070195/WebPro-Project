@@ -14,7 +14,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Connect to SQLite database
-let db = new sqlite3.Database('MyWebData - New.db', (err) => {
+let db = new sqlite3.Database('HavenHub.db', (err) => {
   if (err) {
       console.error(err.message);
   } else {
@@ -1373,7 +1373,7 @@ app.get('/admin', function (req, res) {
               LEFT JOIN bills ON booking.bill_id = bills.id`, (err, rows_bill) => {
         if (err) return console.error(err.message);
 
-        db.all("SELECT * FROM bills WHERE status != 3", (err, rows_notyet) => {
+        db.all("SELECT * FROM bills WHERE status = 1", (err, rows_notyet) => {
           if (err) return console.error(err.message);
 
           db.all(`SELECT * FROM booking 
@@ -1387,13 +1387,13 @@ app.get('/admin', function (req, res) {
               if (err) return console.error(err.message);
 
               db.all(`SELECT * FROM bills 
-                      WHERE (status = 0) AND due_date < '${yesterDate}' `, (err, rows_overdue) => {
+                      WHERE (status = 1) AND due_date < '${yesterDate}' `, (err, rows_overdue) => {
                 if (err) return console.error(err.message);
 
                 db.all("SELECT sex, COUNT(*) as count FROM users GROUP BY sex", (err, rows_sex) => {
                   if (err) return console.error(err.message);
 
-                  console.log("sex :", rows_sex);
+                  console.log("time: ", currentTime);
 
                   res.render('admin', {
                     data: rows_admin,

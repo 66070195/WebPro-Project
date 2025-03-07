@@ -16,16 +16,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Connect to SQLite database
 let db = new sqlite3.Database('HavenHub.db', (err) => {
   if (err) {
-      console.error(err.message);
+    console.error(err.message);
   } else {
-      console.log('Connected to the database.');
-      db.run('PRAGMA foreign_keys = ON;', (err) => {
-          if (err) {
-              console.error('Error enabling foreign keys:', err.message);
-          } else {
-              console.log('Foreign keys enabled.');
-          }
-      });
+    console.log('Connected to the database.');
+    db.run('PRAGMA foreign_keys = ON;', (err) => {
+      if (err) {
+        console.error('Error enabling foreign keys:', err.message);
+      } else {
+        console.log('Foreign keys enabled.');
+      }
+    });
   }
 });
 
@@ -212,7 +212,7 @@ app.get('/managemeter', isAdmin, function (req, res) {
         console.log(err.message);
       }
       // console.log(rows);
-      res.render('managemeter', { data: rows, room : rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      res.render('managemeter', { data: rows, room: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
     });
     // res.render('editroom', { data : rows });
   });
@@ -356,11 +356,11 @@ GROUP BY rooms.id, users.fname, users.lname, users.id, rooms.rent, ms.maintenanc
         return res.status(500).send('Error querying the database');
       }
 
-      
+
       console.log(rows), console.log(rows2)
       res.render('invoice', {
-        data: rows,  
-        bills: rows2, 
+        data: rows,
+        bills: rows2,
         role: req.user.role,
         currentPath: '/invoice',
         sidebarClass: req.session.sidebarClass,
@@ -403,38 +403,38 @@ app.post('/insertbill', isAdmin, function (req, res) {
   const paramsInsert = [user_id, room_id, meter_id, createDay, paidDay, cost_id];
 
   db.run(sqlInsertBill, paramsInsert, function (err) {
+    if (err) {
+      console.log("Error inserting bill:", err.message);
+      return res.status(500).send('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    }
+
+
+    const sqlGetLatestBill = `SELECT id FROM bills WHERE room_id = ? ORDER BY id DESC LIMIT 1;`;
+
+    db.get(sqlGetLatestBill, [room_id], function (err, row) {
       if (err) {
-          console.log("Error inserting bill:", err.message);
-          return res.status(500).send('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+        console.log("Error fetching latest bill:", err.message);
+        return res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูลบิลล่าสุด');
       }
 
-      
-      const sqlGetLatestBill = `SELECT id FROM bills WHERE room_id = ? ORDER BY id DESC LIMIT 1;`;
+      if (!row) {
+        return res.status(404).send('ไม่พบบิลล่าสุดสำหรับห้องนี้');
+      }
 
-      db.get(sqlGetLatestBill, [room_id], function (err, row) {
-          if (err) {
-              console.log("Error fetching latest bill:", err.message);
-              return res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูลบิลล่าสุด');
-          }
+      const latestBillId = row.id;
 
-          if (!row) {
-              return res.status(404).send('ไม่พบบิลล่าสุดสำหรับห้องนี้');
-          }
 
-          const latestBillId = row.id;
+      const sqlUpdateBooking = `UPDATE booking SET bill_id = ? WHERE room_id = ?;`;
 
-    
-          const sqlUpdateBooking = `UPDATE booking SET bill_id = ? WHERE room_id = ?;`;
+      db.run(sqlUpdateBooking, [latestBillId, room_id], function (err) {
+        if (err) {
+          console.log("Error updating booking:", err.message);
+          return res.status(500).send('เกิดข้อผิดพลาดในการอัปเดต booking');
+        }
 
-          db.run(sqlUpdateBooking, [latestBillId, room_id], function (err) {
-              if (err) {
-                  console.log("Error updating booking:", err.message);
-                  return res.status(500).send('เกิดข้อผิดพลาดในการอัปเดต booking');
-              }
-
-              res.redirect('/invoice');
-          });
+        res.redirect('/invoice');
       });
+    });
   });
 });
 
@@ -563,7 +563,7 @@ AND m.id = (
 
 app.post('/insertBill/:id', (req, res) => {
   const roomId = req.params.id;
-  const { water_amount, elec_amount, rent_amount, maintenance_amount, total_amount, extraID,numExtra } = req.body;
+  const { water_amount, elec_amount, rent_amount, maintenance_amount, total_amount, extraID, numExtra } = req.body;
   // Log ค่าที่ได้รับจากฟอร์ม
   const pkq = `SELECT id 
               FROM bills 
@@ -594,9 +594,9 @@ app.post('/insertBill/:id', (req, res) => {
     WHERE id = ?
   `;
 
-  const values = [water_amount, elec_amount, rent_amount, extraID, total_amount, roomId,numExtra];
+  const values = [water_amount, elec_amount, rent_amount, extraID, total_amount, roomId, numExtra];
 
-  
+
   console.log('SQL Query:', sql);
   console.log('Values to update:', values);
 
@@ -625,7 +625,7 @@ app.post('/insertPayment/:id', (req, res) => {
   const roomId = req.params.id;
   const { selectPayment } = req.body;
   const { bill_id } = req.body;
-  console.log(selectPayment,bill_id);
+  console.log(selectPayment, bill_id);
 
   if (!selectPayment) {
     return res.status(400).send('Payment method is required');
@@ -640,7 +640,7 @@ app.post('/insertPayment/:id', (req, res) => {
       ORDER BY created_at DESC LIMIT 1;
     `;
 
-    db.run(sqlInsert, [bill_id,selectPayment, roomId], function (err) {
+    db.run(sqlInsert, [bill_id, selectPayment, roomId], function (err) {
       if (err) {
         console.error('Error inserting payment:', err.message);
         return res.status(500).send('Error inserting payment');
@@ -986,22 +986,22 @@ app.post('/bookroom-submit', (req, res) => {
 
               //   const bill_id = this.lastID;
 
-                // db.run('UPDATE booking SET bill_id = ? WHERE room_id = ? AND user_id = ?', [bill_id, selectroom, selectuser], (err) => {
-                //   if (err) {
-                //     db.run('ROLLBACK');
-                //     return console.error(err.message);
-                //   }
+              // db.run('UPDATE booking SET bill_id = ? WHERE room_id = ? AND user_id = ?', [bill_id, selectroom, selectuser], (err) => {
+              //   if (err) {
+              //     db.run('ROLLBACK');
+              //     return console.error(err.message);
+              //   }
 
-                  db.run('UPDATE rooms SET status = 1 WHERE id = ?', [selectroom], (err) => {
-                    if (err) {
-                      db.run('ROLLBACK');
-                      return console.error(err.message);
-                    }
+              db.run('UPDATE rooms SET status = 1 WHERE id = ?', [selectroom], (err) => {
+                if (err) {
+                  db.run('ROLLBACK');
+                  return console.error(err.message);
+                }
 
-                    db.run('COMMIT');
-                    res.redirect('/bookroom');
-                  });
-                // });
+                db.run('COMMIT');
+                res.redirect('/bookroom');
+              });
+              // });
               // });
             });
           });
@@ -1295,17 +1295,17 @@ app.get('/home', function (req, res) {
         if (err) {
           return console.error(err.message);
         }
-        res.render('home', { data: rows_user, maintenance: rows_maintenance, bill: rows_bill});
+        res.render('home', { data: rows_user, maintenance: rows_maintenance, bill: rows_bill });
       });
     });
   });
 });
 
 // app.get('/admin', function (req, res) {
-  // const userId = req.session.user.id;
-  // const currentTime = new Date();
-  // const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
-  // const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
+// const userId = req.session.user.id;
+// const currentTime = new Date();
+// const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
+// const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
 //   db.all(`SELECT * FROM users WHERE id = ${userId} AND role = 1`, (err, rows_admin) => {
 //     if (err) {
 //       return console.error(err.message);
@@ -1358,7 +1358,7 @@ app.get('/admin', function (req, res) {
   const userId = req.session.user.id;
   const currentTime = new Date();
   const currentDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')} `;
-  const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()-1).padStart(2, '0')} `;
+  const yesterDate = `${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate() - 1).padStart(2, '0')} `;
 
   db.all("SELECT * FROM users WHERE id = ? AND role = 1", [userId], (err, rows_admin) => {
     if (err) return console.error(err.message);
@@ -1433,6 +1433,53 @@ app.get('/meter', function (req, res) {
         console.log(err.message);
       }
       res.render('meter', { room: rows1, data: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
+  });
+});
+
+app.post('/manageroom/removerenter/:id', (req, res) => {
+  const roomId = req.params.id;
+  const { moveOutDate, note, returnDeposit, depositAmount } = req.body;
+
+  console.log('กำลังย้ายผู้เช่าออกจากห้อง:', roomId);
+  console.log('ข้อมูลการย้ายออก:', { moveOutDate, note, returnDeposit, depositAmount });
+
+  // ทำ transaction เพื่อให้แน่ใจว่าการอัพเดตทุกตารางทำงานพร้อมกัน
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION');
+
+    // 1. อัพเดตสถานะห้องเป็นว่าง
+    db.run('UPDATE rooms SET status = 0 WHERE id = ?', [roomId], function (err) {
+      if (err) {
+        console.error('เกิดข้อผิดพลาดในการอัพเดตสถานะห้องพัก:', err.message);
+        db.run('ROLLBACK');
+        return res.status(500).send('เกิดข้อผิดพลาดในการอัพเดตสถานะห้องพัก');
+      }
+
+      console.log('อัพเดตสถานะห้องพักเป็นว่างสำเร็จ');
+
+      // 2. อัพเดตตาราง booking ให้มี end_date เป็นวันที่ย้ายออก
+      db.run('UPDATE booking SET end_date = ? WHERE room_id = ? AND end_date IS NULL', [moveOutDate, roomId], function (err) {
+        if (err) {
+          console.error('เกิดข้อผิดพลาดในการอัพเดต booking:', err.message);
+          db.run('ROLLBACK');
+          return res.status(500).send('เกิดข้อผิดพลาดในการอัพเดต booking');
+        }
+
+        // 3. ลบข้อมูลผู้เช่าออกจากตาราง tenants
+        db.run('DELETE FROM tenants WHERE room_id = ?', [roomId], function (err) {
+          if (err) {
+            console.error('เกิดข้อผิดพลาดในการลบข้อมูลผู้เช่า:', err.message);
+            db.run('ROLLBACK');
+            return res.status(500).send('เกิดข้อผิดพลาดในการลบข้อมูลผู้เช่า');
+          }
+
+          console.log('ลบข้อมูลผู้เช่าสำเร็จ');
+          // ทำ Commit เมื่อทุกอย่างเสร็จสมบูรณ์
+          db.run('COMMIT');
+          res.redirect('/manageroom');
+        });
+      });
     });
   });
 });

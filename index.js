@@ -138,7 +138,7 @@ app.get('/', function (req, res) {
 app.get('/manageuser', isAdmin, (req, res) => {
   // const query = "SELECT users.*, tenants.*, CONCAT(users.fname, ' ', users.lname) AS fullname FROM user LEFT JOIN tenants ON users.id = tenants.user_id";
   // const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
-  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users";
+  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users WHERE users.phone NOT IN ('admin', 'test')";
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -1431,7 +1431,7 @@ app.get('/admin', function (req, res) {
                       WHERE (status = 1) AND due_date < '${yesterDate}' `, (err, rows_overdue) => {
                 if (err) return console.error(err.message);
 
-                db.all("SELECT sex, COUNT(*) as count FROM users GROUP BY sex", (err, rows_sex) => {
+                db.all("SELECT sex, COUNT(*) as count FROM users WHERE users.role = 2 GROUP BY sex ", (err, rows_sex) => {
                   if (err) return console.error(err.message);
 
                   console.log("time: ", currentTime);

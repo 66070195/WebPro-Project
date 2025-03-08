@@ -24,7 +24,7 @@
         </div>
     </div>
     <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
-        <div class="bg-white p-3 mt-3 rounded flex-fill shadowing">
+        <div class="bg-white p-3 mt-3 rounded flex-fill shadowing <%= shake ? 'shake' : '' %>">
             <h5 class="title">เพิ่ม - ห้องพัก</h5>
             <hr>
             <form action="/addroom" method="post">
@@ -47,6 +47,7 @@
                 <div class="mt-3">
                     <button type="submit" class="btn btn-primary form-control form-button py-3">เพิ่มห้องพัก</button>
                 </div>
+                <p class="<%= shake ? 'invalid show' : 'invalid' %>">มีห้องพักนี้แล้ว</p>
             </form>
         </div>
     </div>
@@ -203,6 +204,7 @@
                         position: 'bottom',
                         labels: {
                             font: {
+                                family: "Sarabun",
                                 size: 14,
                                 weight: 'bold'
                             }
@@ -211,6 +213,7 @@
                     datalabels: {
                         color: '#000',
                         font: {
+                            family: "Sarabun",
                             weight: 'bold',
                             size: 14
                         },
@@ -242,4 +245,5 @@
     function confirmDeleteRoom(formId) {
         return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบห้องพักนี้?');
     }
+    
 </script>

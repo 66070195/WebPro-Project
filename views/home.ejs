@@ -73,42 +73,50 @@
     </table>
 </div>
 <script>
-    //const data = <%= JSON.stringify(bill) %>;
-    const data = [
-        { created_at: '2025-01-01', total_amount: 5200 },
-        { created_at: '2025-02-01', total_amount: 5100 },
-        { created_at: '2025-03-01', total_amount: 5500 },
-        { created_at: '2025-04-01', total_amount: 5300 },
-        { created_at: '2025-05-01', total_amount: 5400 },
-        { created_at: '2025-06-01', total_amount: 5200 },
-        { created_at: '2025-07-01', total_amount: 5100 },
-        { created_at: '2025-08-01', total_amount: 5500 },
-        { created_at: '2025-09-01', total_amount: 5300 },
-        { created_at: '2025-10-01', total_amount: 5400 },
-        { created_at: '2025-11-01', total_amount: 5200 },
-        { created_at: '2025-12-01', total_amount: 5100 }
-    ];
-    const labels = data.map(item => item.created_at);
-    const values = data.map(item => item.total_amount);
-    const ctx = document.getElementById('barChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'ค่าใช้จ่าย',
-                data: values,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+    const data = <%- JSON.stringify(bill) %>;
+    const chartData = {
+        labels: data.map(item => item.created_at),
+        values: data.map(item => item.total_amount)
+    };
+    
+    function createChart(chartId, chartData) {
+        console.log("createChart", chartData);
+        const ctx = document.getElementById('barChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'ค่าใช้จ่าย',
+                    data: chartData.values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins:{
+                    legend: {
+                        display: true,
+                        labels: {
+                            font: {
+                                family: "Sarabun",
+                                size: 14,
+                                weight: 'light'
+                            }
+                        }
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+    
+    window.onload = function() {
+        createChart('barChart', chartData);
+    }
 </script>

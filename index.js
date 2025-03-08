@@ -53,6 +53,16 @@ function isAdmin(req, res, next) {
   }
 }
 
+function isValidCardID(id) {
+  const isValid = /^\d{13}$/.test(id);
+  return isValid;
+}
+
+function isPhoneNumber(phone) {
+  const phoneRegex = /^0\d{9}$/.test(phone);
+  return phoneRegex;
+}
+
 //Middleware กำหนด user
 app.use((req, res, next) => {
   if (req.session && req.session.user) {
@@ -110,7 +120,9 @@ function renderPage(page, customPath) {
       role: res.locals.role,
       currentPath: customPath || res.locals.currentPath,
       sidebarClass: res.locals.sidebarClass,
-      rowCount: res.locals.rowCount
+      rowCount: res.locals.rowCount,
+      shake: false,
+      err: ''
     });
   };
 }
@@ -132,7 +144,7 @@ app.get('/manageuser', isAdmin, (req, res) => {
       console.log(err.message);
     }
     console.log(rows);
-    res.render('manageuser', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    res.render('manageuser', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount, shake: false });
   });
 });
 
@@ -193,7 +205,7 @@ app.get('/manageroom', isAdmin, (req, res) => {
       console.log(err.message);
     }
     console.log(rows);
-    res.render('manageroom', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    res.render('manageroom', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount, shake: false });
   });
 });
 // app.get('/manageroom', renderPage('manageroom'));
@@ -724,7 +736,7 @@ app.get('/edituser', isAdmin, function (req, res) {
       console.log(err.message);
     }
     console.log(rows);
-    res.render('edituser', { data: rows, role: req.user.role, currentPath: '/manageuser', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    res.render('edituser', { data: rows, role: req.user.role, currentPath: '/manageuser', sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount, shake: false, err: '' });
     // res.render('editroom', { data : rows });
   });
 });
@@ -847,11 +859,28 @@ app.post('/adduser-submit', (req, res) => {
   // console.log('Submitted Add User:', req.body);
   const { fname, lname, gender, idcard, phone, password } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า manage user
-  db.run('INSERT INTO users (fname, lname, sex, id_card, phone, password) VALUES (?, ?, ?, ?, ?, ?)', [fname, lname, gender, idcard, phone, password], (err) => {
+  const query = 'SELECT * FROM users;';
+  db.all(query, (err, rows) => {
     if (err) {
-      return console.error(err.message);
+      console.log(err.message);
     }
-    res.redirect('manageuser');
+    else if(isValidCardID(idcard) == false){
+      res.render('adduser', {shake: true, err: 'หมายเลขบัตรประชาชนไม่ถูกต้อง'});
+    }
+    else if(isPhoneNumber(phone) == false){
+      res.render('adduser', {shake: true, err: 'เบอร์โทรศัพท์ไม่ถูกต้อง'});
+    }
+    else if(rows.some(row => (row.phone == phone || row.id_card == idcard))){
+      res.render('adduser', {shake: true, err: 'มีผู้ใช้นี้แล้ว'});
+    }
+    else{
+      db.run('INSERT INTO users (fname, lname, sex, id_card, phone, password) VALUES (?, ?, ?, ?, ?, ?)', [fname, lname, gender, idcard, phone, password], (err) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        res.redirect('manageuser');
+      });
+    }
   });
 });
 
@@ -891,12 +920,23 @@ app.post('/addroom', (req, res) => {
   console.log('Submitted Add Room:', req.body);
   const { noroom, roomprice, roominfo } = req.body;
   // insert ข้อมูลลง database ละ redirect กลับหน้า manage room
-  db.run('INSERT INTO rooms (id, rent, description) VALUES (?, ?, ?)', [noroom, roomprice, roominfo], (err) => {
+  const query = 'SELECT * FROM rooms;';
+  db.all(query, (err, rows) => {
     if (err) {
-      return console.error(err.message);
+      console.log(err.message);
     }
-    console.log('Added room.')
-    res.redirect('manageroom');
+    else if(rows.some(row => row.id == noroom)){
+      res.render('manageroom', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount, shake: true });
+    }
+    else{
+      db.run('INSERT INTO rooms (id, rent, description) VALUES (?, ?, ?)', [noroom, roomprice, roominfo], (err) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log('Added room.')
+        res.redirect('manageroom');
+      });
+    }
   });
 });
 

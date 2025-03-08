@@ -10,7 +10,7 @@
 <div class="row justify-content-between">
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">จำนวนห้องพัก</h5>
+            <h5 class="h3">จำนวนห้องพัก</h5>
             <hr>
             <div class="d-flex justify-content-center align-items-center" style="width: 17rem; height: 17rem; justify-self: center;">
                 <canvas id="roomChart"></canvas>
@@ -19,7 +19,7 @@
     </div>
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ผู้เช่า</h5>
+            <h5 class="h3">ผู้เช่า</h5>
             <hr>
             <div class="d-flex justify-content-center align-items-center" style="width: 17rem; height: 17rem; justify-self: center;">
                 <canvas id="sexChart"></canvas>
@@ -30,10 +30,10 @@
 <div class="row justify-content-around">
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ห้องที่ต้องออกใบแจ้งหนี้ (<%= currentDate %>)</h5>
+            <h5 class="h3">ห้องที่ต้องออกใบแจ้งหนี้ <small class="text-muted">(<%= currentDate %>)</small></h5>
             <hr>
             <table class="table py-2 text-center menu-table" id="no-more-tables">
-                <thead class="table-dark">
+                <thead class="table-primary">
                     <tr>
                         <th>ห้อง</th>
                     </tr>
@@ -53,10 +53,10 @@
     </div>
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ห้องที่ยังไม่จ่าย</h5>
+            <h5 class="h3">ห้องที่ยังไม่จ่าย</h5>
             <hr>
             <table class="table py-2 text-center menu-table" id="no-more-tables">
-                <thead class="table-dark">
+                <thead class="table-warning">
                     <tr>
                         <th>ห้อง</th>
                         <th>ค้างชำระ</th>
@@ -79,10 +79,10 @@
 <div class="row justify-content-around">
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ห้องที่ย้ายเข้าวันนี้ (<%= currentDate %>)</h5>
+            <h5 class="h4">ห้องที่ย้ายเข้าวันนี้ <small class="text-muted">(<%= currentDate %>)</small></h5>
             <hr>
             <table class="table py-2 text-center menu-table" id="no-more-tables">
-                <thead class="table-dark">
+                <thead class="table-info">
                     <tr>
                         <th>ห้อง</th>
                         <th>ชื่อเจ้าของห้อง</th>
@@ -101,10 +101,10 @@
     </div>
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ห้องที่ย้ายออกวันนี้ (<%= currentDate %>)</h5>
+            <h5 class="h4">ห้องที่ย้ายออกวันนี้ <small class="text-muted">(<%= currentDate %>)</small></h5>
             <hr>
             <table class="table py-2 text-center menu-table" id="no-more-tables">
-                <thead class="table-dark">
+                <thead class="table-info">
                     <tr>
                         <th>ห้อง</th>
                         <th>ชื่อเจ้าของห้อง</th>
@@ -123,10 +123,10 @@
     </div>
     <div class="col">
         <div class="bg-white p-4 mt-3 rounded shadowing">
-            <h5 class="title">ห้องที่เกินกำหนดชำระ</h5>
+            <h5 class="h4 font-weight-bold">ห้องที่เกินกำหนดชำระ</h5>
             <hr>
             <table class="table py-2 text-center menu-table" id="no-more-tables">
-                <thead class="table-dark">
+                <thead class="table-danger">
                     <tr>
                         <th>ห้อง</th>
                         <th>ค้างชำระ</th>
@@ -201,6 +201,7 @@
                         position: 'bottom',
                         labels: {
                             font: {
+                                family: "Sarabun",
                                 size: 14,
                                 weight: 'bold',
                             },

@@ -8,7 +8,7 @@
     </div> -->
 </div>
 
-<div class="bg-white p-3 mt-3 rounded">
+<div class="bg-white p-3 mt-3 rounded <%= shake ? 'shake' : '' %>">
     <h5 class="title">เพิ่ม - ผู้ใช้งาน & ผู้เช่า</h5>
     <hr>
     <form id="adduser-form" action="/adduser-submit" method="post">
@@ -61,5 +61,6 @@
                 <a href="/manageuser" class="btn btn-danger btn-lg form-control py-3" id="adduser-cancel">ยกเลิก</a>
             </div>
         </div>
+        <p class="<%= shake ? 'invalid show' : 'invalid' %>"><%= err%></p>
     </form>
 </div>

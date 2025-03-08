@@ -48,8 +48,7 @@ li {
 	position: fixed;
 	max-width: 260px;
 	width: 100%;
-	background: var(--dark-blue);
-	/* background: linear-gradient(90deg, #112d4e 0%, #3f72af 100%); */
+	background: linear-gradient(180deg, rgba(17,45,78,1) 70%, rgba(10,24,41,1) 100%);
 	top: 0;
 	left: 0;
 	height: 100%;

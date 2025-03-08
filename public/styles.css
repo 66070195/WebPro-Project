@@ -2,7 +2,6 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	font-family: "Sarabun", sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -274,6 +273,7 @@ nav .profile .profile-link a:hover {
 
 /* MAIN */
 main {
+	font-family: "Sarabun", sans-serif;
 	width: 100%;
 	padding: 24px 20px 20px 20px;
     background: var(--grey);

@@ -1,6 +1,6 @@
 <!-- ส่วนจัดการห้องพัก (manageroom.ejs) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- ส่วนหัวของหน้าจัดการห้องพัก -->
@@ -67,112 +67,116 @@
         </thead>
         <tbody class="align-middle">
             <% let index=1; %>
-                <% let available=0; %>
-                    <% let notAva=0; %>
-                        <% data.forEach((item)=>{ %>
-                            <tr>
-                                <td data-title="#">
-                                    <%= index++ %>
-                                </td>
-                                <td data-title="ห้องพัก">
-                                    <%=item.id %>
-                                </td>
-                                <td data-title="ราคา">
-                                    <%=item.rent %>
-                                </td>
-                                <td data-title="รายละเอียด">
-                                    <%=item.description %>
-                                </td>
-                                <td data-title="สถานะ">
-                                    <% if (item.status===0) { %>
-                                        <%= 'ว่าง' %>
-                                            <% available++; %>
-                                                <% } else { %>
-                                                    <%= 'ไม่ว่าง' %>
-                                                        <% notAva++; %>
-                                                            <% } %>
-                                </td>
-                                <td data-title="จัดการ" class="text-center">
-                                    <div class="btn-table">
-                                        <a href="/editroom?id=<%=item.id%>"
-                                            class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
+            <% let available=0; %>
+            <% let notAva=0; %>
+            <% data.forEach((item)=>{ %>
+                <tr>
+                    <td data-title="#">
+                        <%= index++ %>
+                    </td>
+                    <td data-title="ห้องพัก">
+                        <%=item.id %>
+                    </td>
+                    <td data-title="ราคา">
+                        <%=item.rent %>
+                    </td>
+                    <td data-title="รายละเอียด">
+                        <%=item.description %>
+                    </td>
+                    <td data-title="สถานะ">
+                        <% if (item.status===0) { %>
+                            <%= 'ว่าง' %>
+                            <% available++; %>
+                        <% } else { %>
+                            <%= 'ไม่ว่าง' %>
+                            <% notAva++; %>
+                        <% } %>
+                    </td>
+                    <td data-title="จัดการ" class="text-center">
+                        <div class="btn-table">
+                            <a href="/editroom?id=<%=item.id%>"
+                                class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
 
-                                        <% if (item.status !==0) { %>
-                                            <button type="button" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#removeRenterModal<%=item.id%>">ย้ายออก</button>
+                            <% if (item.status !==0) { %>
+                                <button type="button" class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#removeRenterModal<%=item.id%>">ย้ายออก</button>
 
-                                            <!-- Modal สำหรับย้ายผู้เช่าออก -->
-                                            <div class="modal fade" id="removeRenterModal<%=item.id%>" tabindex="-1"
-                                                aria-labelledby="removeRenterModalLabel<%=item.id%>" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title"
-                                                                id="removeRenterModalLabel<%=item.id%>">
-                                                                ย้ายผู้เช่าออกจากห้อง <%=item.id%>
-                                                            </h5>
-                                                            <button type="button" class="btn-close"
-                                                                data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p>กรุณากรอกข้อมูลการย้ายออก</p>
-                                                            <form id="removeRenterForm<%=item.id%>"
-                                                                action="/manageroom/removerenter/<%=item.id%>"
-                                                                method="post">
-                                                                <div class="mb-3">
-                                                                    <label for="moveOutDate<%=item.id%>"
-                                                                        class="form-label">วันที่ย้ายออก</label>
-                                                                    <input type="date" class="form-control"
-                                                                        id="moveOutDate<%=item.id%>" name="moveOutDate"
-                                                                        required>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label for="note<%=item.id%>"
-                                                                        class="form-label">หมายเหตุ</label>
-                                                                    <textarea class="form-control" id="note<%=item.id%>"
-                                                                        name="note" rows="3"></textarea>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">ยกเลิก</button>
-                                                            <button type="submit" form="removeRenterForm<%=item.id%>"
-                                                                class="btn btn-primary">ย้ายออกและตั้งเป็นห้องว่าง</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                <!-- Modal สำหรับย้ายผู้เช่าออก -->
+                                <div class="modal fade" id="removeRenterModal<%=item.id%>" tabindex="-1"
+                                    aria-labelledby="removeRenterModalLabel<%=item.id%>" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"
+                                                    id="removeRenterModalLabel<%=item.id%>">
+                                                    ย้ายผู้เช่าออกจากห้อง <%=item.id%>
+                                                </h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <% } %>
-
-                                                <form id="removeRoom<%=item.id%>"
-                                                    action="/manageroom/delete/<%=item.id %>" method="post"
-                                                    onsubmit="return confirmDeleteRoom('removeRoom<%=item.id%>')"
-                                                    class="d-inline-block">
-                                                    <button type="submit"
-                                                        class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                                            <div class="modal-body">
+                                                <p>กรุณากรอกข้อมูลการย้ายออก</p>
+                                                <form id="removeRenterForm<%=item.id%>"
+                                                    action="/manageroom/removerenter/<%=item.id%>"
+                                                    method="post">
+                                                    <div class="mb-3">
+                                                        <label for="moveOutDate<%=item.id%>"
+                                                            class="form-label">วันที่ย้ายออก</label>
+                                                        <input type="date" class="form-control"
+                                                            id="moveOutDate<%=item.id%>" name="moveOutDate"
+                                                            required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="note<%=item.id%>"
+                                                            class="form-label">หมายเหตุ</label>
+                                                        <textarea class="form-control" id="note<%=item.id%>"
+                                                            name="note" rows="3"></textarea>
+                                                    </div>
                                                 </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">ยกเลิก</button>
+                                                <button type="submit" form="removeRenterForm<%=item.id%>"
+                                                    class="btn btn-primary">ย้ายออกและตั้งเป็นห้องว่าง</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </td>
-                            </tr>
-                            <% }); %>
+                                </div>
+                            <% } %>
+
+                            <form id="removeRoom<%=item.id%>"
+                                action="/manageroom/delete/<%=item.id %>" method="post"
+                                onsubmit="return confirmDeleteRoom('removeRoom<%=item.id%>')"
+                                class="d-inline-block">
+                                <button type="submit"
+                                    class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %>
         </tbody>
     </table>
 </div>
 
 <script>
+    const ChartDataLabels = window.ChartDataLabels;
+    const available = <%= available || 0 %>;
+    const notAva = <%= notAva || 0 %>;
 
+    // ข้อมูลสำหรับกราฟ
     const roomChartData = {
         type: 'pie',
         labels: ['ห้องว่าง', 'ห้องไม่ว่าง'],
         dataValues: [available, notAva],
         backgroundColors: ['rgba(255, 255, 255, 1)', 'rgba(63, 114, 175, 0.8)'],
         borderColors: ['rgba(214, 219, 224, 1)', 'rgba(44, 89, 138, 1)'],
-        label: 'จำนวนห้อง',
-        tooltipsCallback: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw} ห้อง`
+        label: 'จำนวนห้อง'
     };
 
+    // ฟังก์ชันสร้างกราฟ
     function createChart(chartId, chartData) {
         const data = {
             labels: chartData.labels,
@@ -186,6 +190,7 @@
         };
 
         const ctx = document.getElementById(chartId).getContext('2d');
+        
         new Chart(ctx, {
             type: chartData.type,
             data: data,
@@ -199,9 +204,9 @@
                         labels: {
                             font: {
                                 size: 14,
-                                weight: 'bold',
-                            },
-                        },
+                                weight: 'bold'
+                            }
+                        }
                     },
                     datalabels: {
                         color: '#000',
@@ -209,27 +214,29 @@
                             weight: 'bold',
                             size: 14
                         },
-                        align: 'center',
-                        formatter: (value) => `${value}`,
-                    }
-                },
-                tooltips: {
-                    enabled: true,
-                    callbacks: {
-                        label: chartData.tooltipsCallback,
+                        formatter: (value) => `${value}`
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} ห้อง`;
+                            }
+                        }
                     }
                 },
                 animation: {
                     duration: 1000,
-                    easing: 'easeOutBounce',
+                    easing: 'easeOutBounce'
                 }
             },
             plugins: [ChartDataLabels]
         });
     }
 
-    // สร้างกราฟเมื่อโหลดหน้าเว็บ
-    createChart('roomChart', roomChartData);
+    // เรียกใช้ฟังก์ชันสร้างกราฟเมื่อโหลดหน้าเว็บ
+    document.addEventListener('DOMContentLoaded', function() {
+        createChart('roomChart', roomChartData);
+    });
 
     // ฟังก์ชันยืนยันการลบห้องพัก
     function confirmDeleteRoom(formId) {

@@ -1314,6 +1314,7 @@ app.get('/home', function (req, res) {
   const userId = req.session.user.id;
   sql_user = `SELECT users.*, 
     booking.room_id AS room_id,
+    bills.status AS bill_status,
     count(parcels.id) AS parcel_count 
     FROM users
     LEFT JOIN booking ON users.id = booking.user_id

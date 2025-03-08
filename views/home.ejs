@@ -20,9 +20,9 @@
                         <td>
                             <% if (item.bill_status == null){ %>
                             ไม่มี
-                            <%}else if (item.bill_status == 0) {%>
-                            ค้างชำระ
                             <%}else if (item.bill_status == 1) {%>
+                            ค้างชำระ
+                            <%}else if (item.bill_status == 2) {%>
                             ชำระแล้ว
                             <% } %>
                         </td>

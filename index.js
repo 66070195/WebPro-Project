@@ -747,7 +747,7 @@ app.get('/bookroom', isAdmin, function (req, res) {
   let sql1 = `SELECT * FROM rooms WHERE status = 0 ORDER BY id;`;
   // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE role = 2;`;
   // let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id WHERE users.role = 2 AND tenants.user_id IS NULL`;
-  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE users.role = 2`;
+  let sql2 = `SELECT id, CONCAT(fname, ' ', lname) AS fullname FROM users WHERE users.role = 2 AND users.id NOT IN (SELECT user_id FROM tenants);`;
   db.all(sql1, (err1, rows1) => {
     if (err1) {
       console.log(err1.message);

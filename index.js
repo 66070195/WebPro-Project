@@ -143,7 +143,7 @@ app.get('/manageuser', isAdmin, (req, res) => {
     if (err) {
       console.log(err.message);
     }
-    console.log(rows);
+    // console.log(rows);
     res.render('manageuser', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount, shake: false });
   });
 });
@@ -199,7 +199,11 @@ app.get('/graph', async (req, res) => {
 });
 
 app.get('/manageroom', isAdmin, (req, res) => {
-  const query = 'SELECT * FROM rooms ORDER BY id;';
+  // const query = 'SELECT * FROM rooms ORDER BY id;';
+  const query = `SELECT rooms.*, CONCAT(users.fname, ' ', users.lname) AS name
+                FROM rooms
+                LEFT JOIN tenants ON tenants.room_id = rooms.id
+                LEFT JOIN users ON tenants.user_id = users.id;`;
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -909,7 +913,7 @@ app.post('/manageuser/delete/:id', (req, res) => {
       console.error(err.message);
       return res.status(500).send('Error deleting user');
     }
-    console.log('User deleted.');
+    console.log('User deleted.' + userId);
     res.redirect('/manageuser');
   });
 });
@@ -1159,7 +1163,10 @@ app.post('/getuserdetails', (req, res) => {
 
 app.get('/testquery', (req, res) => {
   const userId = req.session.user.id;
-  const query = `SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id WHERE users.id = ${userId}`
+  const query = `SELECT rooms.*, CONCAT(users.fname, ' ', users.lname) AS name
+                  FROM rooms
+                  JOIN tenants ON tenants.room_id = rooms.id
+                  JOIN users ON tenants.user_id = users.id;`
   // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
   db.all(query, (err, rows) => {
     if (err) {

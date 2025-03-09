@@ -27,35 +27,37 @@
         </div>
     </div>
 </div>
-<div class="row justify-content-around">
-    <div class="col">
+<div class="row justify-content-around mt-2">
+    <div class="col-md-6">
         <div class="bg-white p-4 mt-3 rounded shadowing">
             <h5 class="h3">ห้องที่ต้องออกใบแจ้งหนี้ <small class="text-muted">(<%= currentDate %>)</small></h5>
             <hr>
-            <table class="table py-2 text-center menu-table" id="no-more-tables">
-                <thead class="table-primary">
-                    <tr>
-                        <th>ห้อง</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% bill
-                    .filter(item => 
-                        new Date(item.created_at)<=currentTime.setMonth(currentTime.getMonth() - 1))
-                    .forEach((item)=>{ %>
+            <div class="table-responsive">
+                <table class="table py-2 text-center menu-table manage-user-table" id="no-more-tables">
+                    <thead class="table-primary">
                         <tr>
-                            <td data-title="ห้อง"><%= item.room_id %></td>
+                            <th>ห้อง</th>
                         </tr>
-                    <% }); %>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <% bill
+                        .filter(item => 
+                            new Date(item.created_at)<=currentTime.setMonth(currentTime.getMonth() - 1))
+                        .forEach((item)=>{ %>
+                            <tr>
+                                <td data-title="ห้อง"><%= item.room_id %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <div class="col">
+    <div class="col-md-6">
         <div class="bg-white p-4 mt-3 rounded shadowing">
             <h5 class="h3">ห้องที่ยังไม่จ่าย</h5>
             <hr>
-            <table class="table py-2 text-center menu-table" id="no-more-tables">
+            <table class="table py-2 text-center menu-table">
                 <thead class="table-warning">
                     <tr>
                         <th>ห้อง</th>
@@ -77,11 +79,11 @@
     </div>
 </div>
 <div class="row justify-content-around">
-    <div class="col">
+    <div class="col-lg-4">
         <div class="bg-white p-4 mt-3 rounded shadowing">
             <h5 class="h4">ห้องที่ย้ายเข้าวันนี้ <small class="text-muted">(<%= currentDate %>)</small></h5>
             <hr>
-            <table class="table py-2 text-center menu-table" id="no-more-tables">
+            <table class="table py-2 text-center menu-table">
                 <thead class="table-info">
                     <tr>
                         <th>ห้อง</th>
@@ -99,11 +101,11 @@
             </table>
         </div>
     </div>
-    <div class="col">
+    <div class="col-lg-4">
         <div class="bg-white p-4 mt-3 rounded shadowing">
             <h5 class="h4">ห้องที่ย้ายออกวันนี้ <small class="text-muted">(<%= currentDate %>)</small></h5>
             <hr>
-            <table class="table py-2 text-center menu-table" id="no-more-tables">
+            <table class="table py-2 text-center menu-table">
                 <thead class="table-info">
                     <tr>
                         <th>ห้อง</th>
@@ -121,12 +123,12 @@
             </table>
         </div>
     </div>
-    <div class="col">
+    <div class="col-lg-4">
         <div class="bg-white p-4 mt-3 rounded shadowing">
             <h5 class="h4 font-weight-bold">ห้องที่เกินกำหนดชำระ</h5>
             <hr>
-            <table class="table py-2 text-center menu-table" id="no-more-tables">
-                <thead class="table-danger">
+            <table class="table py-2 text-center menu-table">
+                <thead class="table-danger align-middle">
                     <tr>
                         <th>ห้อง</th>
                         <th>ค้างชำระ</th>

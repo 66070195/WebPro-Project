@@ -156,8 +156,84 @@ $(document).ready(function() {
 //     return confirm('ยืนยันการลบ?');
 // }
 
+function confirmDeleteRoom(formId, roomId) {
+    // สร้าง backdrop
+    let backdrop = document.createElement('div');
+    backdrop.style.position = 'fixed';
+    backdrop.style.top = '0';
+    backdrop.style.left = '0';
+    backdrop.style.width = '100%';
+    backdrop.style.height = '100%';
+    backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    backdrop.style.zIndex = '1040';
+    
+    // สร้างกล่องยืนยัน
+    let confirmBox = document.createElement('div');
+    confirmBox.style.position = 'fixed';
+    confirmBox.style.top = '50%';
+    confirmBox.style.left = '50%';
+    confirmBox.style.transform = 'translate(-50%, -50%)';
+    confirmBox.style.backgroundColor = 'white';
+    confirmBox.style.borderRadius = '4px';
+    confirmBox.style.border = '1px solid #dee2e6';
+    confirmBox.style.width = '300px';
+    confirmBox.style.zIndex = '1050';
+    
+    // ใส่เนื้อหาในกล่องยืนยัน
+    confirmBox.innerHTML = `
+        <div class="card border-0">
+            <div class="card-header bg-danger text-white py-2">
+                <h5 class="mb-0">ยืนยันการลบ</h5>
+            </div>
+            <div class="card-body p-3 text-center">
+                <p class="mb-0">คุณต้องการลบห้องนี้ใช่หรือไม่?</p>
+                <p class="mb-0">${roomId}</p>
+            </div>
+            <div class="card-footer d-flex gap-2 p-2">
+                <button id="cancel-btn" class="btn btn-secondary flex-grow-1">ยกเลิก</button>
+                <button id="confirm-btn" class="btn btn-danger flex-grow-1">ยืนยัน</button>
+            </div>
+        </div>
+    `;
+    
+    // เพิ่ม elements
+    document.body.appendChild(backdrop);
+    document.body.appendChild(confirmBox);
+    
+    // ฟังก์ชันปิดกล่องยืนยัน
+    function closeConfirm() {
+        document.body.removeChild(backdrop);
+        document.body.removeChild(confirmBox);
+    }
+    
 
-function confirmDelete(formId) {
+    confirmBox.querySelector('#confirm-btn').addEventListener('click', function() {
+        closeConfirm();
+        document.getElementById(formId).submit();
+    });
+    
+    confirmBox.querySelector('#cancel-btn').addEventListener('click', function() {
+        closeConfirm();
+    });
+    
+    // ปิดเมื่อคลิกที่ backdrop
+    backdrop.addEventListener('click', function() {
+        closeConfirm();
+    });
+    
+    // เพิ่ม Event Listener สำหรับการกด Escape
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') {
+            closeConfirm();
+            document.removeEventListener('keydown', escHandler);
+        }
+    });
+    
+    return false;
+}
+
+
+function confirmDelete(formId, name) {
     // สร้าง backdrop
     let backdrop = document.createElement('div');
     backdrop.style.position = 'fixed';
@@ -188,6 +264,7 @@ function confirmDelete(formId) {
             </div>
             <div class="card-body p-3 text-center">
                 <p class="mb-0">คุณต้องการลบผู้ใช้งานนี้ใช่หรือไม่?</p>
+                <p class="mb-0">${name}</p>
             </div>
             <div class="card-footer d-flex gap-2 p-2">
                 <button id="cancel-btn" class="btn btn-secondary flex-grow-1">ยกเลิก</button>

@@ -39,7 +39,7 @@
                         <div class="btn-table">
                             <button class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1" onclick="showDetails('<%= item.id %>')">แสดง</button>
                             <a href="/edituser?id=<%=item.id%>" class="btn btn-warning btn-sm px-lg-4 px-md-3 mx-1">แก้ไข</a>
-                            <form id="removeUser" action="/manageuser/delete/<%=item.id%>" method="post" onsubmit="return confirmDelete('removeUser')">
+                            <form id="removeUser<%= item.id %>" action="/manageuser/delete/<%=item.id%>" method="post" onsubmit="return confirmDelete('removeUser<%= item.id %>', '<%=item.fullname%>')">
                                 <button type="submit" class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
                             </form>
                         </div>

@@ -53,6 +53,13 @@
     </div>
 </div>
 
+<% 
+    const today = new Date();
+    today.setHours(today.getHours() + 7); // ปรับค่าตามเขตเวลา (ตัวอย่างนี้สำหรับ GMT+7)
+    const formattedDate = today.toISOString().split('T')[0];
+%>
+
+
 <!-- ส่วนตารางแสดงข้อมูลห้องพัก -->
 <div class="bg-white p-3 mt-4 rounded shadowing">
     <table class="table py-2 manage-room-table" id="no-more-tables">
@@ -63,7 +70,8 @@
                 <th>ราคา</th>
                 <th>รายละเอียด</th>
                 <th>สถานะ</th>
-                <th class="text-center">จัดการ</th>
+                <th>ผู้เช่า</th>
+                <th class="text-center" >จัดการ</th>
             </tr>
         </thead>
         <tbody class="align-middle">
@@ -91,6 +99,13 @@
                         <% } else { %>
                             <%= 'ไม่ว่าง' %>
                             <% notAva++; %>
+                        <% } %>
+                    </td>
+                    <td data-title="ผู้เช่า">
+                        <% if (item.status===0) { %>
+                            <%= '-' %>
+                        <% } else { %>
+                            <%= item.name %>
                         <% } %>
                     </td>
                     <td data-title="จัดการ" class="text-center">
@@ -126,7 +141,7 @@
                                                             class="form-label">วันที่ย้ายออก</label>
                                                         <input type="date" class="form-control"
                                                             id="moveOutDate<%=item.id%>" name="moveOutDate"
-                                                            required>
+                                                            value="<%=formattedDate%>" required>
                                                     </div>
                                                     <div class="mb-3">
                                                         <label for="note<%=item.id%>"
@@ -147,13 +162,15 @@
                                 </div>
                             <% } %>
 
-                            <form id="removeRoom<%=item.id%>"
-                                action="/manageroom/delete/<%=item.id %>" method="post"
-                                onsubmit="return confirmDeleteRoom('removeRoom<%=item.id%>')"
-                                class="d-inline-block">
-                                <button type="submit"
-                                    class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
-                            </form>
+                            <% if (item.status === 0) { %>
+                                <form id="removeRoom<%=item.id%>"
+                                    action="/manageroom/delete/<%=item.id %>" method="post"
+                                    onsubmit="return confirmDeleteRoom('removeRoom<%=item.id%>', '<%= item.id %>')"
+                                    class="d-inline-block">
+                                    <button type="submit"
+                                        class="btn btn-danger btn-sm px-lg-4 px-md-3 mx-1">ลบ</button>
+                                </form>
+                            <% } %>
                         </div>
                     </td>
                 </tr>

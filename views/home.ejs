@@ -1,40 +1,39 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<div style="display: flex; justify-content: center; align-items: center;">
-    <div class="bg-white p-3 mt-3 w-75 rounded-5 shadowing row">
-        <div class="col-3">
-            <img class="rounded-circle w-100" style="box-shadow: 0 0 10px gray;" src="/img/LOGO.png" alt="login" id="logoImg" >
-        </div>
-        <div class="col-9" style="display: flex; align-items: center;">
-            <div class="w-100">
-                <h2 style="font-size: 2vw;">ยินดีต้อนรับ, <%= data[0].fname %></h2><br>
-                <div class="table-responsive">
-                <table class="w-100">
-                    <tr>
-                        <th>ห้อง: </th>
-                        <th>ค้างชำระ: </th>
-                        <th>พัสดุ: </th>
-                    </tr>
-                    <% data.forEach((item)=>{ %>
-                    <tr>
-                        <td><%= item.room_id %></td>
-                        <td>
-                            <% if (item.bill_status == null){ %>
-                            ไม่มี
-                            <%}else if (item.bill_status == 1) {%>
-                            ค้างชำระ
-                            <%}else if (item.bill_status == 2) {%>
-                            ชำระแล้ว
-                            <% } %>
-                        </td>
-                        <td><%= item.parcel_count %> ชื้น</td>
-                    </tr>
-                    <% }); %>
-                </table>
+<div class="d-flex justify-content-center">
+    <div class="bg-white my-3 rounded-5 shadow p-4" style="width: 90%;">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4 text-center">
+                <img class="rounded-circle" style="width: 85%; max-width: 320px; box-shadow: 0 0 10px gray;" src="/img/LOGO.png" alt="login" id="logoImg">
+            </div>
+            <div class="col-md-8 text-center text-md-start">
+                <h2>ยินดีต้อนรับ, <%= data[0].fname %></h2>
+                <div class="row mt-4">
+                    <div class="col-4">
+                        <p class="fw-bold">ห้อง</p>
+                        <p><%= data[0].room_id %></p>
+                    </div>
+                    <div class="col-4">
+                        <p class="fw-bold">ค้างชำระ</p>
+                        <% if (data[0].bill_status == null){ %>
+                                <p>ไม่มี</p>
+                            <%}else if (data[0].bill_status == 1) {%>
+                                <p>ค้างชำระ</p>
+                            <%}else if (data[0].bill_status == 2) {%>
+                                <p>ชำระแล้ว</p>
+                        <% } %>
+                    </div>
+                    <div class="col-4">
+                        <p class="fw-bold">พัสดุ</p>
+                        <p><%= parcel_count %> ชิ้น</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
 <div class="bg-white p-3 mt-4 rounded shadowing">
     <h5 class="title">ค่าใช้จ่ายแต่ละเดือน</h5>
     <hr>

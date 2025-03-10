@@ -1163,10 +1163,19 @@ app.post('/getuserdetails', (req, res) => {
 
 app.get('/testquery', (req, res) => {
   const userId = req.session.user.id;
-  const query = `SELECT rooms.*, CONCAT(users.fname, ' ', users.lname) AS name
-                  FROM rooms
-                  JOIN tenants ON tenants.room_id = rooms.id
-                  JOIN users ON tenants.user_id = users.id;`
+  const query = `SELECT users.*, 
+                  booking.room_id AS room_id,
+                  bills.status AS bill_status,
+                  count(parcels.id) AS parcel_count 
+                  FROM users
+                  LEFT JOIN booking ON users.id = booking.user_id
+                  LEFT JOIN parcels ON booking.room_id = parcels.room_id
+                  LEFT JOIN bills ON booking.bill_id = bills.id
+                  WHERE users.id = 14 AND (parcels.status = 0 OR parcels.id is null)`;
+  // const query = `SELECT rooms.*, CONCAT(users.fname, ' ', users.lname) AS name
+  //                 FROM rooms
+  //                 JOIN tenants ON tenants.room_id = rooms.id
+  //                 JOIN users ON tenants.user_id = users.id;`
   // const query = 'SELECT * FROM tenants RIGHT JOIN users ON users.id = tenants.user_id ';
   db.all(query, (err, rows) => {
     if (err) {
@@ -1319,15 +1328,11 @@ app.post('/request-repair', (req, res) => {
 
 app.get('/home', function (req, res) {
   const userId = req.session.user.id;
-  sql_user = `SELECT users.*, 
-    booking.room_id AS room_id,
-    bills.status AS bill_status,
-    count(parcels.id) AS parcel_count 
+  sql_user = `SELECT users.*, booking.room_id AS room_id, bills.status AS bill_status
     FROM users
     LEFT JOIN booking ON users.id = booking.user_id
-    LEFT JOIN parcels ON booking.room_id = parcels.room_id
     LEFT JOIN bills ON booking.bill_id = bills.id
-    WHERE users.id = ${userId} AND (parcels.status = 0 OR parcels.id is null)`;
+    WHERE users.id = ${userId}`;
   db.all(sql_user, (err, rows_user) => {
     console.log(rows_user);
     if (err) {
@@ -1343,7 +1348,7 @@ app.get('/home', function (req, res) {
         if (err) {
           return console.error(err.message);
         }
-        res.render('home', { data: rows_user, maintenance: rows_maintenance, bill: rows_bill });
+        res.render('home', { data: rows_user, maintenance: rows_maintenance, bill: rows_bill, parcel_count: res.locals.rowCount});
       });
     });
   });

@@ -15,7 +15,10 @@
             <h5 class="title">จำนวนพัสดุ</h5>
             <hr>
             <div class="d-flex justify-content-center align-items-center" >
-                <canvas id="parcelChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="parcelChart"></canvas>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -187,12 +190,13 @@
     });
 }
 
-    // try new
+    
     fetch('/count-parcels')
     .then(response => response.json())
     .then(data => {
         if (!data || data.length === 0) {
             console.log("no parcel");
+            document.querySelector(".chart-container").innerHTML = "<p class='text-muted'>ยังไม่มีข้อมูลพัสดุ</p>";
             return;
         }
 
@@ -200,7 +204,6 @@
         const receivedCounts = data.map(row => row.received_count);
         const notReceivedCounts = data.map(row => row.not_received_count);
 
-        
         const chartData = {
             labels: labels,
             datasets: [
@@ -220,13 +223,12 @@
                 }
             ],
             type: 'bar',
-            tooltipsCallback: function(tooltipItem) {
-                return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
-            }
         };
         createChart('parcelChart', chartData);
     })
     .catch(error => {
         console.error('Error:', error);
+        document.querySelector(".chart-container").innerHTML = "<p class='text-danger'>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>";
     });
+
 </script>

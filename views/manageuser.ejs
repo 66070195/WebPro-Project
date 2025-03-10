@@ -16,6 +16,7 @@
                 <th>ชื่อ</th>
                 <th>เพศ</th>
                 <th>บทบาท</th>
+                <th>ห้อง</th>
                 <th class="text-center">จัดการ</th>
             </tr>
         </thead>
@@ -34,7 +35,8 @@
                           อื่นๆ
                         <% } %>
                       </td>
-                    <td data-title="บทบาท"><%=item.role === 1 ? 'ผู้ดูแล' : 'ผู้เช่า'%></td>
+                    <td data-title="บทบาท"><%=item.room === null ? '-' : 'ผู้เช่า'%></td>
+                    <td data-title="ห้อง"><%=item.room === null ? 'ไม่มีห้อง' : item.room%></td>
                     <td data-title="จัดการ" class="text-center">
                         <div class="btn-table">
                             <button class="btn btn-success btn-sm px-lg-4 px-md-3 mx-1" onclick="showDetails('<%= item.id %>')">แสดง</button>

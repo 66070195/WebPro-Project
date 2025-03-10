@@ -138,7 +138,11 @@ app.get('/', function (req, res) {
 app.get('/manageuser', isAdmin, (req, res) => {
   // const query = "SELECT users.*, tenants.*, CONCAT(users.fname, ' ', users.lname) AS fullname FROM user LEFT JOIN tenants ON users.id = tenants.user_id";
   // const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users LEFT JOIN tenants ON users.id = tenants.user_id";
-  const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users WHERE users.phone NOT IN ('admin', 'test')";
+  // const query = "SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname FROM users WHERE users.phone NOT IN ('admin', 'test')";
+  const query = `SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname, tenants.room_id AS room
+                FROM users
+                FULL JOIN tenants ON users.id = tenants.user_id
+                WHERE users.phone NOT IN ('admin', 'test')`;
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -1163,15 +1167,10 @@ app.post('/getuserdetails', (req, res) => {
 
 app.get('/testquery', (req, res) => {
   const userId = req.session.user.id;
-  const query = `SELECT users.*, 
-                  booking.room_id AS room_id,
-                  bills.status AS bill_status,
-                  count(parcels.id) AS parcel_count 
-                  FROM users
-                  LEFT JOIN booking ON users.id = booking.user_id
-                  LEFT JOIN parcels ON booking.room_id = parcels.room_id
-                  LEFT JOIN bills ON booking.bill_id = bills.id
-                  WHERE users.id = 14 AND (parcels.status = 0 OR parcels.id is null)`;
+  const query = `SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname, tenants.room_id AS room
+                FROM users
+                FULL JOIN tenants ON users.id = tenants.user_id
+                WHERE users.phone NOT IN ('admin', 'test')`;
   // const query = `SELECT rooms.*, CONCAT(users.fname, ' ', users.lname) AS name
   //                 FROM rooms
   //                 JOIN tenants ON tenants.room_id = rooms.id

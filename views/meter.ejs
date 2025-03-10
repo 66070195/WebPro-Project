@@ -12,10 +12,9 @@
         <div class="col-12">
             <label for="room_id" class="form-label fw-bold">เลือกห้องที่ต้องการเช็คมิเตอร์</label>
             <select name="room_id" id="room_id" class="form-control" onchange="meterSelectChange(event)" required>
+                <option value="">-</option>
                 <% if (room.room_id !== '') { %>
                     <option value="<%= room.room_id %>"><%= room.room_id %></option>
-                <% } else { %>
-                    <option value="">-</option>
                 <% } %>
             </select>
         </div>

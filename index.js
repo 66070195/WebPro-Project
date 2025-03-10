@@ -483,12 +483,21 @@ WHERE
 GROUP BY
     r.water_rate, r.elec_rate, m.water_unit, m.elec_unit, rm.rent, m.room_id, m.id, m.read_date
 `;
+const sqlOld = `SELECT * FROM meters
+              WHERE room_id = '${req.query.id}'
+              ORDER BY read_date DESC LIMIT 2`;
   db.all(sql, (err, rows) => {
     if (err) {
       console.log(err.message);
     }
-    console.log(rows);
-    res.render('addinvoice', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    db.all(sqlOld, (err, unit) => {
+      if (err) {
+        console.log(err.message);
+      }
+      
+      console.log(unit);
+      res.render('addinvoice', { data: rows, units: unit , role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
   });
 });
 
@@ -521,38 +530,57 @@ WHERE
 GROUP BY
     r.water_rate, r.elec_rate, m.water_unit, m.elec_unit, rm.rent, m.room_id, m.id, m.read_date, b.total_amount
 `;
+let sqlOld = `SELECT water_unit as ww, elec_unit as ee FROM meters
+              WHERE room_id = '${req.query.id}'
+              ORDER BY read_date DESC LIMIT 2`;
   db.all(sql, (err, rows) => {
     if (err) {
       console.log(err.message);
     }
-    console.log(rows);
-    res.render('addreceipt', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    db.all(sqlOld, (err, unit) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('addreceipt', { data: rows, units: unit, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
   });
 });
 
 app.get('/exportInvoice', isAdmin, function (req, res) {
   let sql = `SELECT DISTINCT u.fname, u.lname, b.*, m.elec_unit, m.water_unit, r.elec_rate, r.water_rate, rm.rent,
-       b.maintenance_cost / 2 AS maintenance_cost_half
-FROM bills b
-JOIN users u ON b.user_id = u.id
-JOIN meters m ON b.room_id = m.room_id
-JOIN rate r ON m.rate_id = r.id
-JOIN rooms rm ON b.room_id = rm.id  -- Get rent from rooms
-WHERE b.id = '${req.query.id}'
-AND m.id = (
-    SELECT MAX(id)
-    FROM meters
-    WHERE room_id = b.room_id
-);
-`
+              b.maintenance_cost / 2 AS maintenance_cost_half
+        FROM bills b
+        JOIN users u ON b.user_id = u.id
+        JOIN meters m ON b.room_id = m.room_id
+        JOIN rate r ON m.rate_id = r.id
+        JOIN rooms rm ON b.room_id = rm.id  -- Get rent from rooms
+        WHERE b.id = '${req.query.id}'
+        AND m.id = (
+            SELECT MAX(id)
+            FROM meters
+            WHERE room_id = b.room_id
+        );
+        `;
+  let sqlOld = `SELECT water_unit, elec_unit FROM meters
+              WHERE room_id = '${req.query.room}'
+              ORDER BY read_date DESC LIMIT 2`;
 
+  console.log(`Room ID for sqlOld query: ${req.query.id}`);
 
   db.all(sql, (err, rows) => {
     if (err) {
       console.log(err.message);
     }
-    console.log(rows);
-    res.render('exportInvoice', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    console.log('Result of first query:', rows);
+    
+    db.all(sqlOld, (err, unit) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log('Result of second query:', unit);
+      res.render('exportInvoice', { data: rows, units: unit, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
   });
 });
 
@@ -571,13 +599,21 @@ AND m.id = (
     WHERE room_id = b.room_id
 );`
 
+let sqlOld = `SELECT water_unit as ww, elec_unit as ee FROM meters
+            WHERE room_id = '${req.query.room}'
+            ORDER BY read_date DESC LIMIT 2`;
 
   db.all(sql, (err, rows) => {
     if (err) {
       console.log(err.message);
     }
-    console.log(rows);
-    res.render('exportReciept', { data: rows, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    db.all(sqlOld, (err, unit) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(rows);
+      res.render('exportReciept', { data: rows, units: unit, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+    });
   });
 });
 
@@ -1167,10 +1203,13 @@ app.post('/getuserdetails', (req, res) => {
 
 app.get('/testquery', (req, res) => {
   const userId = req.session.user.id;
-  const query = `SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname, tenants.room_id AS room
-                FROM users
-                FULL JOIN tenants ON users.id = tenants.user_id
-                WHERE users.phone NOT IN ('admin', 'test')`;
+  const query = `SELECT * FROM meters
+                WHERE room_id = 'A101'
+                ORDER BY read_date DESC LIMIT 2`;
+  // const query = `SELECT *, CONCAT(users.fname, ' ', users.lname) AS fullname, tenants.room_id AS room
+  //               FROM users
+  //               FULL JOIN tenants ON users.id = tenants.user_id
+  //               WHERE users.phone NOT IN ('admin', 'test')`;
   // const query = `SELECT rooms.*, CONCAT(users.fname, ' ', users.lname) AS name
   //                 FROM rooms
   //                 JOIN tenants ON tenants.room_id = rooms.id
@@ -1180,7 +1219,7 @@ app.get('/testquery', (req, res) => {
     if (err) {
       console.log(err.message);
     }
-    console.log(rows);
+    console.log(rows[0].elec_unit - rows[1].elec_unit);
     res.send(JSON.stringify(rows));
   });
 });

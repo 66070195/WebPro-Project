@@ -11,6 +11,9 @@
     </div>
 </div>
 
+<% let e_unit = units[0].elec_unit - units[1].elec_unit; %>
+<% let w_unit = units[0].water_unit - units[1].water_unit; %>
+
 <div class="row">
     <% data.forEach((item)=> { %>
         <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
@@ -36,13 +39,13 @@
                                     <%= item.read_date %>
                                 </td>
                                 <td>
-                                    <%= item.elec_unit %>
+                                    <%= e_unit %>
                                 </td>
                                 <td>
                                     <%= item.elec_rate %>
                                 </td>
                                 <td>
-                                    <%= item.elec_unit * item.elec_rate %>
+                                    <%= e_unit * item.elec_rate %>
                                 </td>
                             </tr>
                         </tbody>
@@ -74,13 +77,13 @@
                                     <%= item.read_date %>
                                 </td>
                                 <td>
-                                    <%= item.water_unit %>
+                                    <%= w_unit %>
                                 </td>
                                 <td>
                                     <%= item.water_rate %>
                                 </td>
                                 <td>
-                                    <%= item.water_unit * item.water_rate %>
+                                    <%= w_unit * item.water_rate %>
                                 </td>
                             </tr>
                         </tbody>
@@ -134,8 +137,8 @@
                         class="form-control w-auto text-center mx-3" placeholder="ราคารวม"
                         value="<%= (item.elec_unit * item.elec_rate) + (item.water_unit * item.water_rate) + item.rent + item.maintenance_cost %>"
                         readonly>
-                    <input type="hidden" name="elec_amount" value="<%= item.elec_unit * item.elec_rate %>">
-                    <input type="hidden" name="water_amount" value="<%= item.water_unit * item.water_rate %>">
+                    <input type="hidden" name="elec_amount" value="<%= e_unit * item.elec_rate %>">
+                    <input type="hidden" name="water_amount" value="<%= w_unit * item.water_rate %>">
                     <input type="hidden" name="rent_amount" value="<%= item.rent %>">
                     <input type="hidden" name="maintenance_amount" value="<%= item.maintenance_cost %>">
                     <input type="hidden" name="extraID" id="extraID<%= item.room_id %>">

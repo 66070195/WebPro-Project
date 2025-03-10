@@ -38,6 +38,9 @@
                     </div>
                 </div>
                 
+                <% let e_unit = units[0].elec_unit - units[1].elec_unit; %>
+                <% let w_unit = units[0].water_unit - units[1].water_unit; %>
+
                 <!-- ตารางรายการ -->
                 <table class="receipt-table">
                     <thead>
@@ -52,13 +55,13 @@
                         <tr>
                             <td>ค่าไฟ</td>
                             <td class="text-right"><%= item.elec_rate %></td>
-                            <td class="text-center"><%= item.elec_unit %></td>
+                            <td class="text-center"><%= e_unit %></td>
                             <td class="text-right"><%= item.elec_amount %></td>
                         </tr>
                         <tr>
                             <td>ค่าน้ำ</td>
                             <td class="text-right"><%= item.water_rate %></td>
-                            <td class="text-center"><%= item.water_unit %></td>
+                            <td class="text-center"><%= w_unit %></td>
                             <td class="text-right"><%= item.water_amount %></td>
                         </tr>
                         <tr>

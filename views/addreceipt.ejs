@@ -8,6 +8,9 @@
     </div>
 </div>
 
+<% let ww = units[0].ww - units[1].ww; %>
+<% let ee = units[0].ee - units[1].ee; %>
+
 <div class="row">
     <% data.forEach((item) => { %>
     <div class="col-lg-6 col-sm-12 d-flex align-items-stretch">
@@ -30,9 +33,9 @@
                         <tr>
                             <td id="start-of-months"></td>
                             <td data-title="มิเตอร์ไฟฟ้าถึงวัน"><%= item.read_date %></td>
-                            <td data-title="ใช้ไฟฟ้าไป"><%= item.elec_unit %></td>
+                            <td data-title="ใช้ไฟฟ้าไป"><%= ee %></td>
                             <td data-title="ราคา/หน่วย"><%= item.elec_rate %></td>
-                            <td data-title="ราคารวม"><%= item.elec_unit * item.elec_rate %></td>
+                            <td data-title="ราคารวม"><%= ee * item.elec_rate %></td>
                         </tr>
                     </tbody>
                 </table>
@@ -59,9 +62,9 @@
                         <tr>
                             <td id="start-of-month"></td>
                             <td data-title="มิเตอร์น้ำถึงวัน"><%= item.read_date %></td>
-                            <td data-title="ใช้น้ำไป"><%= item.water_unit %></td>
+                            <td data-title="ใช้น้ำไป"><%= ww %></td>
                             <td data-title="ราคา/หน่วย"><%= item.water_rate %></td>
-                            <td data-title="ราคารวม"><%= item.water_unit * item.water_rate%></td>
+                            <td data-title="ราคารวม"><%= ww * item.water_rate%></td>
                         </tr>
                     </tbody>
                 </table>

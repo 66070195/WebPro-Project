@@ -9,6 +9,9 @@
                     </div>
                     <div class="receipt-title">ใบเสร็จรับเงิน</div>
                 </div>
+
+                <% let ee = units[0].ee - units[1].ee; %>
+                <% let ww = units[0].ww - units[1].ww; %>
                 
                 <!-- ข้อมูลผู้เช่าและใบเสร็จ -->
                 <% data.forEach((item)=> { %>
@@ -52,13 +55,13 @@
                         <tr>
                             <td>ค่าไฟ</td>
                             <td class="text-right"><%= item.elec_rate %></td>
-                            <td class="text-center"><%= item.elec_unit %></td>
+                            <td class="text-center"><%= ee %></td>
                             <td class="text-right"><%= item.elec_amount %></td>
                         </tr>
                         <tr>
                             <td>ค่าน้ำ</td>
                             <td class="text-right"><%= item.water_rate %></td>
-                            <td class="text-center"><%= item.water_unit %></td>
+                            <td class="text-center"><%= ww %></td>
                             <td class="text-right"><%= item.water_amount %></td>
                         </tr>
                         <tr>

@@ -1,10 +1,16 @@
 ข้อมูลการใช้งานหน้าเว็ป
+
+User ใช้เป็น phone number
+รหัสผ่านใช้เป็น password
+
 ฝั่งผู้เช่า
 User : test
 Password : 1111
+
 ฝั่งเจ้าของหอพัก
 User : admin
 Password : 2222
+
 วิธีการเริ่มต้นใช้งานเว็บไซต์
 วิธีที่ : 1
 1. เปิด Command Prompt

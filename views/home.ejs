@@ -10,7 +10,11 @@
                 <div class="row mt-4">
                     <div class="col-4">
                         <p class="fw-bold">ห้อง</p>
-                        <p><%= data[0].room_id %></p>
+                        <% if (data[0].room_id == null) { %>
+                            <p>ไม่มีห้อง</p>
+                        <% } else { %>
+                            <p><%= data[0].room_id %></p>
+                        <% } %>
                     </div>
                     <div class="col-4">
                         <p class="fw-bold">ค้างชำระ</p>

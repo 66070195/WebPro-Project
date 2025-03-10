@@ -11,12 +11,14 @@
     <form action="/request-repair" method="post">
         <div class="row">
             <div class="col-lg-6 col-sm-12 mb-2">
-                <label for="room_id" class="form-label fw-bold">เลือกห้องที่ต้องการแจ้ง</label>
+                <label for="room_id" class="form-label fw-bold">ห้องที่ต้องการแจ้ง</label>
                 <select name="room_id" id="room_id" class="form-control" required>
-                    <option value="">-</option>
-                    <% room.forEach((item)=>{ %>
-                        <option value="<%= item.room_id %>"><%= item.room_id %></option>
-                    <% }); %>
+                    <% if (room.room_id !== '') { %>
+                        <option value="<%= room.room_id%>"><%= room.room_id%></option>
+                    <% } else { %>
+                        <option value="">-</option>
+                    <% } %>
+                    
                 </select>
             </div>
             <div class="col-lg-6 col-sm-12 mb-2">

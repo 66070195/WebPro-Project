@@ -1302,7 +1302,7 @@ app.get('/repair', function (req, res) {
                 JOIN tenants ON maintenance.room_id = tenants.room_id
                 JOIN users ON tenants.user_id = users.id
                 WHERE users.id = ${userId};`;
-  db.all(query, (err, rows1) => {
+  db.get(query, (err, rows1) => {
     if (err) {
       console.log(err.message);
     }
@@ -1311,7 +1311,7 @@ app.get('/repair', function (req, res) {
         console.log(err.message);
       }
       console.log(rows1);
-      res.render('repair', { room: rows1, data: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      res.render('repair', { room: rows1 || {room_id: ''}, data: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
     });
   });
 });
@@ -1477,7 +1477,7 @@ app.get('/meter', function (req, res) {
   // const query = `SESELECT water_unit, elec_unit, strftime("%d-%m-%Y", read_date) AS read_date FROM meters WHERE room_id = ? ORDER BY read_date DESC LIMIT 1 `
   const sql = `SELECT room_id FROM tenants WHERE user_id = ${userId} `;
   const sql2 = `SELECT water_rate, elec_rate FROM rate LIMIT 1`;
-  db.all(sql, (err, rows1) => {
+  db.get(sql, (err, rows1) => {
     if (err) {
       console.log(err.message);
     }
@@ -1485,7 +1485,7 @@ app.get('/meter', function (req, res) {
       if (err) {
         console.log(err.message);
       }
-      res.render('meter', { room: rows1, data: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
+      res.render('meter', { room: rows1 || { room_id: '' }, data: rows2, role: req.user.role, currentPath: req.path, sidebarClass: req.session.sidebarClass, rowCount: res.locals.rowCount });
     });
   });
 });
